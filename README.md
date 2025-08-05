@@ -20,8 +20,8 @@ Uma API REST para sistema de delivery desenvolvida com Spring Boot.
 
 1. Clone o repositório:
 ```bash
-git clone <url-do-repositorio>
-cd delivery-api
+git clone https://github.com/rabay/delivery-api-rabay.git
+cd delivery-api-rabay
 ```
 
 2. Execute a aplicação:
