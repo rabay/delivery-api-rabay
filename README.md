@@ -1,89 +1,44 @@
-# Delivery API
+# Delivery Tech API
 
-Uma API REST para sistema de delivery desenvolvida com Spring Boot.
+Sistema de delivery desenvolvido com Spring Boot e Java 21.
 
-## Tecnologias
+## 🚀 Tecnologias
+- **Java 21 LTS** (versão mais recente)
+- Spring Boot 3.5.4
+- Spring Web
+- Spring Data JPA
+- H2 Database
+- Maven
 
-- **Java 21**
-- **Spring Boot 3.5.4**
-- **Spring Data JPA**
-- **Spring Web**
-- **H2 Database** (para desenvolvimento)
-- **Maven**
+## ⚡ Recursos Modernos Utilizados
+- Records (Java 14+)
+- Text Blocks (Java 15+)
+- Pattern Matching (Java 17+)
+- Virtual Threads (Java 21)
 
-## Pré-requisitos
+## 🏃‍♂️ Como executar
+1. **Pré-requisitos:** JDK 21 instalado
+2. Clone o repositório
+   ```bash
+   git clone https://github.com/rabay/delivery-api-rabay.git
+   cd delivery-api-rabay
+   ```
+3. Execute:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+4. Acesse: [http://localhost:8080/health](http://localhost:8080/health)
 
-- Java 21 ou superior
-- Maven 3.6 ou superior
+## 📋 Endpoints
+- GET /health - Status da aplicação (inclui versão Java)
+- GET /info - Informações da aplicação
+- GET /h2-console - Console do banco H2
 
-## Como executar
+## 🔧 Configuração
+- Porta: 8080
+- Banco: H2 em memória
+- Profile: development
 
-1. Clone o repositório:
-```bash
-git clone https://github.com/rabay/delivery-api-rabay.git
-cd delivery-api-rabay
-```
-
-2. Execute a aplicação:
-```bash
-./mvnw spring-boot:run
-```
-
-Ou no Windows:
-```cmd
-mvnw.cmd spring-boot:run
-```
-
-3. A aplicação estará disponível em: `http://localhost:8080`
-
-## Compilar o projeto
-
-Para compilar o projeto:
-```bash
-./mvnw clean compile
-```
-
-## Executar testes
-
-Para executar os testes:
-```bash
-./mvnw test
-```
-
-## Gerar o JAR
-
-Para gerar o arquivo JAR:
-```bash
-./mvnw clean package
-```
-
-O arquivo JAR será gerado na pasta `target/`.
-
-## Banco de dados
-
-O projeto utiliza o banco H2 em memória para desenvolvimento. O console do H2 pode ser acessado em:
-`http://localhost:8080/h2-console`
-
-## Estrutura do projeto
-
-```
-src/
-├── main/
-│   ├── java/
-│   │   └── com/deliverytech/delivery_api/
-│   │       └── DeliveryApiApplication.java
-│   └── resources/
-│       └── application.properties
-└── test/
-    └── java/
-        └── com/deliverytech/delivery_api/
-            └── DeliveryApiApplicationTests.java
-```
-
-## Contribuição
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
+## 👨‍💻 Desenvolvedor
+Victor Rabay - TI 58A 02728 - Arquitetura de Sistemas  
+Desenvolvido com JDK 21 e Spring Boot 3.5.4
