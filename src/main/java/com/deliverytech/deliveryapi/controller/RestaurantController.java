@@ -1,5 +1,6 @@
 package com.deliverytech.deliveryapi.controller;
 
+import com.deliverytech.deliveryapi.dto.CreateRestaurantRequest;
 import com.deliverytech.deliveryapi.dto.RestaurantDTO;
 import com.deliverytech.deliveryapi.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,72 @@ public class RestaurantController {
 
     @Autowired
     private RestaurantService restaurantService;
+
+    /**
+     * POST /api/v1/restaurants
+     * Cria um novo restaurante
+     * 
+     * Exemplo de JSON esperado:
+     * {
+     *   "name": "Restaurante Exemplo",
+     *   "description": "Descrição do restaurante",
+     *   "cnpj": "00.000.000/0000-00",
+     *   "phone": "(11) 99999-9999",
+     *   "address": {
+     *     "street": "Rua Exemplo",
+     *     "number": "123",
+     *     "complement": "Sala 101",
+     *     "neighborhood": "Bairro Exemplo",
+     *     "city": "Cidade Exemplo",
+     *     "state": "SP",
+     *     "postalCode": "00000-000",
+     *     "reference": "Próximo ao ponto de ônibus"
+     *   },
+     *   "logo": "https://exemplo.com/logo.png",
+     *   "deliveryFee": 5.00,
+     *   "minimumOrderValue": 15.00,
+     *   "averageDeliveryTimeInMinutes": 30
+     * }
+     */
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> createRestaurant(@RequestBody CreateRestaurantRequest request) {
+        try {
+            RestaurantDTO createdRestaurant = restaurantService.createRestaurant(request);
+            
+            Map<String, Object> response = Map.of(
+                    "data", createdRestaurant,
+                    "meta", Map.of(
+                            "timestamp", LocalDateTime.now(),
+                            "message", "Restaurante criado com sucesso",
+                            "version", "v1"
+                    )
+            );
+            
+            return ResponseEntity.status(201).body(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = Map.of(
+                    "error", "Dados inválidos",
+                    "message", e.getMessage(),
+                    "meta", Map.of(
+                            "timestamp", LocalDateTime.now(),
+                            "version", "v1"
+                    )
+            );
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = Map.of(
+                    "error", "Erro interno do servidor",
+                    "message", "Não foi possível criar o restaurante",
+                    "meta", Map.of(
+                            "timestamp", LocalDateTime.now(),
+                            "version", "v1"
+                    )
+            );
+            
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
 
     /**
      * GET /api/v1/restaurants

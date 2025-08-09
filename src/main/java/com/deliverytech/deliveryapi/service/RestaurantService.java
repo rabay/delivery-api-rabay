@@ -1,7 +1,10 @@
 package com.deliverytech.deliveryapi.service;
 
+import com.deliverytech.deliveryapi.domain.model.Address;
+import com.deliverytech.deliveryapi.domain.model.Money;
 import com.deliverytech.deliveryapi.domain.model.Restaurant;
 import com.deliverytech.deliveryapi.domain.repository.RestaurantRepository;
+import com.deliverytech.deliveryapi.dto.CreateRestaurantRequest;
 import com.deliverytech.deliveryapi.dto.RestaurantDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,44 @@ public class RestaurantService {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
+    /**
+     * Cria um novo restaurante
+     * @param request Dados do restaurante a ser criado
+     * @return DTO do restaurante criado
+     */
+    @Transactional
+    public RestaurantDTO createRestaurant(CreateRestaurantRequest request) {
+        // Converter AddressDTO para Address entity
+        Address address = new Address(
+                request.address().street(),
+                request.address().number(),
+                request.address().complement(),
+                request.address().neighborhood(),
+                request.address().city(),
+                request.address().state(),
+                request.address().postalCode(),
+                request.address().reference()
+        );
+        
+        // Criar nova instância de Restaurant
+        Restaurant restaurant = new Restaurant();
+        restaurant.setName(request.name());
+        restaurant.setDescription(request.description());
+        restaurant.setCnpj(request.cnpj());
+        restaurant.setPhone(request.phone());
+        restaurant.setAddress(address);
+        restaurant.setLogo(request.logo() != null ? request.logo() : "");
+        restaurant.setDeliveryFee(new Money(request.deliveryFee()));
+        restaurant.setMinimumOrderValue(new Money(request.minimumOrderValue()));
+        restaurant.setAverageDeliveryTimeInMinutes(request.averageDeliveryTimeInMinutes());
+        
+        // Salvar o restaurante
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        
+        // Retornar o DTO
+        return RestaurantDTO.from(savedRestaurant);
+    }
 
     /**
      * Lista todos os restaurantes ativos
