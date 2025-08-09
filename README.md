@@ -70,6 +70,7 @@ A aplicação implementa um modelo de domínio completo para delivery, incluindo
 3. **✅ API REST de Restaurantes Completa**:
    - Endpoint `/api/v1/restaurants` com filtros avançados
    - Endpoint `/api/v1/restaurants/{id}` para busca específica
+   - Endpoint `POST /api/v1/restaurants` para criação de novos restaurantes ✨ **NOVO**
    - DTOs com Java 21 Records
    - Service Layer com lógica de negócio
    - 4 restaurantes de exemplo carregados automaticamente
@@ -123,6 +124,7 @@ Para garantir compatibilidade com Hibernate 6.3.1.Final, foram realizados ajuste
 - [x] **Configurar dados de exemplo no banco** ✅
 - [x] **Corrigir estrutura de packages para seguir convenções Java** ✅
 - [x] **Implementar endpoint raiz (/) para melhor UX** ✅
+- [x] **Implementar endpoint POST para criação de restaurantes** ✅
 - [ ] Reimplementar relacionamentos JPA usando estratégias compatíveis com Hibernate 6.3.x
 - [ ] Restaurar consultas de categoria usando join tables ou consultas nativas
 - [ ] Implementar `businessHours` usando tabela separada em vez de `@ElementCollection`
@@ -236,6 +238,60 @@ curl "http://localhost:8080/api/v1/restaurants/1"
 curl "http://localhost:8080/api/v1/restaurants/999"
 ```
 
+#### `POST /api/v1/restaurants` ✨ **NOVO**
+**Cria um novo restaurante**
+
+**Estrutura do JSON esperado:**
+```json
+{
+  "name": "Nome do Restaurante",
+  "description": "Descrição do restaurante",
+  "cnpj": "00.000.000/0000-00",
+  "phone": "(11) 99999-9999",
+  "address": {
+    "street": "Rua Exemplo",
+    "number": "123",
+    "complement": "Sala 101",
+    "neighborhood": "Bairro Exemplo",
+    "city": "Cidade Exemplo",
+    "state": "SP",
+    "postalCode": "00000-000",
+    "reference": "Próximo ao ponto de ônibus"
+  },
+  "logo": "https://exemplo.com/logo.png",
+  "deliveryFee": 5.00,
+  "minimumOrderValue": 15.00,
+  "averageDeliveryTimeInMinutes": 30
+}
+```
+
+**Exemplo de uso:**
+```bash
+# Criar um novo restaurante
+curl -X POST "http://localhost:8080/api/v1/restaurants" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Novo Restaurante",
+    "description": "Descrição do novo restaurante",
+    "cnpj": "12.345.678/0001-90",
+    "phone": "(11) 99999-9999",
+    "address": {
+      "street": "Rua Exemplo",
+      "number": "123",
+      "complement": "Sala 101",
+      "neighborhood": "Bairro Exemplo",
+      "city": "Cidade Exemplo",
+      "state": "SP",
+      "postalCode": "01234-567",
+      "reference": "Próximo ao ponto de ônibus"
+    },
+    "logo": "https://exemplo.com/logo.png",
+    "deliveryFee": 5.00,
+    "minimumOrderValue": 15.00,
+    "averageDeliveryTimeInMinutes": 30
+  }'
+```
+
 ### 📄 **Estrutura da Resposta**
 
 **Response com lista de restaurantes:**
@@ -340,6 +396,11 @@ curl "http://localhost:8080/api/v1/restaurants/999"
    
    # Inclui inativos (mostra todos os 4 restaurantes)
    curl "http://localhost:8080/api/v1/restaurants?includeInactive=true" | jq .
+   
+   # Cria um novo restaurante ✨ NOVO
+   curl -X POST "http://localhost:8080/api/v1/restaurants" \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Restaurante Teste","description":"Descrição do restaurante","cnpj":"12.345.678/0001-90","phone":"(11) 99999-9999","address":{"street":"Rua Exemplo","number":"123","complement":"Sala 101","neighborhood":"Bairro Exemplo","city":"Cidade Exemplo","state":"SP","postalCode":"01234-567","reference":"Próximo ao ponto de ônibus"},"logo":"https://exemplo.com/logo.png","deliveryFee":5.00,"minimumOrderValue":15.00,"averageDeliveryTimeInMinutes":30}' | jq .
    ```
 
 ## 🔧 Configuração
@@ -375,6 +436,7 @@ spring.jpa.show-sql=true
   - `?onlyOpen=true` – Apenas restaurantes abertos
   - `?search=nome` – Busca por nome do restaurante
 - `GET /api/v1/restaurants/{id}` – Busca restaurante específico por ID
+- `POST /api/v1/restaurants` – Cria um novo restaurante ✨ **NOVO**
 
 ### Banco de Dados
 - `GET /h2-console` – Console do banco H2 (para desenvolvimento)
@@ -399,7 +461,9 @@ src/
 │       └── static/             # Recursos estáticos
 └── test/
     └── java/com/deliverytech/deliveryapi/          # 🔄 Package de testes também refatorado
-        └── DeliveryApiApplicationTests.java
+        ├── DeliveryApiApplicationTests.java
+        ├── controller/         # Testes de controller
+        └── service/           # Testes de service
 ```
 
 ### 🔄 Alterações na Estrutura de Packages
@@ -426,4 +490,5 @@ Desenvolvido com JDK 21 e Spring Boot 3.2.x
 - ✅ **Package Structure Refatorada**: Seguindo convenções Java (`com.deliverytech.deliveryapi`)
 - ✅ **Endpoint Raiz Implementado**: Página inicial com mapa de navegação em `/`
 - ✅ **API REST Completa**: Endpoints de restaurantes totalmente funcionais
+- ✅ **Endpoint POST para Restaurantes**: Criação de novos restaurantes implementada
 - ✅ **Build & Testes**: 100% de sucesso após refatoração
