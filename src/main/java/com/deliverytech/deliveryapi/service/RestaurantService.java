@@ -3,8 +3,10 @@ package com.deliverytech.deliveryapi.service;
 import com.deliverytech.deliveryapi.domain.model.Address;
 import com.deliverytech.deliveryapi.domain.model.Money;
 import com.deliverytech.deliveryapi.domain.model.Restaurant;
+import com.deliverytech.deliveryapi.domain.model.RestaurantCategory;
 import com.deliverytech.deliveryapi.domain.repository.RestaurantRepository;
 import com.deliverytech.deliveryapi.dto.CreateRestaurantRequest;
+import com.deliverytech.deliveryapi.dto.RestaurantCategoryDTO;
 import com.deliverytech.deliveryapi.dto.RestaurantDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -112,6 +114,164 @@ public class RestaurantService {
      */
     public List<RestaurantDTO> searchRestaurantsByName(String query) {
         List<Restaurant> restaurants = restaurantRepository.searchByName(query);
+        return restaurants.stream()
+                .map(RestaurantDTO::from)
+                .toList();
+    }
+
+    /**
+     * Atualiza um restaurante existente
+     * @param id ID do restaurante a ser atualizado
+     * @param request Dados atualizados do restaurante
+     * @return DTO do restaurante atualizado
+     * @throws IllegalArgumentException se o restaurante não for encontrado
+     */
+    @Transactional
+    public RestaurantDTO updateRestaurant(Long id, CreateRestaurantRequest request) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Restaurante não encontrado"));
+
+        // Atualizar dados básicos
+        restaurant.setName(request.name());
+        restaurant.setDescription(request.description());
+        restaurant.setCnpj(request.cnpj());
+        restaurant.setPhone(request.phone());
+        
+        // Atualizar endereço
+        if (request.address() != null) {
+            Address address = new Address(
+                    request.address().street(),
+                    request.address().number(),
+                    request.address().complement(),
+                    request.address().neighborhood(),
+                    request.address().city(),
+                    request.address().state(),
+                    request.address().postalCode(),
+                    request.address().reference()
+            );
+            restaurant.setAddress(address);
+        }
+        
+        // Atualizar outros campos
+        if (request.logo() != null) {
+            restaurant.setLogo(request.logo());
+        }
+        if (request.deliveryFee() != null) {
+            restaurant.setDeliveryFee(new Money(request.deliveryFee()));
+        }
+        if (request.minimumOrderValue() != null) {
+            restaurant.setMinimumOrderValue(new Money(request.minimumOrderValue()));
+        }
+        if (request.averageDeliveryTimeInMinutes() != null) {
+            restaurant.setAverageDeliveryTimeInMinutes(request.averageDeliveryTimeInMinutes());
+        }
+
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        return RestaurantDTO.from(savedRestaurant);
+    }
+
+    /**
+     * Ativa ou desativa um restaurante
+     * @param id ID do restaurante
+     * @param active Status ativo do restaurante
+     * @return DTO do restaurante atualizado
+     * @throws IllegalArgumentException se o restaurante não for encontrado
+     */
+    @Transactional
+    public RestaurantDTO toggleActiveStatus(Long id, boolean active) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Restaurante não encontrado"));
+        
+        restaurant.setActive(active);
+        
+        // Se desativando o restaurante, também fechá-lo
+        if (!active) {
+            restaurant.setOpen(false);
+        }
+        
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        return RestaurantDTO.from(savedRestaurant);
+    }
+
+    /**
+     * Abre ou fecha um restaurante para pedidos
+     * @param id ID do restaurante
+     * @param open Status aberto do restaurante
+     * @return DTO do restaurante atualizado
+     * @throws IllegalArgumentException se o restaurante não for encontrado ou inativo
+     */
+    @Transactional
+    public RestaurantDTO toggleOpenStatus(Long id, boolean open) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Restaurante não encontrado"));
+        
+        if (!restaurant.isActive() && open) {
+            throw new IllegalArgumentException("Não é possível abrir um restaurante inativo");
+        }
+        
+        restaurant.setOpen(open);
+        
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        return RestaurantDTO.from(savedRestaurant);
+    }
+
+    /**
+     * Remove um restaurante (soft delete - marca como inativo)
+     * @param id ID do restaurante
+     * @throws IllegalArgumentException se o restaurante não for encontrado
+     */
+    @Transactional
+    public void deleteRestaurant(Long id) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Restaurante não encontrado"));
+        
+        restaurant.setActive(false);
+        restaurant.setOpen(false);
+        restaurantRepository.save(restaurant);
+    }
+
+    /**
+     * Busca restaurantes por categoria (ID da categoria)
+     * @param categoryId ID da categoria
+     * @return Lista de restaurantes da categoria
+     */
+    public List<RestaurantDTO> getRestaurantsByCategory(Long categoryId) {
+        List<Restaurant> restaurants = restaurantRepository.findByCategoryId(categoryId);
+        return restaurants.stream()
+                .map(RestaurantDTO::from)
+                .toList();
+    }
+
+    /**
+     * Busca restaurantes por categoria (nome da categoria)
+     * @param categoryName Nome da categoria
+     * @return Lista de restaurantes da categoria
+     */
+    public List<RestaurantDTO> getRestaurantsByCategoryName(String categoryName) {
+        List<Restaurant> restaurants = restaurantRepository.findByCategoryName(categoryName);
+        return restaurants.stream()
+                .map(RestaurantDTO::from)
+                .toList();
+    }
+
+    /**
+     * Busca todas as categorias que possuem restaurantes
+     * @return Lista de categorias em uso
+     */
+    public List<RestaurantCategoryDTO> getCategoriesInUse() {
+        List<RestaurantCategory> categories = restaurantRepository.findAllCategoriesInUse();
+        return categories.stream()
+                .map(RestaurantCategoryDTO::from)
+                .toList();
+    }
+
+    /**
+     * Busca restaurantes por nome ou categoria
+     * @param query Termo de busca
+     * @return Lista de restaurantes que correspondem à busca
+     */
+    public List<RestaurantDTO> searchRestaurantsByNameOrCategory(String query) {
+        List<Restaurant> restaurants = restaurantRepository.searchByNameOrCategory(query);
         return restaurants.stream()
                 .map(RestaurantDTO::from)
                 .toList();

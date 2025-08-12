@@ -1,0 +1,232 @@
+{
+	"info": {
+		"_postman_id": "load-test-12345678-1234-5678-9abc-123456789abc",
+		"name": "Delivery API - Testes de Carga",
+		"description": "Coleção específica para testes de performance e carga da API Delivery Tech",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup - Criar Dados de Teste",
+			"item": [
+				{
+					"name": "Criar Cliente para Carga",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Cliente Teste {{$randomInt}}\",\n  \"email\": \"cliente{{$randomInt}}@teste.com\",\n  \"password\": \"senha123\",\n  \"phone\": \"(11) {{$randomInt}}\",\n  \"address\": {\n    \"street\": \"Rua Teste\",\n    \"number\": \"{{$randomInt}}\",\n    \"complement\": \"Apt {{$randomInt}}\",\n    \"neighborhood\": \"Centro\",\n    \"city\": \"São Paulo\",\n    \"state\": \"SP\",\n    \"postalCode\": \"01234-567\",\n    \"reference\": \"Referência {{$randomInt}}\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers"]
+						}
+					}
+				},
+				{
+					"name": "Criar Restaurante para Carga",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Restaurante {{$randomCompanyName}}\",\n  \"description\": \"Descrição do restaurante {{$randomLoremWords}}\",\n  \"cnpj\": \"{{$randomInt}}.{{$randomInt}}.{{$randomInt}}/0001-{{$randomInt}}\",\n  \"phone\": \"(11) {{$randomInt}}-{{$randomInt}}\",\n  \"address\": {\n    \"street\": \"{{$randomStreetName}}\",\n    \"number\": \"{{$randomInt}}\",\n    \"complement\": \"Loja {{$randomInt}}\",\n    \"neighborhood\": \"{{$randomCity}}\",\n    \"city\": \"São Paulo\",\n    \"state\": \"SP\",\n    \"postalCode\": \"{{$randomInt}}-{{$randomInt}}\",\n    \"reference\": \"Próximo ao {{$randomLoremWords}}\"\n  },\n  \"logo\": \"https://exemplo.com/logo-{{$randomInt}}.png\",\n  \"deliveryFee\": {{$randomPrice}},\n  \"minimumOrderValue\": {{$randomPrice}},\n  \"averageDeliveryTimeInMinutes\": {{$randomInt}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/restaurants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "restaurants"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Testes de Carga - Leitura",
+			"item": [
+				{
+					"name": "Listar Restaurantes (Alta Frequência)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Resposta em menos de 500ms', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});",
+									"",
+									"pm.test('Status 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/restaurants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "restaurants"]
+						}
+					}
+				},
+				{
+					"name": "Health Check (Monitoramento)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Resposta em menos de 100ms', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(100);",
+									"});",
+									"",
+									"pm.test('Status UP', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('UP');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						}
+					}
+				},
+				{
+					"name": "Buscar Restaurantes Abertos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Resposta em menos de 1000ms', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});",
+									"",
+									"pm.test('Filtro aplicado corretamente', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.meta.filter).to.include('onlyOpen');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/restaurants?onlyOpen=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "restaurants"],
+							"query": [
+								{
+									"key": "onlyOpen",
+									"value": "true"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Testes de Carga - Escrita",
+			"item": [
+				{
+					"name": "Criar Múltiplos Produtos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Criação em menos de 1000ms', function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});",
+									"",
+									"pm.test('Produto criado com sucesso', function () {",
+									"    pm.response.to.have.status(201);",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.id).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{$randomProductName}} {{$randomInt}}\",\n  \"description\": \"{{$randomLoremSentence}}\",\n  \"price\": {{$randomPrice}},\n  \"image\": \"https://exemplo.com/produto-{{$randomInt}}.jpg\",\n  \"preparationTimeInMinutes\": {{$randomInt}},\n  \"restaurantId\": 1,\n  \"categoryId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Log de início do teste",
+					"console.log('Iniciando teste de carga - ' + new Date().toISOString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Log de métricas de performance",
+					"console.log('Tempo de resposta: ' + pm.response.responseTime + 'ms');",
+					"console.log('Status: ' + pm.response.status);"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}

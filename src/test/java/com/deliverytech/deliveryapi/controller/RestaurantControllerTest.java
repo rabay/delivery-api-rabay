@@ -5,124 +5,182 @@ import com.deliverytech.deliveryapi.dto.CreateRestaurantRequest;
 import com.deliverytech.deliveryapi.dto.RestaurantDTO;
 import com.deliverytech.deliveryapi.service.RestaurantService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(RestaurantController.class)
+@ExtendWith(MockitoExtension.class)
 class RestaurantControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private RestaurantService restaurantService;
 
-    @Autowired
+    @InjectMocks
+    private RestaurantController restaurantController;
+
+    private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
-    @Test
-    void shouldCreateRestaurantSuccessfully() throws Exception {
-        // Given
-        String jsonRequest = """
-            {
-                "name": "Restaurante Teste",
-                "description": "Descrição do restaurante",
-                "cnpj": "12.345.678/0001-90",
-                "phone": "(11) 99999-9999",
-                "address": {
-                    "street": "Rua Exemplo",
-                    "number": "123",
-                    "complement": "Sala 101",
-                    "neighborhood": "Bairro Exemplo",
-                    "city": "Cidade Exemplo",
-                    "state": "SP",
-                    "postalCode": "01234-567",
-                    "reference": "Próximo ao ponto de ônibus"
-                },
-                "logo": "https://exemplo.com/logo.png",
-                "deliveryFee": 5.00,
-                "minimumOrderValue": 15.00,
-                "averageDeliveryTimeInMinutes": 30
-            }
-            """;
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(restaurantController).build();
+        objectMapper = new ObjectMapper();
+    }
 
+    @Test
+    @DisplayName("Deve atualizar restaurante com sucesso")
+    void testUpdateRestaurant() throws Exception {
+        // Given
+        Long restaurantId = 1L;
+        
         AddressDTO addressDTO = new AddressDTO(
-                "Rua Exemplo",
-                "123",
-                "Sala 101",
-                "Bairro Exemplo",
-                "Cidade Exemplo",
-                "SP",
-                "01234-567",
-                "Próximo ao ponto de ônibus"
+                "Rua Exemplo", "123", "Sala 101", "Bairro Exemplo",
+                "São Paulo", "SP", "01234-567", "Próximo ao metrô"
         );
 
-        RestaurantDTO restaurantDTO = new RestaurantDTO(
-                1L,
-                "Restaurante Teste",
-                "Descrição do restaurante",
+        CreateRestaurantRequest request = new CreateRestaurantRequest(
+                "Pizza Palace",
+                "O melhor restaurante de pizza da cidade",
+                "12.345.678/0001-90",
+                "(11) 99999-9999",
+                addressDTO,
+                "https://exemplo.com/logo.png",
+                BigDecimal.valueOf(15.0),
+                BigDecimal.valueOf(25.0),
+                30
+        );
+
+        RestaurantDTO expectedResponse = new RestaurantDTO(
+                restaurantId,
+                "Pizza Palace",
+                "O melhor restaurante de pizza da cidade",
                 "12.345.678/0001-90",
                 "(11) 99999-9999",
                 addressDTO,
                 "https://exemplo.com/logo.png",
                 true,
-                false,
+                true,
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
-
-        when(restaurantService.createRestaurant(any(CreateRestaurantRequest.class))).thenReturn(restaurantDTO);
-
-        // When & Then
-        mockMvc.perform(post("/api/v1/restaurants")
+        
+        when(restaurantService.updateRestaurant(restaurantId, request)).thenReturn(expectedResponse);
+        
+        mockMvc.perform(put("/api/v1/restaurants/" + restaurantId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.meta.message").value("Restaurante criado com sucesso"))
-                .andExpect(jsonPath("$.data.name").value("Restaurante Teste"));
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.name").value(expectedResponse.name()))
+                .andExpect(jsonPath("$.data.description").value(expectedResponse.description()))
+                .andExpect(jsonPath("$.data.active").value(expectedResponse.active()))
+                .andExpect(jsonPath("$.meta.message").value("Restaurante atualizado com sucesso"));
+        
+        verify(restaurantService, times(1)).updateRestaurant(restaurantId, request);
     }
-
+    
     @Test
-    void shouldReturnBadRequestWhenInvalidData() throws Exception {
+    @DisplayName("Deve deletar restaurante com sucesso")
+    void testDeleteRestaurant() throws Exception {
+        Long restaurantId = 1L;
+        
+        doNothing().when(restaurantService).deleteRestaurant(restaurantId);
+        
+        mockMvc.perform(delete("/api/v1/restaurants/" + restaurantId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.meta.message").value("Restaurante removido com sucesso"));
+        
+        verify(restaurantService, times(1)).deleteRestaurant(restaurantId);
+    }
+    
+    @Test
+    @DisplayName("Deve ativar restaurante com sucesso")
+    void testToggleActiveStatus() throws Exception {
         // Given
-        String jsonRequest = """
-            {
-                "name": "",
-                "description": "Descrição do restaurante",
-                "cnpj": "12.345.678/0001-90",
-                "phone": "(11) 99999-9999",
-                "address": {
-                    "street": "Rua Exemplo",
-                    "number": "123",
-                    "neighborhood": "Bairro Exemplo",
-                    "city": "Cidade Exemplo",
-                    "state": "SP",
-                    "postalCode": "01234-567"
-                },
-                "deliveryFee": -5.00
-            }
-            """;
+        Long restaurantId = 1L;
+        boolean active = true;
+        
+        AddressDTO addressDTO = new AddressDTO(
+                "Rua Exemplo", "123", "Sala 101", "Bairro Exemplo",
+                "São Paulo", "SP", "01234-567", "Próximo ao metrô"
+        );
 
-        when(restaurantService.createRestaurant(any(CreateRestaurantRequest.class)))
-                .thenThrow(new IllegalArgumentException("Dados inválidos"));
+        RestaurantDTO expectedResponse = new RestaurantDTO(
+                restaurantId,
+                "Pizza Palace",
+                "O melhor restaurante de pizza da cidade",
+                "12.345.678/0001-90",
+                "(11) 99999-9999",
+                addressDTO,
+                "https://exemplo.com/logo.png",
+                true,  // ativo
+                true,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        
+        when(restaurantService.toggleActiveStatus(restaurantId, active)).thenReturn(expectedResponse);
+        
+        mockMvc.perform(patch("/api/v1/restaurants/" + restaurantId + "/status")
+                .param("active", String.valueOf(active))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.active").value(true))
+                .andExpect(jsonPath("$.meta.message").value("Restaurante ativado com sucesso"));
+        
+        verify(restaurantService, times(1)).toggleActiveStatus(restaurantId, active);
+    }
+    
+    @Test
+    @DisplayName("Deve fechar restaurante com sucesso")
+    void testToggleOpenStatusFalse() throws Exception {
+        // Given
+        Long restaurantId = 1L;
+        boolean open = false;
+        
+        AddressDTO addressDTO = new AddressDTO(
+                "Rua Exemplo", "123", "Sala 101", "Bairro Exemplo",
+                "São Paulo", "SP", "01234-567", "Próximo ao metrô"
+        );
 
-        // When & Then
-        mockMvc.perform(post("/api/v1/restaurants")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Dados inválidos"));
+        RestaurantDTO expectedResponse = new RestaurantDTO(
+                restaurantId,
+                "Pizza Palace",
+                "O melhor restaurante de pizza da cidade",
+                "12.345.678/0001-90",
+                "(11) 99999-9999",
+                addressDTO,
+                "https://exemplo.com/logo.png",
+                true,
+                false,  // fechado
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        
+        when(restaurantService.toggleOpenStatus(restaurantId, open)).thenReturn(expectedResponse);
+        
+        mockMvc.perform(patch("/api/v1/restaurants/" + restaurantId + "/open-status")
+                .param("open", String.valueOf(open))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.open").value(false))
+                .andExpect(jsonPath("$.meta.message").value("Restaurante fechado com sucesso"));
+        
+        verify(restaurantService, times(1)).toggleOpenStatus(restaurantId, open);
     }
 }

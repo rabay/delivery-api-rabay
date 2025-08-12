@@ -43,10 +43,13 @@ public class Restaurant {
     @Column(nullable = false)
     private boolean open = false;
 
-    // @ElementCollection - TODO: Fix Hibernate 6.3.x compatibility issue
-    // @CollectionTable(name = "restaurant_categories", joinColumns = @JoinColumn(name = "restaurant_id"))
-    // @Column(name = "category")
-    // private Set<String> categories = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "restaurant_category_associations",
+        joinColumns = @JoinColumn(name = "restaurant_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<RestaurantCategory> categories = new HashSet<>();
 
     // TODO: Restaurar BusinessHours após resolver problema de compatibilidade com Hibernate 6.3.x
     // @ElementCollection
@@ -94,14 +97,13 @@ public class Restaurant {
     }
 
     // Métodos de negócio
-    // TODO: Fix Hibernate 6.3.x compatibility issue
-    // public void addCategory(String category) {
-    //     this.categories.add(category);
-    // }
+    public void addCategory(RestaurantCategory category) {
+        this.categories.add(category);
+    }
 
-    // public void removeCategory(String category) {
-    //     this.categories.remove(category);
-    // }
+    public void removeCategory(RestaurantCategory category) {
+        this.categories.remove(category);
+    }
 
     // TODO: Restaurar métodos BusinessHours após resolver problema de compatibilidade
     /*
@@ -193,14 +195,13 @@ public class Restaurant {
         this.open = open;
     }
 
-    // TODO: Fix Hibernate 6.3.x compatibility issue
-    // public Set<String> getCategories() {
-    //     return categories;
-    // }
+    public Set<RestaurantCategory> getCategories() {
+        return categories;
+    }
 
-    // public void setCategories(Set<String> categories) {
-    //     this.categories = categories;
-    // }
+    public void setCategories(Set<RestaurantCategory> categories) {
+        this.categories = categories;
+    }
 
     // TODO: Restaurar getters/setters BusinessHours
     /*

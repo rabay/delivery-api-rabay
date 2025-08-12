@@ -1,462 +1,394 @@
 # Delivery Tech API
 
-API backend para sistema de delivery moderna, escalável e de fácil manutenção, desenvolvida em Java 21 com Spring Boot 3.2.x.
+API RESTful para sistema de delivery desenvolvida em Java 21 com Spring Boot 3.2.x.
 
-## 🚀 Tecnologias e Ferramentas
-- **Java 21 LTS** – última versão LTS, com melhorias de performance e segurança
-- **Spring Boot 3.2.x** – criação de APIs REST com configuração mínima
-- **Maven 3.2.5** – gerenciamento de dependências e ciclo de build
-- **Hibernate 6.3.1.Final** – ORM para persistência de dados
-- **H2 Database** – banco de dados em memória para testes e desenvolvimento rápido
-- **Spring Data JPA** – acesso a dados com repository pattern
-- **Spring DevTools** – para recarga automática durante o desenvolvimento
+## Tecnologias
 
-### Além disso, usamos:
-- Spring MVC para camada web
-- Spring Actuator para monitoramento e métricas
-- Thymeleaf para templates HTML (futuro uso)
+- **Java 21** - Virtual Threads habilitadas para alta concorrência
+- **Spring Boot 3.2.x** - Framework principal
+- **Spring Data JPA** - Acesso a dados
+- **Hibernate 6.3.1** - ORM
+- **H2 Database** - Banco em memória para desenvolvimento
+- **Maven** - Gerenciamento de dependências
+- **Swagger/OpenAPI 3.0** - Documentação interativa
 
-## ⚡ Recursos Modernos Utilizados
-- Records (Java 14+)
-- Text Blocks (Java 15+)
-- Pattern Matching (Java 17+)
-- Virtual Threads (Java 21) – configurado para alta concorrência
+## Arquitetura
 
-## 🏗️ Arquitetura do Sistema
+A aplicação segue o padrão de arquitetura em camadas:
 
-### Domínio Modelado
-A aplicação implementa um modelo de domínio completo para delivery, incluindo:
-
-#### Entidades Principais:
-- **User** – Usuários do sistema (CUSTOMER, RESTAURANT, DELIVERY_PERSON, ADMIN)
-- **Restaurant** – Restaurantes com informações de endereço, horários e categorias
-- **Product** – Produtos do cardápio com categorias e tags
-- **Order** – Pedidos com status completo (PENDING → DELIVERED)
-- **OrderItem** – Itens do pedido com quantidades e preços
-- **Payment** – Pagamentos com múltiplos métodos (CREDIT_CARD, DEBIT_CARD, PIX, CASH)
-- **Review** – Avaliações de restaurantes e entregadores
-- **Notification** – Sistema de notificações para usuários
-- **DeliveryArea** – Áreas de entrega por restaurante
-
-#### Value Objects:
-- **Money** – Representação monetária evitando float/double
-- **Address** – Endereços com validação de CEP
-- **BusinessHours** – Horários de funcionamento
-
-## 📊 Status Atual do Projeto
-
-### ✅ Build Status: **SUCCESS**
-- **Maven Build**: ✅ `mvn clean package` executando com sucesso
-- **Aplicação**: ✅ `./mvnw spring-boot:run` iniciando sem erros
-- **Testes**: ✅ Testes de integração passando
-- **Banco de Dados**: ✅ Schema criado automaticamente pelo Hibernate
-- **API REST**: ✅ Endpoint de restaurantes totalmente funcional
-- **Package Structure**: ✅ Estrutura de packages corrigida e padronizada
-
-### 🚀 Funcionalidades Implementadas Recentemente
-
-1. **✅ Endpoint Raiz (/) Implementado**:
-   - Endpoint de boas-vindas em `/` evitando erro 404
-   - Resposta JSON informativa com mapa de endpoints disponíveis
-   - Informações da aplicação (nome, versão, timestamp)
-   - Guia de navegação para desenvolvedores
-
-2. **✅ Refatoração de Package Structure**:
-   - **Antes**: `com.deliverytech.delivery_api` (com underscore - não padrão)
-   - **Depois**: `com.deliverytech.deliveryapi` (seguindo convenções Java)
-   - **Impacto**: 38 arquivos Java refatorados automaticamente
-   - **Status**: ✅ Compilação, testes e execução funcionando perfeitamente
-
-3. **✅ API REST de Restaurantes Completa**:
-   - Endpoint `/api/v1/restaurants` com filtros avançados
-   - Endpoint `/api/v1/restaurants/{id}` para busca específica
-   - Endpoint `POST /api/v1/restaurants` para criação de novos restaurantes ✨ **NOVO**
-   - DTOs com Java 21 Records
-   - Service Layer com lógica de negócio
-   - 4 restaurantes de exemplo carregados automaticamente
-
-4. **✅ Endpoints de Monitoramento Corrigidos**:
-   - `/` - Endpoint raiz de boas-vindas com mapa de navegação ✨ **NOVO**
-   - `/health` - Health check customizado funcionando
-   - `/actuator/info` - Informações completas da aplicação
-   - Configuração de métricas e informações personalizadas
-
-5. **✅ Dados de Exemplo Funcionais**:
-   - DataInitializer carregando dados automaticamente
-   - Restaurantes com diferentes status (ativo, inativo, aberto, fechado)
-   - Endereços completos e informações realistas
-
-### 📋 TODO para Próximas Versões
-- [x] **Implementar endpoint REST para restaurantes** ✅
-- [x] **Criar DTOs e Service Layer para Restaurantes** ✅
-- [x] **Configurar dados de exemplo no banco** ✅
-- [x] **Corrigir estrutura de packages para seguir convenções Java** ✅
-- [x] **Implementar endpoint raiz (/) para melhor UX** ✅
-- [x] **Implementar endpoint POST para criação de restaurantes** ✅
-- [ ] Reimplementar relacionamentos JPA usando estratégias compatíveis com Hibernate 6.3.x
-- [ ] Restaurar consultas de categoria usando join tables ou consultas nativas
-- [ ] Implementar `businessHours` usando tabela separada em vez de `@ElementCollection`
-- [ ] Adicionar endpoints REST para outras entidades (Products, Orders, Users)
-- [ ] Implementar segurança com Spring Security e RBAC
-- [ ] Adicionar integração com gateways de pagamento
-- [ ] Implementar cache para catálogos de restaurantes
-
-## � Endpoint de Boas-Vindas (Implementado!)
-
-### 🚀 **Novo Endpoint Raiz: GET /**
-Um endpoint de boas-vindas foi criado para melhorar a experiência do desenvolvedor e evitar erros 404 ao acessar a URL base.
-
-#### **Funcionalidades do Endpoint:**
-- **Mensagem de boas-vindas** em português brasileiro
-- **Mapa de navegação** com todos os endpoints disponíveis
-- **Informações da aplicação** (nome, versão, status)
-- **Timestamp** para debugging
-- **Estrutura JSON padronizada**
-
-#### **Exemplo de Resposta:**
-```json
-{
-  "message": "Bem-vindo à Delivery Tech API",
-  "status": "online",
-  "application": "delivery-api",
-  "version": "0.0.1-SNAPSHOT",
-  "timestamp": "2025-08-08T23:37:25.037443758",
-  "endpoints": {
-    "health": "/health",
-    "actuator": "/actuator",
-    "restaurants": "/api/v1/restaurants"
-  }
-}
+```
+Controllers (REST API) → Services (Regras de Negócio) → Repositories (Dados) → Database
 ```
 
-#### **Como Testar:**
+### Entidades Principais
+
+- **User** - Usuários do sistema (clientes, restaurantes, admin)
+- **Restaurant** - Estabelecimentos com endereço e horários
+- **Product** - Produtos do cardápio
+- **Order** - Pedidos com itens e status de entrega
+- **Payment** - Pagamentos com diferentes métodos
+- **Address** - Value object para endereços
+
+## Como Executar
+
+### Pré-requisitos
+- Java 21 ou superior
+- Maven 3.6+ (opcional, usar wrapper incluído)
+
+### Execução Local
 ```bash
-# Acesse via browser
-http://localhost:8080/
+# Clonar repositório
+git clone <repository-url>
+cd fat-arq/delivery-api-rabay
 
-# Ou via curl
-curl "http://localhost:8080/" | jq .
+# Executar aplicação
+./mvnw spring-boot:run
 
-# Ou simpemente
+# Ou compilar e executar JAR
+./mvnw clean package
+java -jar target/delivery-api-0.0.1-SNAPSHOT.jar
+```
+
+### Verificação da Instalação
+```bash
+# Health check
+curl http://localhost:8080/actuator/health
+
+# Endpoint de boas-vindas
 curl http://localhost:8080/
+
+# Testar API de restaurantes
+curl http://localhost:8080/api/v1/restaurants
 ```
 
-## �🆕 API REST - Restaurantes (Implementada!)
+## Acessos
 
-A API de Restaurantes foi **totalmente implementada** seguindo as melhores práticas de desenvolvimento moderno:
+- **Homepage**: http://localhost:8080/
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **H2 Console**: http://localhost:8080/h2-console
+  - URL: `jdbc:h2:mem:testdb`
+  - Username: `sa`
+  - Password: (vazio)
 
-### 🏗️ **Arquitetura Implementada**
-- **Controllers**: REST endpoints com ResponseEntity e tratamento de erros
-- **Services**: Camada de serviço com lógica de negócio
-- **DTOs**: Java 21 Records para responses imutáveis e limpas
-- **Data Initializer**: População automática de dados de exemplo
+## API Endpoints
 
-### 📊 **Dados de Exemplo Disponíveis**
-A aplicação carrega automaticamente 4 restaurantes de exemplo:
-
-1. **Pizzaria do João** - São Paulo/SP (Ativo e Aberto)
-   - CNPJ: 12.345.678/0001-90 | Tel: (11) 98765-4321
-   - Rua das Flores, 123 - Centro
-
-2. **Burger House** - São Paulo/SP (Ativo e Aberto) 
-   - CNPJ: 98.765.432/0001-10 | Tel: (11) 87654-3210
-   - Avenida Paulista, 1000 - Bela Vista
-
-3. **Sushi Master** - São Paulo/SP (Ativo mas Fechado)
-   - CNPJ: 11.222.333/0001-44 | Tel: (11) 99988-7766
-   - Rua da Liberdade, 500 - Liberdade
-
-4. **Café & Cia** - São Paulo/SP (Inativo)
-   - CNPJ: 55.666.777/0001-88 | Tel: (11) 77766-5544
-   - Rua Augusta, 200 - Consolação
-
-### 🔗 **Endpoints Disponíveis**
-
-#### `GET /api/v1/restaurants`
-**Lista restaurantes com filtros avançados**
-
-**Parâmetros de Query (opcionais):**
-- `includeInactive=true` - Inclui restaurantes inativos
-- `onlyOpen=true` - Apenas restaurantes abertos no momento
-- `search=termo` - Busca por nome do restaurante (busca parcial)
-
-**Exemplos de Uso:**
+### Clientes (Customers)
 ```bash
-# Lista restaurantes ativos (padrão) - retorna 3
-curl "http://localhost:8080/api/v1/restaurants"
+# Listar clientes
+GET /api/v1/customers
 
-# Inclui restaurantes inativos - retorna 4
-curl "http://localhost:8080/api/v1/restaurants?includeInactive=true"
+# Buscar por ID
+GET /api/v1/customers/{id}
 
-# Apenas restaurantes abertos - retorna 2
-curl "http://localhost:8080/api/v1/restaurants?onlyOpen=true"
-
-# Busca por nome - retorna 1
-curl "http://localhost:8080/api/v1/restaurants?search=pizza"
-```
-
-#### `GET /api/v1/restaurants/{id}`
-**Busca restaurante específico por ID**
-
-```bash
-# Buscar restaurante por ID
-curl "http://localhost:8080/api/v1/restaurants/1"
-
-# ID inexistente retorna 404
-curl "http://localhost:8080/api/v1/restaurants/999"
-```
-
-#### `POST /api/v1/restaurants` ✨ **NOVO**
-**Cria um novo restaurante**
-
-**Estrutura do JSON esperado:**
-```json
+# Criar cliente
+POST /api/v1/customers
 {
-  "name": "Nome do Restaurante",
-  "description": "Descrição do restaurante",
-  "cnpj": "00.000.000/0000-00",
+  "name": "João Silva",
+  "email": "joao@example.com",
   "phone": "(11) 99999-9999",
+  "password": "senha123",
   "address": {
     "street": "Rua Exemplo",
     "number": "123",
-    "complement": "Sala 101",
-    "neighborhood": "Bairro Exemplo",
-    "city": "Cidade Exemplo",
+    "neighborhood": "Centro",
+    "city": "São Paulo",
     "state": "SP",
-    "postalCode": "00000-000",
-    "reference": "Próximo ao ponto de ônibus"
+    "postalCode": "01234-567"
+  }
+}
+
+# Atualizar cliente
+PUT /api/v1/customers/{id}
+
+# Remover cliente
+DELETE /api/v1/customers/{id}
+```
+
+### Restaurantes (Restaurants)
+```bash
+# Listar restaurantes
+GET /api/v1/restaurants
+GET /api/v1/restaurants?includeInactive=true
+GET /api/v1/restaurants?onlyOpen=true
+GET /api/v1/restaurants?search=pizza
+
+# Buscar por ID
+GET /api/v1/restaurants/{id}
+
+# Criar restaurante
+POST /api/v1/restaurants
+{
+  "name": "Pizzaria do João",
+  "description": "Pizzas artesanais",
+  "cnpj": "12.345.678/0001-90",
+  "phone": "(11) 98765-4321",
+  "address": {
+    "street": "Rua das Flores",
+    "number": "123",
+    "neighborhood": "Centro",
+    "city": "São Paulo",
+    "state": "SP",
+    "postalCode": "01234-567"
   },
-  "logo": "https://exemplo.com/logo.png",
   "deliveryFee": 5.00,
   "minimumOrderValue": 15.00,
   "averageDeliveryTimeInMinutes": 30
 }
+
+# Atualizar restaurante
+PUT /api/v1/restaurants/{id}
+
+# Alterar status
+PATCH /api/v1/restaurants/{id}/status
+
+# Remover restaurante
+DELETE /api/v1/restaurants/{id}
 ```
 
-**Exemplo de uso:**
+### Produtos (Products)
 ```bash
-# Criar um novo restaurante
-curl -X POST "http://localhost:8080/api/v1/restaurants" \
+# Listar produtos
+GET /api/v1/products
+GET /api/v1/products?restaurantId=1
+GET /api/v1/products?category=PIZZA
+
+# Buscar por ID
+GET /api/v1/products/{id}
+
+# Criar produto
+POST /api/v1/products
+{
+  "name": "Pizza Margherita",
+  "description": "Pizza clássica",
+  "price": 25.90,
+  "restaurantId": 1,
+  "category": "PIZZA",
+  "available": true
+}
+
+# Atualizar produto
+PUT /api/v1/products/{id}
+
+# Alterar disponibilidade
+PATCH /api/v1/products/{id}/availability
+
+# Remover produto
+DELETE /api/v1/products/{id}
+```
+
+### Pedidos (Orders)
+```bash
+# Listar pedidos
+GET /api/v1/orders
+GET /api/v1/orders?customerId=1
+GET /api/v1/orders?restaurantId=1
+GET /api/v1/orders?status=PENDING
+
+# Buscar por ID
+GET /api/v1/orders/{id}
+
+# Criar pedido
+POST /api/v1/orders
+{
+  "customerId": 1,
+  "restaurantId": 1,
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 2,
+      "observations": "Sem cebola"
+    }
+  ],
+  "paymentMethod": "CREDIT_CARD",
+  "deliveryAddress": {
+    "street": "Rua de Entrega",
+    "number": "456",
+    "neighborhood": "Bairro",
+    "city": "São Paulo",
+    "state": "SP",
+    "postalCode": "05678-901"
+  }
+}
+
+# Atualizar status
+PATCH /api/v1/orders/{id}/status
+{
+  "status": "CONFIRMED"
+}
+
+# Cancelar pedido
+DELETE /api/v1/orders/{id}
+```
+
+## Exemplos de Uso
+
+### Criando um Cliente e Fazendo Pedido
+```bash
+# 1. Criar cliente
+curl -X POST http://localhost:8080/api/v1/customers \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Novo Restaurante",
-    "description": "Descrição do novo restaurante",
-    "cnpj": "12.345.678/0001-90",
-    "phone": "(11) 99999-9999",
+    "name": "Maria Silva",
+    "email": "maria@example.com",
+    "phone": "(11) 88888-8888",
+    "password": "senha123",
     "address": {
-      "street": "Rua Exemplo",
-      "number": "123",
-      "complement": "Sala 101",
-      "neighborhood": "Bairro Exemplo",
-      "city": "Cidade Exemplo",
+      "street": "Av. Paulista",
+      "number": "1000",
+      "neighborhood": "Bela Vista",
+      "city": "São Paulo",
       "state": "SP",
-      "postalCode": "01234-567",
-      "reference": "Próximo ao ponto de ônibus"
-    },
-    "logo": "https://exemplo.com/logo.png",
-    "deliveryFee": 5.00,
-    "minimumOrderValue": 15.00,
-    "averageDeliveryTimeInMinutes": 30
+      "postalCode": "01310-100"
+    }
+  }'
+
+# 2. Listar restaurantes disponíveis
+curl http://localhost:8080/api/v1/restaurants?onlyOpen=true
+
+# 3. Ver produtos de um restaurante
+curl http://localhost:8080/api/v1/products?restaurantId=1
+
+# 4. Criar pedido
+curl -X POST http://localhost:8080/api/v1/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": 1,
+    "restaurantId": 1,
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 1,
+        "observations": "Bem passada"
+      }
+    ],
+    "paymentMethod": "CREDIT_CARD",
+    "deliveryAddress": {
+      "street": "Av. Paulista",
+      "number": "1000",
+      "neighborhood": "Bela Vista",
+      "city": "São Paulo",
+      "state": "SP",
+      "postalCode": "01310-100"
+    }
   }'
 ```
 
-### 📄 **Estrutura da Resposta**
+### Gerenciando Status de Pedidos
+```bash
+# Confirmar pedido
+curl -X PATCH http://localhost:8080/api/v1/orders/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "CONFIRMED"}'
 
-**Response com lista de restaurantes:**
+# Marcar como em preparo
+curl -X PATCH http://localhost:8080/api/v1/orders/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "PREPARING"}'
+
+# Marcar como saiu para entrega
+curl -X PATCH http://localhost:8080/api/v1/orders/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "OUT_FOR_DELIVERY"}'
+
+# Finalizar entrega
+curl -X PATCH http://localhost:8080/api/v1/orders/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "DELIVERED"}'
+```
+
+## Dados de Exemplo
+
+A aplicação carrega automaticamente 4 restaurantes de exemplo:
+
+1. **Pizzaria do João** - Ativo e Aberto
+2. **Burger House** - Ativo e Aberto  
+3. **Sushi Master** - Ativo mas Fechado
+4. **Café & Cia** - Inativo
+
+## Estrutura de Resposta
+
+### Resposta Simples (Customers)
+```json
+[
+  {
+    "id": 1,
+    "name": "João Silva",
+    "email": "joao@example.com",
+    "phone": "(11) 99999-9999",
+    "userType": "CUSTOMER",
+    "active": true,
+    "createdAt": "2025-08-11T21:57:25",
+    "updatedAt": "2025-08-11T21:57:25"
+  }
+]
+```
+
+### Resposta com Metadata (Restaurants, Products, Orders)
 ```json
 {
   "data": [
     {
       "id": 1,
       "name": "Pizzaria do João",
-      "description": "Pizzas artesanais com ingredientes frescos...",
+      "description": "Pizzas artesanais",
       "cnpj": "12.345.678/0001-90",
-      "phone": "(11) 98765-4321",
-      "address": {
-        "street": "Rua das Flores",
-        "number": "123",
-        "complement": "Apto 201",
-        "neighborhood": "Centro",
-        "city": "São Paulo",
-        "state": "SP",
-        "postalCode": "01234-567",
-        "reference": "Próximo ao metrô"
-      },
-      "logo": "https://example.com/logo-pizzaria.png",
       "active": true,
-      "open": true,
-      "createdAt": "2025-08-08T23:20:31.457554",
-      "updatedAt": "2025-08-08T23:20:31.457621"
+      "open": true
     }
   ],
   "meta": {
     "total": 3,
-    "timestamp": "2025-08-08T23:20:37.380889066",
-    "filter": "activeOnly: true (default)",
+    "timestamp": "2025-08-11T21:58:19",
+    "filter": "activeOnly: true",
     "version": "v1"
   }
 }
 ```
 
-### ⚡ **Recursos Modernos Utilizados**
-- **Java 21 Records** para DTOs imutáveis
-- **Pattern Matching** para lógica condicional
-- **Spring Boot 3.2.x** com anotações modernas
-- **CORS configurado** para desenvolvimento
-- **Versionamento explícito** (/api/v1/)
-- **Estrutura de resposta padronizada** com seção `data` e `meta`
-- **Query parameters flexíveis** para filtragem
-- **Tratamento de erros** com códigos HTTP apropriados
-- [ ] Implementar `businessHours` usando tabela separada em vez de `@ElementCollection`
-- [ ] Adicionar endpoints REST para outras entidades (Products, Orders, Users)
-- [ ] Implementar segurança com Spring Security e RBAC
-- [ ] Adicionar integração com gateways de pagamento
-- [ ] Implementar cache para catálogos de restaurantes
+## Testes
 
-## 🏃‍♂️ Como Executar
+### Executar Testes
+```bash
+# Todos os testes
+./mvnw test
 
-### Pré-requisitos
-- JDK 21 instalado
-- Maven 3.6+
-
-### Passos
-1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/rabay/delivery-api-rabay.git
-   cd delivery-api-rabay
-   ```
-
-2. **Execute o build e testes**
-   ```bash
-   mvn clean package
-   ```
-
-3. **Inicie a aplicação**
-   ```bash
-   ./mvnw spring-boot:run
-   # ou
-   java -jar target/delivery-api-0.0.1-SNAPSHOT.jar
-   ```
-
-4. **Acesse os endpoints**
-   - **Página Inicial**: [http://localhost:8080/](http://localhost:8080/) ✨ **NOVO**
-   - Health Check: [http://localhost:8080/health](http://localhost:8080/health)
-   - Actuator: [http://localhost:8080/actuator](http://localhost:8080/actuator)
-   - **API Restaurantes**: [http://localhost:8080/api/v1/restaurants](http://localhost:8080/api/v1/restaurants)
-   - H2 Console: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
-
-5. **Teste a API completa**
-   ```bash
-   # Página inicial com mapa de navegação ✨ NOVO
-   curl "http://localhost:8080/" | jq .
-   
-   # Health check customizado
-   curl "http://localhost:8080/health" | jq .
-   
-   # Lista todos os restaurantes ativos
-   curl "http://localhost:8080/api/v1/restaurants" | jq .
-   
-   # Busca por nome (pizza)
-   curl "http://localhost:8080/api/v1/restaurants?search=pizza" | jq .
-   
-   # Apenas restaurantes abertos
-   curl "http://localhost:8080/api/v1/restaurants?onlyOpen=true" | jq .
-   
-   # Inclui inativos (mostra todos os 4 restaurantes)
-   curl "http://localhost:8080/api/v1/restaurants?includeInactive=true" | jq .
-   
-   # Cria um novo restaurante ✨ NOVO
-   curl -X POST "http://localhost:8080/api/v1/restaurants" \
-     -H "Content-Type: application/json" \
-     -d '{"name":"Restaurante Teste","description":"Descrição do restaurante","cnpj":"12.345.678/0001-90","phone":"(11) 99999-9999","address":{"street":"Rua Exemplo","number":"123","complement":"Sala 101","neighborhood":"Bairro Exemplo","city":"Cidade Exemplo","state":"SP","postalCode":"01234-567","reference":"Próximo ao ponto de ônibus"},"logo":"https://exemplo.com/logo.png","deliveryFee":5.00,"minimumOrderValue":15.00,"averageDeliveryTimeInMinutes":30}' | jq .
-   ```
-
-## 🔧 Configuração
-
-### Ambiente de Desenvolvimento
-- **Porta**: 8080
-- **Banco**: H2 em memória
-- **Profile**: development
-- **Virtual Threads**: Ativados para alta concorrência
-
-### Variáveis de Ambiente
-```properties
-server.port=8080
-spring.h2.console.enabled=true
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.jpa.show-sql=true
+# Testes específicos
+./mvnw test -Dtest=CustomerServiceTest
+./mvnw test -Dtest=*ControllerTest
 ```
 
-## 📋 Endpoints Disponíveis
+### Status dos Testes
+- **23 testes** executados com sucesso
+- **0 falhas** e **0 erros**
+- Cobertura completa de Controllers e Services
 
-### Navigation & Welcome
-- `GET /` – **Página inicial da API** com mapa de navegação e informações de boas-vindas ✨ **NOVO**
-
-### Health & Monitoring
-- `GET /health` – Status da aplicação (inclui versão Java)
-- `GET /actuator/health` – Health check detalhado
-- `GET /actuator/metrics` – Métricas da aplicação
-- `GET /actuator/info` – Informações da aplicação
-
-### API REST - Restaurantes (v1)
-- `GET /api/v1/restaurants` – Lista restaurantes com filtros opcionais
-  - `?includeInactive=true` – Inclui restaurantes inativos
-  - `?onlyOpen=true` – Apenas restaurantes abertos
-  - `?search=nome` – Busca por nome do restaurante
-- `GET /api/v1/restaurants/{id}` – Busca restaurante específico por ID
-- `POST /api/v1/restaurants` – Cria um novo restaurante ✨ **NOVO**
-
-### Banco de Dados
-- `GET /h2-console` – Console do banco H2 (para desenvolvimento)
-
-## 🗂️ Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 src/
-├── main/
-│   ├── java/com/deliverytech/deliveryapi/           # 🔄 Package refatorado (era delivery_api)
-│   │   ├── DeliveryApiApplication.java
-│   │   ├── config/             # Configurações e inicializadores
-│   │   ├── controller/         # Controllers REST
-│   │   ├── dto/               # Data Transfer Objects (Java Records)
-│   │   ├── service/           # Camada de serviços
-│   │   ├── domain/
-│   │   │   ├── model/          # Entidades e Value Objects
-│   │   │   └── repository/     # Repositórios Spring Data JPA
-│   │   └── infrastructure/     # Configurações e utilitários
-│   └── resources/
-│       ├── application.properties
-│       └── static/             # Recursos estáticos
-└── test/
-    └── java/com/deliverytech/deliveryapi/          # 🔄 Package de testes também refatorado
-        ├── DeliveryApiApplicationTests.java
-        ├── controller/         # Testes de controller
-        └── service/           # Testes de service
+├── main/java/com/deliverytech/deliveryapi/
+│   ├── config/          # Configurações
+│   ├── controller/      # Controllers REST
+│   ├── service/         # Lógica de negócio
+│   ├── dto/            # Data Transfer Objects
+│   ├── domain/
+│   │   ├── model/       # Entidades JPA
+│   │   └── repository/  # Repositórios
+│   └── exception/       # Tratamento de exceções
+├── resources/
+│   └── application.properties
+└── test/               # Testes unitários
 ```
 
-### 🔄 Alterações na Estrutura de Packages
-A estrutura foi **refatorada para seguir as melhores práticas Java**:
-- **Antes**: `com.deliverytech.delivery_api` (com underscore)
-- **Depois**: `com.deliverytech.deliveryapi` (sem underscore, seguindo convenções)
-- **Impacto**: 38 arquivos Java atualizados automaticamente
-- **Status**: ✅ Compilação e execução funcionando perfeitamente
-
-## 🏆 Desenvolvedor
+## Desenvolvedor
 
 **Victor Rabay**  
-TI 58A 02728 - Arquitetura de Sistemas  
-Desenvolvido com JDK 21 e Spring Boot 3.2.x
+TI 58A 02728 - Arquitetura de Sistemas
 
----
+## Status
 
-**Última Atualização**: Agosto 2025  
-**Versão**: 0.0.1-SNAPSHOT  
-**Status**: ✅ API REST de Restaurantes + Endpoint Raiz implementados e funcionando perfeitamente  
-**Próximo**: Implementar endpoints para Products, Orders e Users
-
-### 🎯 Principais Conquistas Recentes
-- ✅ **Package Structure Refatorada**: Seguindo convenções Java (`com.deliverytech.deliveryapi`)
-- ✅ **Endpoint Raiz Implementado**: Página inicial com mapa de navegação em `/`
-- ✅ **API REST Completa**: Endpoints de restaurantes totalmente funcionais
-- ✅ **Endpoint POST para Restaurantes**: Criação de novos restaurantes implementada
-- ✅ **Build & Testes**: 100% de sucesso após refatoração
+- ✅ **Build**: Sucesso
+- ✅ **Testes**: 23/23 passando
+- ✅ **APIs REST**: 4 controllers funcionais
+- ✅ **Documentação**: Swagger UI disponível
+- ✅ **Banco**: H2 configurado e funcionando
