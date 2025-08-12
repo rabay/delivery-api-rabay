@@ -362,9 +362,78 @@ A aplicação carrega automaticamente 4 restaurantes de exemplo:
 - **0 falhas** e **0 erros**
 - Cobertura completa de Controllers e Services
 
+## 📮 Testes com Postman
+
+Este projeto inclui uma **coleção completa de testes do Postman** para validação de todos os endpoints da API, incluindo cenários de sucesso, falha e testes de performance.
+
+### 📋 Recursos Disponíveis
+
+- **📄 Coleção Principal** - Mais de 30 testes cobrindo todos os endpoints
+- **⚡ Testes de Carga** - Validação de performance e stress testing
+- **🌐 Ambiente Configurado** - Variáveis para desenvolvimento local
+- **🚀 Script Automatizado** - Execução via Newman CLI
+- **📊 Dados de Teste** - CSV com dados para testes data-driven
+- **📖 Documentação Completa** - Guia detalhado de uso
+
+### 🎯 Cobertura de Testes
+
+| Módulo | Endpoints | Cenários Testados |
+|--------|-----------|-------------------|
+| **Health & System** | 2 | Status da API, informações do sistema |
+| **Customers** | 6 | CRUD completo, validações, busca por email |
+| **Restaurants** | 11 | CRUD, filtros avançados, gerenciamento de status |
+| **Products** | 10 | CRUD, filtros por restaurante, disponibilidade |
+| **Orders** | 8 | Criação, status, filtros por cliente/restaurante |
+| **Cenários Negativos** | 6+ | Validações de entrada, recursos inexistentes |
+
+### 🚀 Como Usar
+
+#### Postman (Interface Gráfica)
+
+```bash
+# 1. Importar coleções no Postman
+postman/Delivery-API-Collection.postman_collection.json
+postman/Delivery-API-Local.postman_environment.json
+
+# 2. Selecionar o ambiente "Delivery API - Local Development"
+# 3. Executar a coleção sequencialmente
+```
+
+#### Newman (Linha de Comando)
+
+```bash
+# Navegar para o diretório de testes
+cd postman/
+
+# Executar script interativo
+./run-tests.sh
+
+# Ou executar diretamente
+newman run Delivery-API-Collection.postman_collection.json \
+  --environment Delivery-API-Local.postman_environment.json \
+  --reporters html,cli \
+  --reporter-html-export reports/test-results.html
+```
+
+### 📊 Tipos de Teste
+
+- **✅ Funcionais** - Validação de funcionalidades e regras de negócio
+- **🔍 Validação de Dados** - Estrutura JSON, tipos e campos obrigatórios
+- **⚡ Performance** - Tempo de resposta e throughput
+- **🛡️ Negativos** - Cenários de erro e edge cases
+- **🔗 Integração** - Fluxos completos entre módulos
+
+### 📚 Documentação Completa
+
+Para instruções detalhadas, exemplos avançados e troubleshooting:
+
+**👉 [Consulte a documentação completa dos testes](postman/README.md)**
+
+---
+
 ## Estrutura do Projeto
 
-```
+```text
 src/
 ├── main/java/com/deliverytech/deliveryapi/
 │   ├── config/          # Configurações
