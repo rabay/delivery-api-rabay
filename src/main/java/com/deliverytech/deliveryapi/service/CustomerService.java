@@ -5,6 +5,8 @@ import com.deliverytech.deliveryapi.domain.model.UserType;
 import com.deliverytech.deliveryapi.domain.repository.UserRepository;
 import com.deliverytech.deliveryapi.dto.CreateCustomerRequest;
 import com.deliverytech.deliveryapi.dto.CustomerDTO;
+import com.deliverytech.deliveryapi.exception.EntityNotFoundException;
+import com.deliverytech.deliveryapi.exception.ValidationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +34,7 @@ public class CustomerService {
      */
     public CustomerDTO createCustomer(CreateCustomerRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email já cadastrado");
+            throw new ValidationException("Email já cadastrado");
         }
 
         User user = new User();
@@ -65,10 +67,10 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public CustomerDTO getCustomerById(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
         
         if (user.getUserType() != UserType.CUSTOMER) {
-            throw new IllegalArgumentException("Usuário não é um cliente");
+            throw new ValidationException("Usuário não é um cliente");
         }
         
         return CustomerDTO.from(user);
@@ -91,10 +93,10 @@ public class CustomerService {
     @Transactional(readOnly = true)
     public CustomerDTO getCustomerByEmail(String email) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
         
         if (user.getUserType() != UserType.CUSTOMER) {
-            throw new IllegalArgumentException("Usuário não é um cliente");
+            throw new ValidationException("Usuário não é um cliente");
         }
         
         return CustomerDTO.from(user);
@@ -106,15 +108,15 @@ public class CustomerService {
     @Transactional
     public CustomerDTO updateCustomer(Long id, CreateCustomerRequest request) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
         
         if (user.getUserType() != UserType.CUSTOMER) {
-            throw new IllegalArgumentException("Usuário não é um cliente");
+            throw new ValidationException("Usuário não é um cliente");
         }
 
         // Validar e-mail se estiver sendo alterado
         if (!user.getEmail().equals(request.email()) && userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email já cadastrado");
+            throw new ValidationException("Email já cadastrado");
         }
 
         // Atualizar dados
@@ -146,10 +148,10 @@ public class CustomerService {
     @Transactional
     public void deleteCustomer(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
         
         if (user.getUserType() != UserType.CUSTOMER) {
-            throw new IllegalArgumentException("Usuário não é um cliente");
+            throw new ValidationException("Usuário não é um cliente");
         }
 
         user.setActive(false);

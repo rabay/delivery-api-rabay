@@ -423,7 +423,7 @@ public class RestaurantController {
             @PathVariable Long id, 
             @RequestParam("active") boolean active) {
         try {
-            RestaurantDTO updatedRestaurant = restaurantService.toggleActiveStatus(id, active);
+            RestaurantDTO updatedRestaurant = restaurantService.updateActiveStatus(id, active);
             
             Map<String, Object> response = Map.of(
                     "data", updatedRestaurant,
@@ -469,7 +469,7 @@ public class RestaurantController {
             @PathVariable Long id, 
             @RequestParam("open") boolean open) {
         try {
-            RestaurantDTO updatedRestaurant = restaurantService.toggleOpenStatus(id, open);
+            RestaurantDTO updatedRestaurant = restaurantService.updateOpenStatus(id, open);
             
             Map<String, Object> response = Map.of(
                     "data", updatedRestaurant,
@@ -505,4 +505,8 @@ public class RestaurantController {
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
+    
+
+    
+
 }

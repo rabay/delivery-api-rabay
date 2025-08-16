@@ -9,6 +9,7 @@ import com.deliverytech.deliveryapi.domain.repository.RestaurantRepository;
 import com.deliverytech.deliveryapi.domain.repository.ProductCategoryRepository;
 import com.deliverytech.deliveryapi.dto.CreateProductRequest;
 import com.deliverytech.deliveryapi.dto.ProductDTO;
+import com.deliverytech.deliveryapi.exception.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -277,5 +278,20 @@ public class ProductService {
             .stream()
             .map(ProductDTO::from)
             .collect(Collectors.toList());
+    }
+    
+    /**
+     * Altera a disponibilidade de um produto
+     * @param id ID do produto
+     * @param available Nova disponibilidade (true=disponível, false=indisponível)
+     * @return DTO do produto atualizado
+     */
+    public ProductDTO updateAvailability(Long id, boolean available) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+        
+        product.setAvailable(available);
+        Product saved = productRepository.save(product);
+        return ProductDTO.from(saved);
     }
 }

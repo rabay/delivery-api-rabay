@@ -26,16 +26,41 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Delivery API")
-                        .description("API REST para sistema de delivery moderno e escalável com CRUD completo para todas as entidades")
+                        .description("""
+                            API REST para sistema de delivery moderno e escalável com CRUD completo para todas as entidades.
+                            
+                            ### Funcionalidades Principais:
+                            - **Gestão de Clientes** - Cadastro e gerenciamento completo de usuários
+                            - **Gestão de Restaurantes** - CRUD com categorias e busca avançada
+                            - **Catálogo de Produtos** - Gerenciamento por restaurante com disponibilidade
+                            - **Sistema de Pedidos** - Fluxo completo com validações de negócio
+                            - **Monitoramento** - Health checks e métricas via Actuator
+                            
+                            ### Padrões da API:
+                            - Todos os endpoints retornam JSON estruturado
+                            - Validação completa de entrada com mensagens de erro descritivas
+                            - Status HTTP apropriados para cada operação
+                            - Paginação e filtros quando aplicável
+                            """)
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Delivery Tech Team")
-                                .email("tech@deliveryapi.com")))
+                                .email("tech@deliveryapi.com")
+                                .url("https://github.com/deliverytech/api"))
+                        .license(new License()
+                                .name("MIT License")
+                                .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:8080")
-                                .description("Servidor de Desenvolvimento")))
+                                .description("Servidor de Desenvolvimento"),
+                        new Server()
+                                .url("https://api.deliverytech.com")
+                                .description("Servidor de Produção")))
                 .tags(List.of(
+                        new Tag()
+                                .name("Health")
+                                .description("Endpoints de monitoramento e saúde da aplicação"),
                         new Tag()
                                 .name("Customers")
                                 .description("Operações CRUD para gerenciamento de clientes do sistema de delivery"),
@@ -49,7 +74,8 @@ public class OpenApiConfig {
                                 .name("Orders")
                                 .description("Operações para gerenciamento de pedidos, consultas por cliente/restaurante e controle de status"),
                         new Tag()
-                                .name("Health")
-                                .description("Endpoints de monitoramento e saúde da aplicação")));
+                                .name("Test")
+                                .description("Operações de teste - APENAS DESENVOLVIMENTO")
+                ));
     }
 }

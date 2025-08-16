@@ -33,3 +33,5 @@ build/
 .vscode/
 
 delivery-api/
+
+application.log

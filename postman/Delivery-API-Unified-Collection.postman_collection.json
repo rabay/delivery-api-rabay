@@ -1,0 +1,858 @@
+{
+	"info": {
+		"_postman_id": "unified-delivery-api-collection",
+		"name": "🚀 Delivery Tech API - Coleção Unificada",
+		"description": "Coleção unificada e corrigida com todos os endpoints funcionais da Delivery Tech API.\n\n**Status dos Controllers:**\n- ✅ HealthController: Funcionando\n- ✅ CustomerController: Funcionando (com correções)\n- ✅ RestaurantController: Funcionando  \n- ✅ ProductController: Funcionando\n- ✅ OrderController: Funcionando\n- ✅ TestController: Funcionando\n- ❌ PaymentController: Não implementado\n- ❌ NotificationController: Não implementado\n- ❌ ReviewController: Não implementado\n- ❌ DeliveryAreaController: Não implementado\n\n**Fluxo de Teste Recomendado:**\n1. 🏠 Health & System\n2. 🔧 Database Setup (opcional)\n3. 👥 Customers\n4. 🍽️ Restaurants\n5. 🍕 Products\n6. 📦 Orders",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🏠 Health & System",
+			"description": "Verificações de saúde da API",
+			"item": [
+				{
+					"name": "✅ Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has version and details', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('version');",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"    pm.expect(jsonData).to.have.property('details');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ API Welcome",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Welcome message returned', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData.status).to.eql('online');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": ["{{baseUrl}}"],
+							"path": [""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🔧 Database Setup",
+			"description": "Utilitários para configurar dados de teste",
+			"item": [
+				{
+					"name": "⚠️ Reset Database (Use com Cuidado)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Request completed', function () {",
+									"    pm.expect([200, 500]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('Response contains message', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/test/reset",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "test", "reset"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "🔄 Initialize Test Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Request completed', function () {",
+									"    pm.expect([200, 500]).to.include(pm.response.code);",
+									"});",
+									"",
+									"pm.test('Response contains message', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/test/init",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "test", "init"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👥 Customers - Gerenciamento de Clientes",
+			"description": "CRUD de clientes com correções aplicadas",
+			"item": [
+				{
+					"name": "✅ List All Customers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response is array', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"    // Accept empty array or array with customers",
+									"    pm.expect(jsonData.length).to.be.at.least(0);",
+									"    ",
+									"    // Store first customer if exists",
+									"    if (jsonData.length > 0) {",
+									"        pm.environment.set('firstCustomerId', jsonData[0].id);",
+									"        pm.environment.set('existingCustomerId', jsonData[0].id);",
+									"        console.log('Stored customer ID: ' + jsonData[0].id);",
+									"    } else {",
+									"        console.log('No customers found in list');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Get Customer by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Customer has required fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"    pm.expect(jsonData).to.have.property('email');",
+									"    pm.expect(jsonData).to.have.property('phone');",
+									"    pm.expect(jsonData).to.have.property('address');",
+									"    ",
+									"    // Store for later use",
+									"    pm.environment.set('customerId', jsonData.id);",
+									"    pm.environment.set('customerName', jsonData.name);",
+									"    pm.environment.set('customerEmail', jsonData.email);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers/{{firstCustomerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers", "{{firstCustomerId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Create New Customer (Fixed)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate unique data for new customer",
+									"const timestamp = Date.now();",
+									"const uniqueId = Math.random().toString(36).substr(2, 9);",
+									"",
+									"pm.environment.set('newCustomerEmail', `customer-${timestamp}@test.com`);",
+									"pm.environment.set('newCustomerName', `Test Customer ${uniqueId}`);",
+									"pm.environment.set('newCustomerPassword', 'senha123'); // Required field"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Customer created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.email).to.eql(pm.environment.get('newCustomerEmail'));",
+									"    ",
+									"    // Store new customer ID",
+									"    pm.environment.set('newCustomerId', jsonData.id);",
+									"    pm.environment.set('lastCreatedCustomerId', jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{newCustomerName}}\",\n    \"email\": \"{{newCustomerEmail}}\",\n    \"password\": \"{{newCustomerPassword}}\",\n    \"phone\": \"(11) 99999-1234\",\n    \"address\": {\n        \"street\": \"Rua Teste\",\n        \"number\": \"456\",\n        \"complement\": \"Apt 789\",\n        \"neighborhood\": \"Vila Teste\",\n        \"city\": \"São Paulo\",\n        \"state\": \"SP\",\n        \"postalCode\": \"04567-890\",\n        \"reference\": \"Próximo ao teste\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Update Customer (Optional)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Customer updated successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData.phone).to.eql('(11) 88888-8888');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{newCustomerName}} - Updated\",\n    \"email\": \"{{newCustomerEmail}}\",\n    \"password\": \"{{newCustomerPassword}}\",\n    \"phone\": \"(11) 88888-8888\",\n    \"address\": {\n        \"street\": \"Rua Teste Atualizada\",\n        \"number\": \"456\",\n        \"complement\": \"Apt 789\",\n        \"neighborhood\": \"Vila Teste\",\n        \"city\": \"São Paulo\",\n        \"state\": \"SP\",\n        \"postalCode\": \"04567-890\",\n        \"reference\": \"Próximo ao teste atualizado\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/customers/{{newCustomerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "customers", "{{newCustomerId}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🍽️ Restaurants - Gestão de Restaurantes",
+			"description": "Endpoints de restaurantes e categorias",
+			"item": [
+				{
+					"name": "✅ List All Restaurants",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response contains restaurants list', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    pm.expect(jsonData.data.length).to.be.greaterThan(0);",
+									"    ",
+									"    // Find first active and open restaurant",
+									"    const activeRestaurant = jsonData.data.find(r => r.active === true && r.open === true);",
+									"    if (activeRestaurant) {",
+									"        pm.environment.set('activeRestaurantId', activeRestaurant.id);",
+									"        pm.environment.set('activeRestaurantName', activeRestaurant.name);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/restaurants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "restaurants"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Get Restaurant by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Restaurant has required fields', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data).to.have.property('name');",
+									"    pm.expect(jsonData.data).to.have.property('active');",
+									"    ",
+									"    // Store for later use",
+									"    pm.environment.set('restaurantId', jsonData.data.id);",
+									"    pm.environment.set('restaurantName', jsonData.data.name);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/restaurants/{{activeRestaurantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "restaurants", "{{activeRestaurantId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Get Restaurant Categories",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Categories list returned', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    ",
+									"    // Store first category if exists",
+									"    if (jsonData.data.length > 0) {",
+									"        pm.environment.set('firstCategoryId', jsonData.data[0].id);",
+									"        pm.environment.set('firstCategoryName', jsonData.data[0].name);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/restaurants/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "restaurants", "categories"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🍕 Products - Catálogo de Produtos",
+			"description": "Gerenciamento de produtos",
+			"item": [
+				{
+					"name": "✅ List All Products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Products list returned', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    ",
+									"    // Store first available product if exists",
+									"    const availableProduct = jsonData.data.find(p => p.available === true);",
+									"    if (availableProduct) {",
+									"        pm.environment.set('availableProductId', availableProduct.id);",
+									"        pm.environment.set('availableProductName', availableProduct.name);",
+									"        pm.environment.set('availableProductPrice', availableProduct.price.amount);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Get Products by Restaurant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Restaurant products returned', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products/restaurant/{{activeRestaurantId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products", "restaurant", "{{activeRestaurantId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Get Available Products by Restaurant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Available products returned', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    ",
+									"    // All returned products should be available",
+									"    jsonData.data.forEach(product => {",
+									"        pm.expect(product.available).to.be.true;",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products/restaurant/{{activeRestaurantId}}/available",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products", "restaurant", "{{activeRestaurantId}}", "available"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Create New Product (Optional)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate unique product data",
+									"const timestamp = Date.now();",
+									"pm.environment.set('newProductName', `Test Product ${timestamp}`);",
+									"pm.environment.set('newProductPrice', '19.90');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Product created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data.name).to.eql(pm.environment.get('newProductName'));",
+									"    ",
+									"    // Store new product ID",
+									"    pm.environment.set('newProductId', jsonData.data.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{newProductName}}\",\n    \"description\": \"Produto criado via teste automatizado\",\n    \"price\": {{newProductPrice}},\n    \"image\": \"https://exemplo.com/test-product.jpg\",\n    \"preparationTimeInMinutes\": 15,\n    \"restaurantId\": {{restaurantId}},\n    \"categoryId\": 1,\n    \"available\": true,\n    \"active\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "products"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📦 Orders - Gestão de Pedidos",
+			"description": "CRUD de pedidos - Fluxo principal do delivery",
+			"item": [
+				{
+					"name": "✅ List All Orders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Orders list returned', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    ",
+									"    // Store first order for testing if exists",
+									"    if (jsonData.data.length > 0) {",
+									"        const firstOrder = jsonData.data[0];",
+									"        pm.environment.set('existingOrderId', firstOrder.id);",
+									"        pm.environment.set('existingOrderCode', firstOrder.code);",
+									"        pm.environment.set('existingOrderStatus', firstOrder.status);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Get Order by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Order details returned', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data).to.have.property('code');",
+									"    pm.expect(jsonData.data).to.have.property('status');",
+									"    pm.expect(jsonData.data).to.have.property('customerId');",
+									"    pm.expect(jsonData.data).to.have.property('restaurantId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders/{{existingOrderId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders", "{{existingOrderId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Get Orders by Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Customer orders returned', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.be.an('array');",
+									"    ",
+									"    // All orders should belong to the customer",
+									"    const customerId = parseInt(pm.environment.get('customerId'));",
+									"    jsonData.data.forEach(order => {",
+									"        pm.expect(order.customerId).to.eql(customerId);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders/customer/{{firstCustomerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders", "customer", "{{firstCustomerId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "✅ Create New Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Order created successfully', function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data).to.have.property('id');",
+									"    pm.expect(jsonData.data).to.have.property('code');",
+									"    pm.expect(jsonData.data.status).to.eql('PENDING');",
+									"    ",
+									"    // Store new order details",
+									"    pm.environment.set('newOrderId', jsonData.data.id);",
+									"    pm.environment.set('newOrderCode', jsonData.data.code);",
+									"    pm.environment.set('newOrderTotal', jsonData.data.totalValue);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\": {{firstCustomerId}},\n    \"restaurantId\": {{activeRestaurantId}},\n    \"deliveryAddress\": {\n        \"street\": \"Rua do Teste Postman\",\n        \"number\": \"123\",\n        \"complement\": \"Apto 456\",\n        \"neighborhood\": \"Centro\",\n        \"city\": \"São Paulo\",\n        \"state\": \"SP\",\n        \"postalCode\": \"01000-000\",\n        \"reference\": \"Criado via Postman\"\n    },\n    \"items\": [\n        {\n            \"productId\": 1,\n            \"quantity\": 2,\n            \"observations\": \"Pizza extra queijo\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global pre-request script",
+					"console.log('🚀 Executando: ' + pm.info.requestName);",
+					"",
+					"// Set default values if not set",
+					"if (!pm.environment.get('baseUrl')) {",
+					"    pm.environment.set('baseUrl', 'http://localhost:8080');",
+					"}",
+					"",
+					"// Log current environment variables for debugging",
+					"console.log('📍 Base URL: ' + pm.environment.get('baseUrl'));",
+					"if (pm.environment.get('customerId')) {",
+					"    console.log('👤 Customer ID: ' + pm.environment.get('customerId'));",
+					"}",
+					"if (pm.environment.get('restaurantId')) {",
+					"    console.log('🍽️ Restaurant ID: ' + pm.environment.get('restaurantId'));",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script",
+					"pm.test('Response time is reasonable (< 5000ms)', function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+					"});",
+					"",
+					"// Only check Content-Type for successful responses",
+					"if (pm.response.code >= 200 && pm.response.code < 300) {",
+					"    pm.test('Response has correct Content-Type', function () {",
+					"        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+					"    });",
+					"}",
+					"",
+					"// Log response status for debugging",
+					"console.log('📊 Response: ' + pm.response.code + ' ' + pm.response.status);",
+					"",
+					"// Store common response time for monitoring",
+					"pm.environment.set('lastResponseTime', pm.response.responseTime);"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}

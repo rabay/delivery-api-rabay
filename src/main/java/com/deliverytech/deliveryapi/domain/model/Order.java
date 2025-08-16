@@ -122,12 +122,19 @@ public class Order {
     }
 
     public void calculateTotal() {
-        // Para agora, vamos usar valores fixos para evitar erros
-        // TODO: Implementar cálculo baseado em consulta ao banco
+        // Para agora, vamos calcular com base nos itens existentes
         if (this.subtotal == null) {
             this.subtotal = Money.zero();
         }
+        if (this.deliveryFee == null) {
+            this.deliveryFee = Money.zero();
+        }
         this.total = subtotal.add(deliveryFee);
+    }
+
+    public void setCalculatedSubtotal(Money subtotal) {
+        this.subtotal = subtotal;
+        calculateTotal();
     }
 
     public void confirm() {

@@ -63,9 +63,9 @@ curl http://localhost:8080/api/v1/restaurants
 
 ## Acessos
 
-- **Homepage**: http://localhost:8080/
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **H2 Console**: http://localhost:8080/h2-console
+- **Homepage**: [http://localhost:8080/](http://localhost:8080/)
+- **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **H2 Console**: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
   - URL: `jdbc:h2:mem:testdb`
   - Username: `sa`
   - Password: (vazio)

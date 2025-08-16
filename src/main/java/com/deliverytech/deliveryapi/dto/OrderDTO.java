@@ -61,4 +61,31 @@ public record OrderDTO(
             null // TODO: Implementar cancellationReason na entidade
         );
     }
+
+    public static OrderDTO fromWithItems(Order order, List<OrderItemDTO> items) {
+        return new OrderDTO(
+            order.getId(),
+            order.getCode(),
+            order.getStatus(),
+            order.getCustomer().getId(),
+            order.getCustomer().getName(),
+            order.getRestaurant().getId(),
+            order.getRestaurant().getName(),
+            AddressDTO.from(order.getDeliveryAddress()),
+            order.getSubtotal().getAmount(),
+            order.getDeliveryFee().getAmount(),
+            order.getTotal().getAmount(),
+            items, // Items fornecidos como parâmetro
+            null, // TODO: Implementar estimatedDeliveryTime na entidade
+            order.getDeliveryEndDate(),
+            order.getCreatedAt(),
+            order.getConfirmationDate(),
+            order.getPreparationStartDate(),
+            order.getPreparationEndDate(),
+            order.getDeliveryStartDate(),
+            order.getDeliveryEndDate(),
+            order.getCancellationDate(),
+            null // TODO: Implementar cancellationReason na entidade
+        );
+    }
 }

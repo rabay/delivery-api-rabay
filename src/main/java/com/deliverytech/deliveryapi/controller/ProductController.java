@@ -313,7 +313,7 @@ public class ProductController {
     @Operation(summary = "Alterar disponibilidade", description = "Alterna a disponibilidade de um produto")
     public ResponseEntity<Map<String, Object>> toggleAvailability(@PathVariable Long id, @RequestParam("available") boolean available) {
         try {
-            ProductDTO updatedProduct = productService.toggleAvailability(id, available);
+            ProductDTO updatedProduct = productService.updateAvailability(id, available);
             
             Map<String, Object> response = Map.of(
                 "data", updatedProduct,
@@ -349,6 +349,8 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+    
+
 
     /**
      * Trata exceções de argumento ilegal

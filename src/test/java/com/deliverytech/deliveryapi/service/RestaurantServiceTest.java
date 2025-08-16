@@ -3,7 +3,9 @@ package com.deliverytech.deliveryapi.service;
 import com.deliverytech.deliveryapi.domain.model.Address;
 import com.deliverytech.deliveryapi.domain.model.Money;
 import com.deliverytech.deliveryapi.domain.model.Restaurant;
+import com.deliverytech.deliveryapi.domain.model.RestaurantCategory;
 import com.deliverytech.deliveryapi.domain.repository.RestaurantRepository;
+import com.deliverytech.deliveryapi.domain.repository.RestaurantCategoryRepository;
 import com.deliverytech.deliveryapi.dto.AddressDTO;
 import com.deliverytech.deliveryapi.dto.CreateRestaurantRequest;
 import com.deliverytech.deliveryapi.dto.RestaurantDTO;
@@ -14,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +27,9 @@ class RestaurantServiceTest {
 
     @Mock
     private RestaurantRepository restaurantRepository;
+
+    @Mock
+    private RestaurantCategoryRepository restaurantCategoryRepository;
 
     @InjectMocks
     private RestaurantService restaurantService;
@@ -55,8 +62,16 @@ class RestaurantServiceTest {
                 "https://logo.teste.com",
                 new BigDecimal("5.00"),
                 new BigDecimal("15.00"),
-                30
+                30,
+                List.of(1L)
         );
+
+        // Mock category validation
+        when(restaurantCategoryRepository.existsById(1L)).thenReturn(true);
+        
+        RestaurantCategory mockCategory = new RestaurantCategory("Italiana", "Culinária italiana");
+        mockCategory.setId(1L);
+        when(restaurantCategoryRepository.findById(1L)).thenReturn(Optional.of(mockCategory));
 
         Restaurant restaurant = new Restaurant();
         restaurant.setId(1L);
@@ -124,8 +139,16 @@ class RestaurantServiceTest {
                 null,
                 new BigDecimal("0.00"),
                 null,
-                null
+                null,
+                List.of(1L)
         );
+
+        // Mock category validation
+        when(restaurantCategoryRepository.existsById(1L)).thenReturn(true);
+        
+        RestaurantCategory mockCategory = new RestaurantCategory("Italiana", "Culinária italiana");
+        mockCategory.setId(1L);
+        when(restaurantCategoryRepository.findById(1L)).thenReturn(Optional.of(mockCategory));
 
         Restaurant restaurant = new Restaurant();
         restaurant.setId(1L);

@@ -5,6 +5,8 @@ import com.deliverytech.deliveryapi.domain.model.UserType;
 import com.deliverytech.deliveryapi.domain.repository.UserRepository;
 import com.deliverytech.deliveryapi.dto.CreateCustomerRequest;
 import com.deliverytech.deliveryapi.dto.CustomerDTO;
+import com.deliverytech.deliveryapi.exception.EntityNotFoundException;
+import com.deliverytech.deliveryapi.exception.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,8 +88,8 @@ class CustomerServiceTest {
         when(userRepository.existsByEmail(createCustomerRequest.email())).thenReturn(true);
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ValidationException exception = assertThrows(
+            ValidationException.class,
             () -> customerService.createCustomer(createCustomerRequest)
         );
 
@@ -120,8 +122,8 @@ class CustomerServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        EntityNotFoundException exception = assertThrows(
+            EntityNotFoundException.class,
             () -> customerService.getCustomerById(1L)
         );
 
@@ -136,8 +138,8 @@ class CustomerServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ValidationException exception = assertThrows(
+            ValidationException.class,
             () -> customerService.getCustomerById(1L)
         );
 
@@ -196,8 +198,8 @@ class CustomerServiceTest {
         when(userRepository.findByEmail("nonexistent@email.com")).thenReturn(Optional.empty());
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        EntityNotFoundException exception = assertThrows(
+            EntityNotFoundException.class,
             () -> customerService.getCustomerByEmail("nonexistent@email.com")
         );
 
@@ -212,8 +214,8 @@ class CustomerServiceTest {
         when(userRepository.findByEmail("joao.silva@email.com")).thenReturn(Optional.of(user));
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        ValidationException exception = assertThrows(
+            ValidationException.class,
             () -> customerService.getCustomerByEmail("joao.silva@email.com")
         );
 

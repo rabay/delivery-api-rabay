@@ -4,8 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * DTO para criação de restaurante via API REST
@@ -37,6 +39,9 @@ public record CreateRestaurantRequest(
         @PositiveOrZero(message = "Valor mínimo do pedido deve ser maior ou igual a zero")
         BigDecimal minimumOrderValue,
         
-        Integer averageDeliveryTimeInMinutes
+        Integer averageDeliveryTimeInMinutes,
+        
+        @NotEmpty(message = "Pelo menos uma categoria é obrigatória")
+        List<Long> categoryIds
 ) {
 }

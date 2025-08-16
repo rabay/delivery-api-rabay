@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -62,7 +63,8 @@ class RestaurantControllerTest {
                 "https://exemplo.com/logo.png",
                 BigDecimal.valueOf(15.0),
                 BigDecimal.valueOf(25.0),
-                30
+                30,
+                List.of(1L)
         );
 
         RestaurantDTO expectedResponse = new RestaurantDTO(
@@ -134,7 +136,7 @@ class RestaurantControllerTest {
                 LocalDateTime.now()
         );
         
-        when(restaurantService.toggleActiveStatus(restaurantId, active)).thenReturn(expectedResponse);
+        when(restaurantService.updateActiveStatus(restaurantId, active)).thenReturn(expectedResponse);
         
         mockMvc.perform(patch("/api/v1/restaurants/" + restaurantId + "/status")
                 .param("active", String.valueOf(active))
@@ -143,7 +145,7 @@ class RestaurantControllerTest {
                 .andExpect(jsonPath("$.data.active").value(true))
                 .andExpect(jsonPath("$.meta.message").value("Restaurante ativado com sucesso"));
         
-        verify(restaurantService, times(1)).toggleActiveStatus(restaurantId, active);
+        verify(restaurantService, times(1)).updateActiveStatus(restaurantId, active);
     }
     
     @Test
@@ -172,7 +174,7 @@ class RestaurantControllerTest {
                 LocalDateTime.now()
         );
         
-        when(restaurantService.toggleOpenStatus(restaurantId, open)).thenReturn(expectedResponse);
+        when(restaurantService.updateOpenStatus(restaurantId, open)).thenReturn(expectedResponse);
         
         mockMvc.perform(patch("/api/v1/restaurants/" + restaurantId + "/open-status")
                 .param("open", String.valueOf(open))
@@ -181,6 +183,6 @@ class RestaurantControllerTest {
                 .andExpect(jsonPath("$.data.open").value(false))
                 .andExpect(jsonPath("$.meta.message").value("Restaurante fechado com sucesso"));
         
-        verify(restaurantService, times(1)).toggleOpenStatus(restaurantId, open);
+        verify(restaurantService, times(1)).updateOpenStatus(restaurantId, open);
     }
 }

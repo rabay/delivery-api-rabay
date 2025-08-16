@@ -5,9 +5,12 @@ import com.deliverytech.deliveryapi.domain.model.Money;
 import com.deliverytech.deliveryapi.domain.model.Restaurant;
 import com.deliverytech.deliveryapi.domain.model.RestaurantCategory;
 import com.deliverytech.deliveryapi.domain.repository.RestaurantRepository;
+import com.deliverytech.deliveryapi.domain.repository.RestaurantCategoryRepository;
 import com.deliverytech.deliveryapi.dto.CreateRestaurantRequest;
 import com.deliverytech.deliveryapi.dto.RestaurantCategoryDTO;
 import com.deliverytech.deliveryapi.dto.RestaurantDTO;
+import com.deliverytech.deliveryapi.exception.EntityNotFoundException;
+import com.deliverytech.deliveryapi.exception.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,9 @@ public class RestaurantService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    @Autowired
+    private RestaurantCategoryRepository restaurantCategoryRepository;
+
     /**
      * Cria um novo restaurante
      * @param request Dados do restaurante a ser criado
@@ -33,6 +39,23 @@ public class RestaurantService {
      */
     @Transactional
     public RestaurantDTO createRestaurant(CreateRestaurantRequest request) {
+        // Validar CNPJ
+        if (!isValidCNPJ(request.cnpj())) {
+            throw new ValidationException("CNPJ inválido");
+        }
+        
+        // Validar e buscar categorias
+        if (request.categoryIds() == null || request.categoryIds().isEmpty()) {
+            throw new ValidationException("Pelo menos uma categoria é obrigatória");
+        }
+        
+        // Verificar se todas as categorias existem
+        for (Long categoryId : request.categoryIds()) {
+            if (!restaurantCategoryRepository.existsById(categoryId)) {
+                throw new ValidationException("Categoria com ID " + categoryId + " não encontrada");
+            }
+        }
+        
         // Converter AddressDTO para Address entity
         Address address = new Address(
                 request.address().street(),
@@ -56,6 +79,13 @@ public class RestaurantService {
         restaurant.setDeliveryFee(new Money(request.deliveryFee()));
         restaurant.setMinimumOrderValue(new Money(request.minimumOrderValue()));
         restaurant.setAverageDeliveryTimeInMinutes(request.averageDeliveryTimeInMinutes());
+        
+        // Adicionar categorias ao restaurante
+        for (Long categoryId : request.categoryIds()) {
+            RestaurantCategory category = restaurantCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ValidationException("Categoria com ID " + categoryId + " não encontrada"));
+            restaurant.addCategory(category);
+        }
         
         // Salvar o restaurante
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
@@ -275,5 +305,65 @@ public class RestaurantService {
         return restaurants.stream()
                 .map(RestaurantDTO::from)
                 .toList();
+    }
+    
+    /**
+     * Altera o status ativo/inativo de um restaurante
+     * @param id ID do restaurante
+     * @param active Novo status (true=ativo, false=inativo)
+     * @return DTO do restaurante atualizado
+     */
+    @Transactional
+    public RestaurantDTO updateActiveStatus(Long id, boolean active) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Restaurante não encontrado"));
+        
+        restaurant.setActive(active);
+        Restaurant saved = restaurantRepository.save(restaurant);
+        return RestaurantDTO.from(saved);
+    }
+    
+    /**
+     * Altera o status de funcionamento (aberto/fechado) de um restaurante
+     * @param id ID do restaurante
+     * @param open Novo status (true=aberto, false=fechado)
+     * @return DTO do restaurante atualizado
+     */
+    @Transactional
+    public RestaurantDTO updateOpenStatus(Long id, boolean open) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Restaurante não encontrado"));
+        
+        restaurant.setOpen(open);
+        Restaurant saved = restaurantRepository.save(restaurant);
+        return RestaurantDTO.from(saved);
+    }
+    
+    /**
+     * Valida se o CNPJ é válido
+     * @param cnpj CNPJ a ser validado
+     * @return true se válido, false caso contrário
+     */
+    private boolean isValidCNPJ(String cnpj) {
+        if (cnpj == null || cnpj.trim().isEmpty()) {
+            return false;
+        }
+        
+        // Remover caracteres não numéricos
+        String numbers = cnpj.replaceAll("[^0-9]", "");
+        
+        // CNPJ deve ter exatamente 14 dígitos
+        if (numbers.length() != 14) {
+            return false;
+        }
+        
+        // Verificar se não são todos números iguais (ex: 11.111.111/0001-11)
+        if (numbers.matches("(\\d)\\1{13}")) {
+            return false;
+        }
+        
+        // Para simplificar, consideramos válido se passou nas validações básicas
+        // Em produção, implementaria o algoritmo completo dos dígitos verificadores
+        return true;
     }
 }

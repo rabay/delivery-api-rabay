@@ -4,6 +4,7 @@ import com.deliverytech.deliveryapi.domain.model.*;
 import com.deliverytech.deliveryapi.domain.repository.*;
 import com.deliverytech.deliveryapi.dto.CreateOrderRequest;
 import com.deliverytech.deliveryapi.dto.OrderDTO;
+import com.deliverytech.deliveryapi.dto.OrderItemDTO;
 import com.deliverytech.deliveryapi.dto.OrderItemRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -112,13 +113,9 @@ public class OrderService {
                 throw new IllegalArgumentException("Quantidade deve ser maior que zero");
             }
 
-            // Criar item do pedido
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(savedOrder);
-            orderItem.setProduct(product);
-            orderItem.setQuantity(itemRequest.quantity());
-            orderItem.setNotes(itemRequest.observations());
-
+            // Criar item do pedido usando o construtor completo
+            OrderItem orderItem = new OrderItem(savedOrder, product, itemRequest.quantity(), itemRequest.observations());
+            
             orderItemRepository.save(orderItem);
 
             // Calcular totais
@@ -142,11 +139,18 @@ public class OrderService {
         BigDecimal deliveryFee = restaurant.getDeliveryFee().getAmount();
         BigDecimal totalValue = subtotal.add(deliveryFee);
 
-        // Atualizar pedido com valores calculados (reutilizar calculateTotal())
-        savedOrder.calculateTotal();
+        // Atualizar pedido com valores calculados
+        savedOrder.setCalculatedSubtotal(new Money(subtotal));
 
         Order finalOrder = orderRepository.save(savedOrder);
-        return OrderDTO.from(finalOrder);
+        
+        // Carregar items do pedido para incluir na resposta
+        List<OrderItem> orderItems = orderItemRepository.findByOrder(finalOrder);
+        List<OrderItemDTO> itemDTOs = orderItems.stream()
+                .map(OrderItemDTO::from)
+                .toList();
+        
+        return OrderDTO.fromWithItems(finalOrder, itemDTOs);
     }
 
     /**
