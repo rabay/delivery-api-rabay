@@ -1,0 +1,36 @@
+package com.deliverytech.delivery_api.repository;
+
+import com.deliverytech.delivery_api.model.Cliente;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+class ClienteRepositoryTest {
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Test
+    void testFindByEmail() {
+        Cliente cliente = new Cliente();
+        cliente.setNome("João");
+        cliente.setEmail("joao@email.com");
+        cliente.setAtivo(true);
+        clienteRepository.save(cliente);
+        Optional<Cliente> found = clienteRepository.findByEmail("joao@email.com");
+        assertThat(found).isPresent();
+        assertThat(found.get().getNome()).isEqualTo("João");
+    }
+
+    @Test
+    void testFindByAtivoTrue() {
+        Cliente cliente = new Cliente();
+        cliente.setNome("Maria");
+        cliente.setEmail("maria@email.com");
+        cliente.setAtivo(true);
+        clienteRepository.save(cliente);
+        assertThat(clienteRepository.findByAtivoTrue()).extracting(Cliente::getNome).contains("Maria");
+    }
+}
