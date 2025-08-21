@@ -8,9 +8,10 @@ DC_BIN = os.path.join(PROJECT_DIR, 'bin', 'dependency-check', 'bin', 'dependency
 REPORT_DIR = os.path.join(PROJECT_DIR, 'dependency-check-report')
 SCAN_DIR = PROJECT_DIR
 
+
 # Parâmetros padrão
 project = 'delivery-api'
-format = 'HTML'
+formats = ['HTML', 'XML']
 out = REPORT_DIR
 
 # Permite argumentos opcionais
@@ -36,10 +37,12 @@ cmd = [
     DC_BIN,
     '--project', project,
     '--scan', SCAN_DIR,
-    '--format', format,
     '--out', out,
-    '--nvdApiKey', nvd_api_key
+    '--nvdApiKey', nvd_api_key,
+    '--disableCentral'
 ]
+for fmt in formats:
+    cmd.extend(['--format', fmt])
 print(f"Executando: {' '.join(cmd)}")
 subprocess.run(cmd, check=True)
 print(f"Relatório salvo em: {out}")

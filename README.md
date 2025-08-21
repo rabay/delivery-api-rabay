@@ -146,9 +146,10 @@ act push
 # Defina sua NVD API Key (obrigatório):
 export NVD_API_KEY=seu_token_nvd
 
-# Execute o script Python:
+# Execute o script Python (recomendado: com Central Analyzer desabilitado para evitar erros de rede):
 python scripts/run_dependency_check.py
-# Relatório HTML gerado em: dependency-check-report/index.html
+# Por padrão, o script já executa com --disableCentral, evitando timeouts ao acessar o Maven Central.
+# Relatórios HTML e XML gerados em: dependency-check-report/
 ```
 
 #### b) Execução no CI/CD (GitHub Actions)
