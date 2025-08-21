@@ -3,7 +3,6 @@ package com.deliverytech.delivery_api.service;
 import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import java.util.List;
 public class ProdutoService {
     private final ProdutoRepository produtoRepository;
 
-    @Autowired
     public ProdutoService(ProdutoRepository produtoRepository) {
         this.produtoRepository = produtoRepository;
     }

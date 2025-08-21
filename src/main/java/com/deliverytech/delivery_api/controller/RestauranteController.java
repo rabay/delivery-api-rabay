@@ -2,7 +2,6 @@ package com.deliverytech.delivery_api.controller;
 
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.service.RestauranteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.List;
 public class RestauranteController {
     private final RestauranteService restauranteService;
 
-    @Autowired
     public RestauranteController(RestauranteService restauranteService) {
         this.restauranteService = restauranteService;
     }

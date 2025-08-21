@@ -2,7 +2,6 @@ package com.deliverytech.delivery_api.service;
 
 import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.List;
 public class ClienteService {
     private final ClienteRepository clienteRepository;
 
-    @Autowired
     public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
     }

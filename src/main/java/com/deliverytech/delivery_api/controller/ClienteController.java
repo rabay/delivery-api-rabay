@@ -2,7 +2,6 @@ package com.deliverytech.delivery_api.controller;
 
 import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.service.ClienteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -13,7 +12,6 @@ import java.util.List;
 public class ClienteController {
     private final ClienteService clienteService;
 
-    @Autowired
     public ClienteController(ClienteService clienteService) {
         this.clienteService = clienteService;
     }

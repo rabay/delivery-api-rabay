@@ -4,7 +4,6 @@ import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.service.PedidoService;
 import com.deliverytech.delivery_api.service.ClienteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -15,7 +14,6 @@ public class PedidoController {
     private final PedidoService pedidoService;
     private final ClienteService clienteService;
 
-    @Autowired
     public PedidoController(PedidoService pedidoService, ClienteService clienteService) {
         this.pedidoService = pedidoService;
         this.clienteService = clienteService;

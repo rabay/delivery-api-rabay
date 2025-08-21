@@ -2,7 +2,6 @@ package com.deliverytech.delivery_api.service;
 
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.List;
 public class RestauranteService {
     private final RestauranteRepository restauranteRepository;
 
-    @Autowired
     public RestauranteService(RestauranteRepository restauranteRepository) {
         this.restauranteRepository = restauranteRepository;
     }
