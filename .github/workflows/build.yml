@@ -43,3 +43,14 @@ jobs:
           context: .
           push: false
           tags: delivery-api-rabay:latest
+
+      # Scan de vulnerabilidades na imagem Docker usando Trivy
+      - name: Scan de vulnerabilidades com Trivy (Aqua Security)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'delivery-api-rabay:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
