@@ -90,60 +90,89 @@ delivery-api-rabay/
 ## 🏃‍♂️ Como Executar, Testar e Usar CI/CD
 
 
-1. **Pré-requisitos:**
-	- JDK 21 instalado
-	- Docker instalado (para build de imagem e uso do compose)
-	- [act](https://github.com/nektos/act) instalado (opcional, para simular o workflow localmente)
+### 1. Pré-requisitos
 
+- JDK 21 instalado
+- Docker instalado (para build de imagem e uso do compose)
+- [act](https://github.com/nektos/act) instalado (opcional, para simular o workflow localmente)
 
-1. **Pré-requisitos:**
-	- JDK 21 instalado
-	- Docker instalado (para build de imagem e uso do compose)
-	- [act](https://github.com/nektos/act) instalado (opcional, para simular o workflow localmente)
+### 2. Clone o repositório
 
-2. Clone o repositório:
-	```bash
-	git clone https://github.com/rabay/delivery-api-rabay.git
-	cd delivery-api-rabay
-	```
-
-3. **Build e Teste Local:**
-	```bash
-	./mvnw clean verify
-	```
-
-4. **Executar aplicação localmente:**
-	```bash
-	./mvnw spring-boot:run
-	```
-
-5. **Build da imagem Docker:**
-	```bash
-	docker build -t delivery-api-rabay:latest .
-	```
-
-6. **Executar com Docker Compose:**
-	```bash
-	docker-compose up --build
-	```
-
-7. **Executar workflow CI/CD localmente (opcional):**
-	```bash
-	./bin/act push
-	```
-	> O workflow executa build, testes, cobertura Jacoco e build da imagem Docker, mas **não publica binários nem imagens**.
-
-8. **Acesse endpoints básicos:**
-	- Health: [http://localhost:8080/health](http://localhost:8080/health)
-	- Info: [http://localhost:8080/info](http://localhost:8080/info)
-	- H2 Console: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
-	  - JDBC URL: `jdbc:h2:mem:testdb` | User: `sa` | Senha: (em branco)
-
-Após rodar `./mvnw clean verify`, o relatório de cobertura Jacoco estará disponível em:
-
+```bash
+git clone https://github.com/rabay/delivery-api-rabay.git
+cd delivery-api-rabay
 ```
-target/site/jacoco/index.html
+
+### 3. Build, Testes e Cobertura Local
+
+```bash
+./mvnw clean verify
+# Relatório Jacoco: target/site/jacoco/index.html
 ```
+
+### 4. Executar aplicação localmente
+
+```bash
+./mvnw spring-boot:run
+```
+
+### 5. Build da imagem Docker
+
+```bash
+docker build -t delivery-api-rabay:latest .
+```
+
+### 6. Executar com Docker Compose
+
+```bash
+docker compose up --build
+# ou
+docker-compose up --build
+```
+
+### 7. Executar workflow CI/CD localmente (opcional)
+
+```bash
+act push
+```
+
+> O workflow executa build, testes, cobertura Jacoco, Dependency-Check e build da imagem Docker, mas **não publica binários nem imagens**.
+
+### 8. Verificação de Dependências (OWASP Dependency-Check)
+
+#### a) Execução Local (CLI)
+
+```bash
+# Defina sua NVD API Key (obrigatório):
+export NVD_API_KEY=seu_token_nvd
+
+# Execute o script Python:
+python scripts/run_dependency_check.py
+# Relatório HTML gerado em: dependency-check-report/index.html
+```
+
+#### b) Execução no CI/CD (GitHub Actions)
+
+
+O workflow já executa o Dependency-Check automaticamente, publica o relatório como artefato (`dependency-check-report`) **e gera um summary em Markdown** (exibido no painel do GitHub Actions, igual ao Jacoco).
+
+O summary traz:
+- Total de dependências analisadas
+- Quantidade de dependências vulneráveis
+- Tabela de vulnerabilidades por severidade
+- Link para o relatório HTML completo
+
+### 9. Acesse endpoints básicos
+
+- Health: [http://localhost:8080/health](http://localhost:8080/health)
+- Info: [http://localhost:8080/info](http://localhost:8080/info)
+- H2 Console: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+	- JDBC URL: `jdbc:h2:mem:testdb` | User: `sa` | Senha: (em branco)
+
+### 10. Relatórios
+
+- **Cobertura Jacoco:** `target/site/jacoco/index.html`
+- **Dependency-Check:** `dependency-check-report/index.html` (local ou artefato do CI)
 
 
 ### Teste Manual
