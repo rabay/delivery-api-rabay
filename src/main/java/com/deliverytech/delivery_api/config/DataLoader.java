@@ -50,19 +50,19 @@ public class DataLoader implements CommandLineRunner {
         }
 
         Pedido pedido1 = new Pedido();
-        pedido1.setCliente(clientes.get(0));
-        pedido1.setStatus("CRIADO");
-        pedido1.setDataPedido(java.time.LocalDateTime.now().minusDays(1));
+    pedido1.setCliente(clientes.get(0));
+    pedido1.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CRIADO);
+    pedido1.setDataPedido(java.time.LocalDateTime.now().minusDays(1));
 
         Pedido pedido2 = new Pedido();
-        pedido2.setCliente(clientes.get(1));
-        pedido2.setStatus("FINALIZADO");
-        pedido2.setDataPedido(java.time.LocalDateTime.now().minusHours(5));
+    pedido2.setCliente(clientes.get(1));
+    pedido2.setStatus(com.deliverytech.delivery_api.model.StatusPedido.ENTREGUE);
+    pedido2.setDataPedido(java.time.LocalDateTime.now().minusHours(5));
 
         Pedido pedido3 = new Pedido();
-        pedido3.setCliente(clientes.get(2));
-        pedido3.setStatus("CANCELADO");
-        pedido3.setDataPedido(java.time.LocalDateTime.now().minusDays(2));
+    pedido3.setCliente(clientes.get(2));
+    pedido3.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CANCELADO);
+    pedido3.setDataPedido(java.time.LocalDateTime.now().minusDays(2));
 
         pedidoRepository.saveAll(Arrays.asList(pedido1, pedido2, pedido3));
         System.out.println("✓ 3 pedidos inseridos");
@@ -103,35 +103,36 @@ public class DataLoader implements CommandLineRunner {
     private void inserirRestaurantes() {
         System.out.println("--- Inserindo Restaurantes ---");
 
-        Restaurante restaurante1 = new Restaurante();
-        restaurante1.setNome("Pizza Express");
-        restaurante1.setCategoria("Italiana");
-        restaurante1.setAtivo(true);
-        restaurante1.setAvaliacao(4.5);
 
-        Restaurante restaurante2 = new Restaurante();
-        restaurante2.setNome("Burger King");
-        restaurante2.setCategoria("Fast Food");
-        restaurante2.setAtivo(true);
-        restaurante2.setAvaliacao(4.2);
+    Restaurante restaurante1 = new Restaurante();
+    restaurante1.setNome("Pizza Express");
+    restaurante1.setCategoria("Italiana");
+    restaurante1.setAtivo(true);
+    restaurante1.setAvaliacao(new java.math.BigDecimal("4.5"));
 
-        Restaurante restaurante3 = new Restaurante();
-        restaurante3.setNome("Sushi House");
-        restaurante3.setCategoria("Japonesa");
-        restaurante3.setAtivo(true);
-        restaurante3.setAvaliacao(4.8);
+    Restaurante restaurante2 = new Restaurante();
+    restaurante2.setNome("Burger King");
+    restaurante2.setCategoria("Fast Food");
+    restaurante2.setAtivo(true);
+    restaurante2.setAvaliacao(new java.math.BigDecimal("4.2"));
 
-        Restaurante restaurante4 = new Restaurante();
-        restaurante4.setNome("Gyros Athenas");
-        restaurante4.setCategoria("Grega");
-        restaurante4.setAtivo(true);
-        restaurante4.setAvaliacao(4.0);
+    Restaurante restaurante3 = new Restaurante();
+    restaurante3.setNome("Sushi House");
+    restaurante3.setCategoria("Japonesa");
+    restaurante3.setAtivo(true);
+    restaurante3.setAvaliacao(new java.math.BigDecimal("4.8"));
 
-        Restaurante restaurante5 = new Restaurante();
-        restaurante5.setNome("Chiparia do Porto");
-        restaurante5.setCategoria("Frutos do Mar");
-        restaurante5.setAtivo(true);
-        restaurante5.setAvaliacao(4.3);
+    Restaurante restaurante4 = new Restaurante();
+    restaurante4.setNome("Gyros Athenas");
+    restaurante4.setCategoria("Grega");
+    restaurante4.setAtivo(true);
+    restaurante4.setAvaliacao(new java.math.BigDecimal("4.0"));
+
+    Restaurante restaurante5 = new Restaurante();
+    restaurante5.setNome("Chiparia do Porto");
+    restaurante5.setCategoria("Frutos do Mar");
+    restaurante5.setAtivo(true);
+    restaurante5.setAvaliacao(new java.math.BigDecimal("4.3"));
 
         restauranteRepository
                 .saveAll(Arrays.asList(restaurante1, restaurante2, restaurante3, restaurante4, restaurante5));

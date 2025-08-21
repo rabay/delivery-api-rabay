@@ -27,15 +27,13 @@ public class PedidoController {
 
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<List<Pedido>> buscarPorCliente(@PathVariable Long clienteId) {
-        Cliente cliente = clienteService.buscarPorId(clienteId)
-            .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-        List<Pedido> pedidos = pedidoService.buscarPorCliente(cliente);
+        List<Pedido> pedidos = pedidoService.buscarPorCliente(clienteId);
         return ResponseEntity.ok(pedidos);
     }
 
     @PutMapping("/{id}/status")
     public ResponseEntity<Pedido> atualizarStatus(@PathVariable Long id, @RequestParam String status) {
-        Pedido atualizado = pedidoService.mudarStatus(id, status);
+        Pedido atualizado = pedidoService.atualizarStatus(id, com.deliverytech.delivery_api.model.StatusPedido.valueOf(status));
         return ResponseEntity.ok(atualizado);
     }
 }

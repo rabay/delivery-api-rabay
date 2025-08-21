@@ -14,11 +14,11 @@ class RestauranteRepositoryTest {
 
     @Test
     void testFindByNomeContainingIgnoreCase() {
-        Restaurante r = new Restaurante();
-        r.setNome("Pizza Place");
-        r.setCategoria("Italiana");
-        r.setAtivo(true);
-        r.setAvaliacao(4.5);
+    Restaurante r = new Restaurante();
+    r.setNome("Pizza Place");
+    r.setCategoria("Italiana");
+    r.setAtivo(true);
+    r.setAvaliacao(new java.math.BigDecimal("4.5"));
         restauranteRepository.save(r);
         List<Restaurante> results = restauranteRepository.findByNomeContainingIgnoreCase("pizza");
         assertThat(results).isNotEmpty();
@@ -26,11 +26,11 @@ class RestauranteRepositoryTest {
 
     @Test
     void testFindByCategoria() {
-        Restaurante r = new Restaurante();
-        r.setNome("Sushi Bar");
-        r.setCategoria("Japonesa");
-        r.setAtivo(true);
-        r.setAvaliacao(4.8);
+    Restaurante r = new Restaurante();
+    r.setNome("Sushi Bar");
+    r.setCategoria("Japonesa");
+    r.setAtivo(true);
+    r.setAvaliacao(new java.math.BigDecimal("4.8"));
         restauranteRepository.save(r);
         assertThat(restauranteRepository.findByCategoria("Japonesa")).extracting(Restaurante::getNome).contains("Sushi Bar");
     }

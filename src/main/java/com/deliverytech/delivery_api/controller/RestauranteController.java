@@ -1,6 +1,7 @@
 package com.deliverytech.delivery_api.controller;
 
 import com.deliverytech.delivery_api.model.Restaurante;
+import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.service.RestauranteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,15 +16,17 @@ public class RestauranteController {
         this.restauranteService = restauranteService;
     }
 
+
     @PostMapping
-    public ResponseEntity<Restaurante> criar(@RequestBody Restaurante restaurante) {
-        Restaurante novo = restauranteService.cadastrar(restaurante);
+    public ResponseEntity<Restaurante> criar(@RequestBody RestauranteRequest restauranteRequest) {
+        Restaurante novo = restauranteService.cadastrar(restauranteRequest);
         return ResponseEntity.status(201).body(novo);
     }
 
+
     @GetMapping
     public List<Restaurante> listar() {
-        return restauranteService.buscarAtivos();
+        return restauranteService.listarAtivos();
     }
 
     @GetMapping("/{id}")
@@ -33,12 +36,10 @@ public class RestauranteController {
             .orElse(ResponseEntity.notFound().build());
     }
 
+
     @PutMapping("/{id}")
-    public ResponseEntity<Restaurante> atualizar(@PathVariable Long id, @RequestBody Restaurante restaurante) {
-        if (!id.equals(restaurante.getId())) {
-            return ResponseEntity.badRequest().build();
-        }
-        Restaurante atualizado = restauranteService.cadastrar(restaurante);
+    public ResponseEntity<Restaurante> atualizar(@PathVariable Long id, @RequestBody RestauranteRequest restauranteRequest) {
+        Restaurante atualizado = restauranteService.atualizar(id, restauranteRequest);
         return ResponseEntity.ok(atualizado);
     }
 

@@ -17,11 +17,11 @@ class ProdutoRepositoryTest {
 
     @Test
     void testFindByRestaurante() {
-        Restaurante r = new Restaurante();
-        r.setNome("Burguer House");
-        r.setCategoria("Lanches");
-        r.setAtivo(true);
-        r.setAvaliacao(4.2);
+    Restaurante r = new Restaurante();
+    r.setNome("Burguer House");
+    r.setCategoria("Lanches");
+    r.setAtivo(true);
+    r.setAvaliacao(new java.math.BigDecimal("4.2"));
         restauranteRepository.save(r);
         Produto p = new Produto();
         p.setNome("X-Burguer");

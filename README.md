@@ -39,16 +39,20 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 
 ## 📈 Status do Projeto
 
-✅ Aplicação funcional, endpoints REST testados via Postman/Newman, DataLoader populando H2 e testes automatizados presentes.
+✅ Aplicação funcional, endpoints REST testados via Postman/Newman, DataLoader populando H2 e testes automatizados presentes. Estrutura de código alinhada a padrões modernos de arquitetura Java/Spring Boot, facilitando manutenção, testes e evolução.
 
 ---
 
-## ✅ Funcionalidades Implementadas
+## ✅ Funcionalidades e Refatorações Recentes
 
-- [x] CRUD completo para Cliente, Restaurante, Produto, Pedido
-- [x] Consultas customizadas nos repositórios
-- [x] DataLoader para carga de dados de teste
-- [x] Testes automatizados de repositório e serviço
+- [x] Refatoração completa dos serviços seguindo padrão interface/implementação, alinhado a projeto de referência
+- [x] Criação e uso de DTOs para requisições e respostas (ex: ClienteRequest, RestauranteRequest, ItemPedidoRequest)
+- [x] Enum StatusPedido implementado para status de pedidos, eliminando uso de String
+- [x] Modelos de domínio revisados e enriquecidos (Pedido, Produto, ItemPedido, Cliente, Restaurante)
+- [x] Repositórios atualizados com métodos customizados e queries otimizadas
+- [x] Controladores e DataLoader adaptados para novas assinaturas e tipos
+- [x] Testes automatizados revisados e compatíveis com as novas estruturas
+- [x] Build Maven com empacotamento Spring Boot (repackage) para geração de fat jar executável
 - [x] Collection Postman para testes de API
 
 ---

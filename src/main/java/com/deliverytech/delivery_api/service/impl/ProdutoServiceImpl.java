@@ -48,4 +48,67 @@ public class ProdutoServiceImpl implements ProdutoService {
     public Optional<Produto> buscarPorId(Long id) {
         return produtoRepository.findById(id);
     }
+
+    @Override
+    public List<Produto> listarTodos() {
+        return produtoRepository.findAll();
+    }
+
+    @Override
+    public Produto atualizar(Long id, Produto produtoAtualizado) {
+        Produto existente = produtoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        existente.setNome(produtoAtualizado.getNome());
+    existente.setCategoria(produtoAtualizado.getCategoria());
+    existente.setDisponivel(produtoAtualizado.getDisponivel());
+    existente.setRestaurante(produtoAtualizado.getRestaurante());
+        // Adicione outros campos conforme necessário
+        return produtoRepository.save(existente);
+    }
+
+    @Override
+    public void inativar(Long id) {
+        Produto produto = produtoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        produto.setDisponivel(false);
+        produtoRepository.save(produto);
+    }
+
+    @Override
+    public void deletar(Long id) {
+        if (!produtoRepository.existsById(id)) {
+            throw new RuntimeException("Produto não encontrado");
+        }
+        produtoRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Produto> buscarPorCategoria(String categoria) {
+        return produtoRepository.findByCategoria(categoria);
+    }
+
+    @Override
+    public List<Produto> buscarPorNome(String nome) {
+        // Supondo que exista um método customizado no repository, senão filtra em memória
+        // return produtoRepository.findByNomeContainingIgnoreCase(nome);
+        List<Produto> todos = produtoRepository.findAll();
+        return todos.stream()
+            .filter(p -> p.getNome() != null && p.getNome().toLowerCase().contains(nome.toLowerCase()))
+            .toList();
+    }
+
+    @Override
+    public void alterarDisponibilidade(Long id, boolean disponivel) {
+        Produto produto = produtoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        produto.setDisponivel(disponivel);
+        produtoRepository.save(produto);
+    }
+
+    @Override
+    public void validarPreco(java.math.BigDecimal preco) {
+        if (preco == null || preco.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Preço inválido");
+        }
+    }
 }

@@ -17,7 +17,7 @@ class PedidoRepositoryTest {
     private ClienteRepository clienteRepository;
 
     @Test
-    void testFindByCliente() {
+    void testFindByClienteId() {
         Cliente c = new Cliente();
         c.setNome("Carlos");
         c.setEmail("carlos@email.com");
@@ -25,10 +25,10 @@ class PedidoRepositoryTest {
         clienteRepository.save(c);
         Pedido p = new Pedido();
         p.setCliente(c);
-        p.setStatus("NOVO");
+        p.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CRIADO);
         p.setDataPedido(LocalDateTime.now());
         pedidoRepository.save(p);
-        List<Pedido> results = pedidoRepository.findByCliente(c);
+        List<Pedido> results = pedidoRepository.findByClienteId(c.getId());
         assertThat(results).isNotEmpty();
     }
 }
