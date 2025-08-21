@@ -31,7 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
-.github/
+.github/*
+!.github/workflows/
+!.github/workflows/**
 .mvn/
 *.log
 temp*
+bin/

@@ -1,0 +1,45 @@
+name: Build, Testes e Coverage Java Maven
+
+# Atenção: Nenhum binário gerado pelo build Java (JAR/WAR) ou imagem Docker será salvo ou publicado como artefato.
+# Somente o relatório de cobertura Jacoco será salvo como artefato neste workflow.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Permitir execução do Maven Wrapper
+        run: chmod +x ./mvnw
+
+      - name: Build, testes unitários e cobertura
+        run: ./mvnw clean verify
+
+  # Apenas o relatório de cobertura será salvo como artefato. Nenhum JAR/WAR será publicado.
+
+      - name: Publicar relatório de cobertura Jacoco
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-report
+          path: target/site/jacoco
+
+      # Build da imagem Docker apenas para validação. Não será feito push nem upload da imagem.
+      - name: Build da imagem Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: delivery-api-rabay:latest
