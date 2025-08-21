@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    container_name: delivery-api-rabay
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    # A aplicação poderá acessar o banco pelo hostname 'db'
+    # Não altere variáveis de ambiente da aplicação neste momento
+
+  db:
+    image: mysql:8.0
+    container_name: delivery-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: deliverydb
+      MYSQL_USER: deliveryuser
+      MYSQL_PASSWORD: deliverypass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # O banco estará acessível na rede interna como 'db:3306'
+
+volumes:
+  mysql_data:
+    driver: local
