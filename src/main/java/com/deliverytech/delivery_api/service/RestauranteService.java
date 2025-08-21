@@ -24,8 +24,13 @@ public class RestauranteService {
         return restauranteRepository.findById(id);
     }
 
+
     public List<Restaurante> buscarAtivos() {
         return restauranteRepository.findByAtivoTrue();
+    }
+
+    public List<Restaurante> buscarPorCategoria(String categoria) {
+        return restauranteRepository.findByCategoria(categoria);
     }
 
     public Restaurante ativar(Long id) {

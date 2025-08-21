@@ -40,4 +40,8 @@ public class ProdutoService {
     public List<Produto> buscarDisponiveis() {
         return produtoRepository.findByDisponivelTrue();
     }
+
+    public java.util.Optional<Produto> buscarPorId(Long id) {
+        return produtoRepository.findById(id);
+    }
 }
