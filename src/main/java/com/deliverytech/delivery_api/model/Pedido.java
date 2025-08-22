@@ -24,6 +24,9 @@ public class Pedido {
     private BigDecimal subtotal;
     private String observacoes;
 
+    @Embedded
+    private Endereco enderecoEntrega;
+
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
@@ -33,6 +36,8 @@ public class Pedido {
     private List<ItemPedido> itens;
 
     // Getters e setters
+    public Endereco getEnderecoEntrega() { return enderecoEntrega; }
+    public void setEnderecoEntrega(Endereco enderecoEntrega) { this.enderecoEntrega = enderecoEntrega; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Cliente getCliente() { return cliente; }

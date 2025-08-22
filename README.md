@@ -48,14 +48,17 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 
 - [x] Refatoração completa dos serviços seguindo padrão interface/implementação, alinhado a projeto de referência
 - [x] **Padronização de transações:** Todos os serviços (Cliente, Produto, Restaurante, Pedido) agora utilizam `@Transactional` no nível de classe e `@Transactional(readOnly = true)` nos métodos de leitura, conforme boas práticas do projeto de referência. Isso garante integridade transacional, melhor performance em consultas e alinhamento com padrões Spring modernos.
-- [x] Criação e uso de DTOs para requisições e respostas (ex: ClienteRequest, RestauranteRequest, ItemPedidoRequest)
-- [x] Enum StatusPedido implementado para status de pedidos, eliminando uso de String
-- [x] Modelos de domínio revisados e enriquecidos (Pedido, Produto, ItemPedido, Cliente, Restaurante)
-- [x] Repositórios atualizados com métodos customizados e queries otimizadas
-- [x] Controladores e DataLoader adaptados para novas assinaturas e tipos
-- [x] Testes automatizados revisados e compatíveis com as novas estruturas
-- [x] Build Maven com empacotamento Spring Boot (repackage) para geração de fat jar executável
-- [x] Collection Postman para testes de API
+- [x] Criação e uso de DTOs para requisições e respostas (ex: ClienteRequest, RestauranteRequest, ItemPedidoRequest, **PedidoRequest, PedidoResponse, StatusUpdateRequest, ItemPedidoResponse**)
+- [x] **PedidoController refatorado:** Agora utiliza DTOs, validação com `@Valid`, mapeamento explícito entre entidades e DTOs, e respostas REST padronizadas. Endpoints de pedido aceitam e retornam apenas DTOs, alinhando a API ao padrão moderno e desacoplando o domínio da camada web.
+- [x] **Campo enderecoEntrega** adicionado ao modelo Pedido, com mapeamento JPA e integração total com DTOs e controller.
+- [x] Métodos utilitários de mapeamento implementados no controller para conversão entre entidades e DTOs.
+- [x] Enum StatusPedido implementado para status de pedidos, eliminando uso de String.
+- [x] Modelos de domínio revisados e enriquecidos (Pedido, Produto, ItemPedido, Cliente, Restaurante, Endereco).
+- [x] Repositórios atualizados com métodos customizados e queries otimizadas.
+- [x] Controladores e DataLoader adaptados para novas assinaturas e tipos.
+- [x] Testes automatizados revisados e compatíveis com as novas estruturas.
+- [x] Build Maven com empacotamento Spring Boot (repackage) para geração de fat jar executável.
+- [x] Collection Postman para testes de API.
 
 ---
 
@@ -240,12 +243,36 @@ POST /produtos
 }
 ```
 
+
 ### Criar Pedido
 
 ```json
 POST /pedidos
 {
-	"cliente": {"id": 1}
+	"clienteId": 1,
+	"restauranteId": 1,
+	"enderecoEntrega": {
+		"rua": "Rua Exemplo",
+		"numero": "123",
+		"bairro": "Centro",
+		"cidade": "São Paulo",
+		"estado": "SP",
+		"cep": "01000-000",
+		"complemento": "Apto 101"
+	},
+	"itens": [
+		{ "produtoId": 1, "quantidade": 2 },
+		{ "produtoId": 2, "quantidade": 1 }
+	]
+}
+```
+
+### Atualizar status do pedido
+
+```json
+PUT /pedidos/{id}/status
+{
+	"status": "CONFIRMADO"
 }
 ```
 
@@ -256,7 +283,9 @@ POST /pedidos
 - `GET /clientes`, `POST /clientes`, `PUT /clientes/{id}`, `DELETE /clientes/{id}`
 - `GET /restaurantes`, `POST /restaurantes`, ...
 - `GET /produtos`, `POST /produtos`, ...
-- `GET /pedidos/cliente/{id}`, `POST /pedidos`, ...
+- `GET /pedidos/cliente/{clienteId}`: Lista pedidos de um cliente (retorna lista de PedidoResponse)
+- `POST /pedidos`: Cria pedido (recebe PedidoRequest, retorna PedidoResponse)
+- `PUT /pedidos/{id}/status`: Atualiza status do pedido (recebe StatusUpdateRequest, retorna PedidoResponse)
 - `GET /health`, `GET /info`, `GET /h2-console`
 
 ---
