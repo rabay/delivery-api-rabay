@@ -1,4 +1,3 @@
-
 # 🚀 Delivery API Rabay
 
 > **ATENÇÃO:** Este projeto utiliza CI/CD completo com GitHub Actions, build/teste automatizado, cobertura Jacoco e build de imagem Docker. Apenas o relatório de cobertura é salvo como artefato. Nenhum binário (JAR/WAR) ou imagem Docker é publicado pelo pipeline.
@@ -305,6 +304,20 @@ PUT /pedidos/{id}/status
 - Nenhum JAR/WAR ou imagem Docker é publicado pelo workflow.
 - O build Docker é feito apenas para validação.
 - Para publicar imagens, configure um job/passo extra conforme sua necessidade.
+
+---
+
+## 🚦 Padrão para consultas com relacionamentos LAZY (fetch join)
+
+- Para evitar erros de LazyInitializationException ao acessar coleções LAZY (ex: Pedido.itens) fora do contexto de sessão do Hibernate, foi implementado o método customizado no PedidoRepository usando @Query com fetch join:
+
+```java
+@Query("SELECT DISTINCT p FROM Pedido p LEFT JOIN FETCH p.itens i LEFT JOIN FETCH i.produto")
+List<Pedido> findAllWithItens();
+```
+
+- O DataLoader utiliza esse método para validar os relacionamentos e garantir que os itens dos pedidos estejam carregados corretamente, mesmo em contexto de inicialização ou testes.
+- Sempre que for necessário acessar coleções LAZY fora do controller/service, recomenda-se criar métodos com fetch join no repositório correspondente.
 
 ---
 
