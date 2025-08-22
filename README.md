@@ -48,7 +48,27 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 ---
 
 
+
 ## 🆕 Implementações e Correções Recentes (Agosto/2025)
+
+- [x] **Validação de E-mail Único e Erro 409:**
+	- Cadastro de cliente agora retorna HTTP 409 (Conflict) e mensagem clara ao tentar cadastrar e-mail já existente.
+	- Exceção customizada (`EmailDuplicadoException`) e tratamento global via `GlobalExceptionHandler`.
+	- Teste automatizado específico na collection Postman para garantir o comportamento correto.
+
+- [x] **Refatoração completa do módulo Cliente:**
+	- Implementação do padrão DTO para requisições e respostas (`ClienteRequest`, `ClienteResponse`).
+	- Criação da camada de mapeamento (`ClienteMapper`) para conversão entre entidade e DTO.
+	- Refatoração do serviço (`ClienteService`, `ClienteServiceImpl`) e controller para uso exclusivo de DTOs, eliminando exposição direta da entidade.
+	- Métodos legados marcados como `@Deprecated` para facilitar transição e manter compatibilidade temporária.
+	- Testes unitários e collection Postman atualizados para refletir o novo contrato de API (payloads e respostas).
+	- Validação e tratamento de erros padronizados para cadastro, atualização, busca e inativação de clientes.
+	- Documentação e exemplos de payloads revisados neste README.
+
+- [x] **Testes Postman idempotentes e robustos:**
+	- Os testes automatizados agora utilizam e-mails dinâmicos e únicos a cada execução, evitando falhas por dados duplicados.
+	- Adicionado teste específico para tentativa de cadastro com e-mail duplicado, validando o retorno do erro 409.
+	- Scripts de teste revisados para aceitar múltiplos status onde aplicável (ex: 200 ou 405), tornando a suite mais resiliente.
 
 - [x] **Soft Delete (Exclusão Lógica) implementado para Cliente, Restaurante e Produto:**
 	- Todas as entidades principais agora possuem o campo `excluido` (Boolean).
@@ -243,6 +263,7 @@ newman run entregaveis/delivery-api-rabay.postman_collection.json --reporters cl
 ## 📦 Exemplos de Uso (Payloads)
 
 
+
 ### Criar Cliente
 
 ```json
@@ -250,7 +271,22 @@ POST /clientes
 {
 	"nome": "Novo Cliente",
 	"email": "novo@email.com",
-	"ativo": true
+	"telefone": "11999999999",
+	"endereco": "Rua Exemplo, 123, Centro, São Paulo, SP"
+}
+```
+
+#### Exemplo de resposta (ClienteResponse)
+
+```json
+{
+	"id": 1,
+	"nome": "Novo Cliente",
+	"email": "novo@email.com",
+	"telefone": "11999999999",
+	"endereco": "Rua Exemplo, 123, Centro, São Paulo, SP",
+	"ativo": true,
+	"excluido": false
 }
 ```
 
@@ -332,7 +368,67 @@ POST /pedidos
 }
 ```
 
-### Atualizar status do pedido
+
+### Atualizar Cliente
+
+```json
+PUT /clientes/{id}
+{
+	"nome": "Cliente Atualizado",
+	"email": "atualizado@email.com",
+	"telefone": "11988888888",
+	"endereco": "Rua Nova, 456, Centro, São Paulo, SP"
+}
+```
+
+#### Exemplo de resposta (ClienteResponse)
+
+{
+	"id": 1,
+	"nome": "Cliente Atualizado",
+	"email": "atualizado@email.com",
+	"telefone": "11988888888",
+	"endereco": "Rua Nova, 456, Centro, São Paulo, SP",
+	"ativo": true,
+	"excluido": false
+}
+
+---
+
+### Buscar Cliente por Email
+
+`GET /clientes/email/{email}`
+
+Resposta:
+```json
+{
+	"id": 1,
+	"nome": "Novo Cliente",
+	"email": "novo@email.com",
+	"telefone": "11999999999",
+	"endereco": "Rua Exemplo, 123, Centro, São Paulo, SP",
+	"ativo": true,
+	"excluido": false
+}
+```
+
+---
+
+### Inativar Cliente (Soft Delete)
+
+`DELETE /clientes/{id}`
+
+Resposta:
+```json
+{
+	"id": 1,
+	"nome": "Novo Cliente",
+	"excluido": true,
+	...
+}
+```
+
+---
 
 ```json
 PUT /pedidos/{id}/status
@@ -374,7 +470,18 @@ Desde agosto/2025, a exclusão de clientes, restaurantes e produtos é feita por
 ---
 
 
-## 📋 Endpoints Principais
+
+## 📋 Endpoints Principais (Cliente)
+
+- `GET /clientes` — Lista todos os clientes ativos (retorna lista de `ClienteResponse`)
+- `GET /clientes/email/{email}` — Busca cliente por email (retorna `ClienteResponse`)
+- `POST /clientes` — Cria cliente (recebe `ClienteRequest`, retorna `ClienteResponse`)
+- `PUT /clientes/{id}` — Atualiza cliente (recebe `ClienteRequest`, retorna `ClienteResponse`)
+- `DELETE /clientes/{id}` — Inativa cliente (soft delete, retorna `ClienteResponse`)
+
+Todos os endpoints agora utilizam DTOs para entrada e saída, garantindo desacoplamento entre domínio e API, maior segurança e facilidade de evolução do contrato.
+
+---
 
 - `GET /clientes`, `POST /clientes`, `PUT /clientes/{id}`, `DELETE /clientes/{id}`
 - `GET /restaurantes`, `POST /restaurantes`, ...

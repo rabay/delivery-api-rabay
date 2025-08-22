@@ -3,7 +3,8 @@ package com.deliverytech.delivery_api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import com.deliverytech.delivery_api.model.Cliente;
+import com.deliverytech.delivery_api.dto.request.ClienteRequest;
+import com.deliverytech.delivery_api.dto.response.ClienteResponse;
 import com.deliverytech.delivery_api.service.ClienteService;
 
 import org.springframework.http.ResponseEntity;
@@ -25,23 +26,23 @@ public class ClienteController {
 
     @Operation(summary = "Cadastrar novo cliente", description = "Cria um novo cliente ativo no sistema.")
     @PostMapping
-    public ResponseEntity<Cliente> criar(@Valid @RequestBody Cliente cliente) {
-        Cliente novo = clienteService.cadastrar(cliente);
+    public ResponseEntity<ClienteResponse> criar(@Valid @RequestBody ClienteRequest clienteRequest) {
+        ClienteResponse novo = clienteService.cadastrar(clienteRequest);
         return ResponseEntity.status(201).body(novo);
     }
 
 
     @Operation(summary = "Listar clientes ativos", description = "Retorna todos os clientes ativos cadastrados.")
     @GetMapping
-    public List<Cliente> listar() {
-        return clienteService.buscarAtivos();
+    public List<ClienteResponse> listar() {
+        return clienteService.listarAtivos();
     }
 
 
-    @Operation(summary = "Buscar cliente por ID", description = "Consulta um cliente pelo seu identificador único.")
-    @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarPorId(@PathVariable Long id) {
-        return clienteService.buscarPorId(id)
+    @Operation(summary = "Buscar cliente por e-mail", description = "Consulta um cliente pelo e-mail.")
+    @GetMapping("/email/{email}")
+    public ResponseEntity<ClienteResponse> buscarPorEmail(@PathVariable String email) {
+        return clienteService.buscarPorEmail(email)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -49,11 +50,8 @@ public class ClienteController {
 
     @Operation(summary = "Atualizar cliente", description = "Atualiza os dados de um cliente existente.")
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @Valid @RequestBody Cliente cliente) {
-        if (!id.equals(cliente.getId())) {
-            return ResponseEntity.badRequest().build();
-        }
-        Cliente atualizado = clienteService.atualizar(cliente);
+    public ResponseEntity<ClienteResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ClienteRequest clienteRequest) {
+        ClienteResponse atualizado = clienteService.atualizar(id, clienteRequest);
         return ResponseEntity.ok(atualizado);
     }
 

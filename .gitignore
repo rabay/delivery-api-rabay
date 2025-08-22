@@ -41,3 +41,8 @@ bin/
 
 # Ignorar arquivo de memória do agente
 .github/instructions/memory.instruction.md
+
+# Ignorar resultado do Newman
+entregaveis/newman-result.json
+
+plan/

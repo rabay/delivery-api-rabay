@@ -1,22 +1,27 @@
 package com.deliverytech.delivery_api.service;
 
-import com.deliverytech.delivery_api.model.Cliente;
+import com.deliverytech.delivery_api.dto.request.ClienteRequest;
+import com.deliverytech.delivery_api.dto.response.ClienteResponse;
 import java.util.Optional;
 import java.util.List;
 
-// Adaptação para alinhar com o projeto de referência
 public interface ClienteService {
-    Cliente cadastrar(Cliente cliente); // manter para compatibilidade
-    Optional<Cliente> buscarPorId(Long id);
-    List<Cliente> buscarAtivos();
-    Cliente atualizar(Cliente cliente);
-    void inativar(Long id);
+    // Métodos compatíveis para uso interno/legado
+    @Deprecated
+    com.deliverytech.delivery_api.model.Cliente cadastrar(com.deliverytech.delivery_api.model.Cliente cliente);
+    @Deprecated
+    Optional<com.deliverytech.delivery_api.model.Cliente> buscarPorId(Long id);
+    @Deprecated
+    List<com.deliverytech.delivery_api.model.Cliente> buscarAtivos();
+    @Deprecated
+    com.deliverytech.delivery_api.model.Cliente atualizar(com.deliverytech.delivery_api.model.Cliente cliente);
 
-    // Métodos do projeto de referência
-    Cliente cadastrar(com.deliverytech.delivery_api.dto.request.ClienteRequest clienteRequest);
-    Optional<Cliente> buscarPorEmail(String email);
-    List<Cliente> listarAtivos();
-    List<Cliente> buscarPorNome(String nome);
-    Cliente atualizar(Long id, com.deliverytech.delivery_api.dto.request.ClienteRequest clienteRequest);
-    Cliente ativarDesativarCliente(Long id);
+    // Métodos novos com DTOs
+    ClienteResponse cadastrar(ClienteRequest clienteRequest);
+    Optional<ClienteResponse> buscarPorEmail(String email);
+    List<ClienteResponse> listarAtivos();
+    List<ClienteResponse> buscarPorNome(String nome);
+    ClienteResponse atualizar(Long id, ClienteRequest clienteRequest);
+    void inativar(Long id);
+    ClienteResponse ativarDesativarCliente(Long id);
 }

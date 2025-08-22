@@ -1,18 +1,12 @@
-package com.deliverytech.delivery_api.model;
+package com.deliverytech.delivery_api.dto.response;
 
-import jakarta.persistence.*;
-
-@Entity
-public class Cliente {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ClienteResponse {
     private Long id;
     private String nome;
     private String email;
     private String telefone;
     private String endereco;
     private boolean ativo;
-    private Boolean excluido = false;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -26,6 +20,4 @@ public class Cliente {
     public void setEndereco(String endereco) { this.endereco = endereco; }
     public boolean isAtivo() { return ativo; }
     public void setAtivo(boolean ativo) { this.ativo = ativo; }
-    public Boolean getExcluido() { return excluido; }
-    public void setExcluido(Boolean excluido) { this.excluido = excluido; }
 }

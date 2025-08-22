@@ -3,24 +3,30 @@ package com.deliverytech.delivery_api.service.impl;
 import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
 import com.deliverytech.delivery_api.service.ClienteService;
+import com.deliverytech.delivery_api.dto.request.ClienteRequest;
+import com.deliverytech.delivery_api.dto.response.ClienteResponse;
+import com.deliverytech.delivery_api.mapper.ClienteMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Optional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class ClienteServiceImpl implements ClienteService {
     private static final Logger log = LoggerFactory.getLogger(ClienteServiceImpl.class);
     private final ClienteRepository clienteRepository;
+    private final ClienteMapper clienteMapper;
 
-    public ClienteServiceImpl(ClienteRepository clienteRepository) {
+    public ClienteServiceImpl(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
         this.clienteRepository = clienteRepository;
+        this.clienteMapper = clienteMapper;
     }
 
-    @Override
+    @Deprecated
     public Cliente cadastrar(Cliente cliente) {
         if (clienteRepository.findByEmailAndExcluidoFalse(cliente.getEmail()).isPresent()) {
             log.warn("Tentativa de cadastro de cliente com e-mail já existente: {}", cliente.getEmail());
@@ -30,49 +36,54 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public Cliente cadastrar(com.deliverytech.delivery_api.dto.request.ClienteRequest clienteRequest) {
-        Cliente cliente = new Cliente();
-        cliente.setNome(clienteRequest.getNome());
-        cliente.setEmail(clienteRequest.getEmail());
-        cliente.setAtivo(true);
-        // Adapte para outros campos se existirem no modelo
-        return cadastrar(cliente);
+    public ClienteResponse cadastrar(ClienteRequest clienteRequest) {
+        Cliente cliente = clienteMapper.toEntity(clienteRequest);
+        if (clienteRepository.findByEmailAndExcluidoFalse(cliente.getEmail()).isPresent()) {
+            log.warn("Tentativa de cadastro de cliente com e-mail já existente: {}", cliente.getEmail());
+            throw new com.deliverytech.delivery_api.exception.EmailDuplicadoException(cliente.getEmail());
+        }
+        Cliente salvo = clienteRepository.save(cliente);
+        return clienteMapper.toResponse(salvo);
     }
 
-    @Override
     @Transactional(readOnly = true)
+    @Deprecated
     public Optional<Cliente> buscarPorId(Long id) {
         return clienteRepository.findById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Cliente> buscarPorEmail(String email) {
-        return clienteRepository.findByEmailAndExcluidoFalse(email);
+    public Optional<ClienteResponse> buscarPorEmail(String email) {
+        return clienteRepository.findByEmailAndExcluidoFalse(email)
+                .map(clienteMapper::toResponse);
     }
 
-    @Override
     @Transactional(readOnly = true)
+    @Deprecated
     public List<Cliente> buscarAtivos() {
         return clienteRepository.findByAtivoTrueAndExcluidoFalse();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Cliente> listarAtivos() {
-        return clienteRepository.findByAtivoTrueAndExcluidoFalse();
+    public List<ClienteResponse> listarAtivos() {
+        return clienteRepository.findByAtivoTrueAndExcluidoFalse()
+                .stream()
+                .map(clienteMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Cliente> buscarPorNome(String nome) {
-        List<Cliente> todos = clienteRepository.findByAtivoTrueAndExcluidoFalse();
-        return todos.stream()
-            .filter(c -> c.getNome() != null && c.getNome().toLowerCase().contains(nome.toLowerCase()))
-            .toList();
+    public List<ClienteResponse> buscarPorNome(String nome) {
+        return clienteRepository.findByAtivoTrueAndExcluidoFalse().stream()
+                .filter(c -> c.getNome() != null && c.getNome().toLowerCase().contains(nome.toLowerCase()))
+                .map(clienteMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    @Override
+    @Deprecated
     public Cliente atualizar(Cliente cliente) {
         if (!clienteRepository.existsById(cliente.getId())) {
             throw new RuntimeException("Cliente não encontrado");
@@ -81,20 +92,22 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public Cliente atualizar(Long id, com.deliverytech.delivery_api.dto.request.ClienteRequest clienteRequest) {
+    public ClienteResponse atualizar(Long id, ClienteRequest clienteRequest) {
         Cliente existente = clienteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
         existente.setNome(clienteRequest.getNome());
         existente.setEmail(clienteRequest.getEmail());
-        // Adapte para outros campos se existirem no modelo
-        return clienteRepository.save(existente);
+        existente.setTelefone(clienteRequest.getTelefone());
+        existente.setEndereco(clienteRequest.getEndereco());
+        Cliente atualizado = clienteRepository.save(existente);
+        return clienteMapper.toResponse(atualizado);
     }
 
     @Override
     public void inativar(Long id) {
         Cliente cliente = clienteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-    if (!cliente.isAtivo() || Boolean.TRUE.equals(cliente.getExcluido())) {
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        if (!cliente.isAtivo() || Boolean.TRUE.equals(cliente.getExcluido())) {
             log.info("Cliente já estava inativo ou excluído: id={}, email={}", cliente.getId(), cliente.getEmail());
         } else {
             cliente.setAtivo(false);
@@ -105,10 +118,11 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public Cliente ativarDesativarCliente(Long id) {
+    public ClienteResponse ativarDesativarCliente(Long id) {
         Cliente cliente = clienteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
         cliente.setAtivo(!cliente.isAtivo());
-        return clienteRepository.save(cliente);
+        Cliente atualizado = clienteRepository.save(cliente);
+        return clienteMapper.toResponse(atualizado);
     }
 }
