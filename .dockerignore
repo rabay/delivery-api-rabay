@@ -1,0 +1,16 @@
+# Evita arquivos desnecessários no contexto do build Docker
+/target
+/.mvn
+*.md
+*.iml
+.idea
+*.log
+*.swp
+*.swo
+.DS_Store
+.git
+.gitignore
+HELP.md
+README.md
+entregaveis/
+scripts/
