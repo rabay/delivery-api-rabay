@@ -5,6 +5,7 @@ import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.service.PedidoService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,7 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional
 public class PedidoServiceImpl implements PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ProdutoRepository produtoRepository;
@@ -32,22 +36,26 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Pedido buscarPorId(Long id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Pedido> buscarPorCliente(Long clienteId) {
         return pedidoRepository.findByClienteId(clienteId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Pedido> buscarPorRestaurante(Long restauranteId) {
         return pedidoRepository.findByRestauranteId(restauranteId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Pedido> buscarPorStatus(StatusPedido status) {
         return pedidoRepository.findByStatus(status);
     }
@@ -103,6 +111,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal calcularTotal(Pedido pedido) {
         if (pedido.getItens() == null || pedido.getItens().isEmpty()) {
             return BigDecimal.ZERO;
@@ -113,6 +122,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal calcularTotalPedido(List<ItemPedidoRequest> itens) {
         if (itens == null || itens.isEmpty()) {
             return BigDecimal.ZERO;
@@ -133,6 +143,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Pedido> listarComFiltros(StatusPedido status, LocalDate dataInicio, LocalDate dataFim) {
         if (status == null && dataInicio == null && dataFim == null) {
             return pedidoRepository.findAll();
@@ -158,21 +169,25 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Pedido> buscarPorPeriodo(LocalDateTime inicio, LocalDateTime fim) {
         return pedidoRepository.findByDataPedidoBetween(inicio, fim);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Pedido> buscarPorIdComItens(Long id) {
         return pedidoRepository.findByIdWithItens(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Pedido> buscarPorClienteComItens(Long clienteId) {
         return pedidoRepository.findByClienteIdWithItens(clienteId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Pedido> listarTodos() {
         return pedidoRepository.findAll();
     }

@@ -5,10 +5,12 @@ import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.service.ProdutoService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ProdutoServiceImpl implements ProdutoService {
     private final ProdutoRepository produtoRepository;
 
@@ -35,21 +37,25 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Produto> buscarPorRestaurante(Restaurante restaurante) {
         return produtoRepository.findByRestaurante(restaurante);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Produto> buscarDisponiveis() {
         return produtoRepository.findByDisponivelTrue();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Produto> buscarPorId(Long id) {
         return produtoRepository.findById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Produto> listarTodos() {
         return produtoRepository.findAll();
     }
@@ -83,11 +89,13 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Produto> buscarPorCategoria(String categoria) {
         return produtoRepository.findByCategoria(categoria);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Produto> buscarPorNome(String nome) {
         // Supondo que exista um método customizado no repository, senão filtra em memória
         // return produtoRepository.findByNomeContainingIgnoreCase(nome);

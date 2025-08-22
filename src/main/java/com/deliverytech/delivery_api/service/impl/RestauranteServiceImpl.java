@@ -5,11 +5,13 @@ import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
 import com.deliverytech.delivery_api.service.RestauranteService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.List;
 import java.math.BigDecimal;
 
 @Service
+@Transactional
 public class RestauranteServiceImpl implements RestauranteService {
     private final RestauranteRepository restauranteRepository;
 
@@ -33,31 +35,37 @@ public class RestauranteServiceImpl implements RestauranteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Restaurante> buscarPorId(Long id) {
         return restauranteRepository.findById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Restaurante> listarTodos() {
         return restauranteRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Restaurante> listarAtivos() {
         return restauranteRepository.findByAtivoTrue();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Restaurante> buscarPorCategoria(String categoria) {
         return restauranteRepository.findByCategoria(categoria);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Restaurante> buscarPorAvaliacao(BigDecimal minAvaliacao) {
         return restauranteRepository.findByAvaliacaoGreaterThanEqual(minAvaliacao);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Restaurante> buscarPorTaxaEntrega(BigDecimal maxTaxa) {
         return restauranteRepository.findByTaxaEntregaLessThanEqual(maxTaxa);
     }
@@ -128,6 +136,7 @@ public class RestauranteServiceImpl implements RestauranteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Restaurante> buscarProximos(String cep) {
         List<Restaurante> restaurantesAtivos = restauranteRepository.findByAtivoTrue();
         String primeirosDigitos = cep.substring(0, Math.min(2, cep.length()));
@@ -146,6 +155,7 @@ public class RestauranteServiceImpl implements RestauranteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Restaurante> listarComFiltros(String categoria, Boolean ativo) {
         if (categoria == null && ativo == null) {
             return restauranteRepository.findAll();

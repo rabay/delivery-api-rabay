@@ -43,9 +43,11 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 
 ---
 
+
 ## ✅ Funcionalidades e Refatorações Recentes
 
 - [x] Refatoração completa dos serviços seguindo padrão interface/implementação, alinhado a projeto de referência
+- [x] **Padronização de transações:** Todos os serviços (Cliente, Produto, Restaurante, Pedido) agora utilizam `@Transactional` no nível de classe e `@Transactional(readOnly = true)` nos métodos de leitura, conforme boas práticas do projeto de referência. Isso garante integridade transacional, melhor performance em consultas e alinhamento com padrões Spring modernos.
 - [x] Criação e uso de DTOs para requisições e respostas (ex: ClienteRequest, RestauranteRequest, ItemPedidoRequest)
 - [x] Enum StatusPedido implementado para status de pedidos, eliminando uso de String
 - [x] Modelos de domínio revisados e enriquecidos (Pedido, Produto, ItemPedido, Cliente, Restaurante)

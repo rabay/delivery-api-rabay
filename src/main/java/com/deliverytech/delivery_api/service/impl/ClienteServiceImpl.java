@@ -4,10 +4,12 @@ import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
 import com.deliverytech.delivery_api.service.ClienteService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.List;
 
 @Service
+@Transactional
 public class ClienteServiceImpl implements ClienteService {
     private final ClienteRepository clienteRepository;
 
@@ -34,26 +36,31 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Cliente> buscarPorId(Long id) {
         return clienteRepository.findById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Cliente> buscarPorEmail(String email) {
         return clienteRepository.findByEmail(email);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Cliente> buscarAtivos() {
         return clienteRepository.findByAtivoTrue();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Cliente> listarAtivos() {
         return clienteRepository.findByAtivoTrue();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Cliente> buscarPorNome(String nome) {
         List<Cliente> todos = clienteRepository.findAll();
         return todos.stream()
