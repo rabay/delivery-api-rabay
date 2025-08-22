@@ -342,6 +342,7 @@ Commits organizados por feature, correção e entregáveis. Veja histórico no r
 3. Valide os dados no H2 Console
 4. Consulte este README para exemplos e instruções
 
+## Desenvolvido por:
 
 Victor Alexandre Rabay - TI 58A 02728 - Arquitetura de Sistemas
 Desenvolvido com JDK 21 e Spring Boot 3.2.x
