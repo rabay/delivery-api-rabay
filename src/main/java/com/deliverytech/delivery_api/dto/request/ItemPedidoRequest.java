@@ -1,14 +1,20 @@
+
 package com.deliverytech.delivery_api.dto.request;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+@Schema(description = "DTO para item de pedido.")
 public class ItemPedidoRequest {
     @NotNull(message = "ID do produto é obrigatório")
+    @Schema(description = "ID do produto.", example = "5")
     private Long produtoId;
 
     @NotNull(message = "Quantidade é obrigatória")
     @Positive(message = "Quantidade deve ser maior que zero")
+    @Schema(description = "Quantidade do produto no pedido.", example = "2")
     private Integer quantidade;
 
     public ItemPedidoRequest() {}

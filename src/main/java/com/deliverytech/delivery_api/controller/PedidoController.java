@@ -1,4 +1,8 @@
+
 package com.deliverytech.delivery_api.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.model.StatusPedido;
@@ -15,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/pedidos")
+@Tag(name = "Pedidos", description = "Criação, consulta e atualização de pedidos realizados pelos clientes.")
 public class PedidoController {
     private final PedidoService pedidoService;
 
@@ -22,6 +27,7 @@ public class PedidoController {
         this.pedidoService = pedidoService;
     }
 
+    @Operation(summary = "Criar novo pedido", description = "Cria um novo pedido para um cliente em um restaurante.")
     @PostMapping
     public ResponseEntity<PedidoResponse> criar(@Valid @RequestBody PedidoRequest pedidoRequest) {
         Pedido pedido = mapToEntity(pedidoRequest);
@@ -30,6 +36,7 @@ public class PedidoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "Listar pedidos de um cliente", description = "Retorna todos os pedidos realizados por um cliente específico.")
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<List<PedidoResponse>> buscarPorCliente(@PathVariable Long clienteId) {
         List<Pedido> pedidos = pedidoService.buscarPorCliente(clienteId);
@@ -37,6 +44,7 @@ public class PedidoController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "Atualizar status do pedido", description = "Atualiza o status de um pedido existente (ex: CRIADO, ENTREGUE, CANCELADO).")
     @PutMapping("/{id}/status")
     public ResponseEntity<PedidoResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusUpdateRequest statusUpdateRequest) {
         StatusPedido status = StatusPedido.valueOf(statusUpdateRequest.getStatus());

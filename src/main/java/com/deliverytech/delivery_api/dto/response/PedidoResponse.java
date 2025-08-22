@@ -1,4 +1,7 @@
+
 package com.deliverytech.delivery_api.dto.response;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import com.deliverytech.delivery_api.model.StatusPedido;
 import com.deliverytech.delivery_api.model.Endereco;
@@ -6,14 +9,23 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Schema(description = "DTO de resposta para pedidos.")
 public class PedidoResponse {
+    @Schema(description = "ID do pedido.", example = "10")
     private Long id;
+    @Schema(description = "ID do cliente.", example = "1")
     private Long clienteId;
+    @Schema(description = "ID do restaurante.", example = "2")
     private Long restauranteId;
+    @Schema(description = "Endereço de entrega do pedido.")
     private Endereco enderecoEntrega;
+    @Schema(description = "Valor total do pedido.", example = "99.90")
     private BigDecimal valorTotal;
+    @Schema(description = "Status atual do pedido.", example = "CRIADO")
     private StatusPedido status;
+    @Schema(description = "Data/hora do pedido.", example = "2025-08-21T12:34:56")
     private LocalDateTime dataPedido;
+    @Schema(description = "Lista de itens do pedido.")
     private List<ItemPedidoResponse> itens;
 
     public PedidoResponse() {}
