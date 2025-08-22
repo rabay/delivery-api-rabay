@@ -21,6 +21,9 @@ public class RestauranteServiceImpl implements RestauranteService {
 
     @Override
     public Restaurante cadastrar(RestauranteRequest restauranteRequest) {
+        if (restauranteRequest.getNome() == null || restauranteRequest.getNome().trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome do restaurante é obrigatório.");
+        }
         Restaurante restaurante = new Restaurante();
         restaurante.setNome(restauranteRequest.getNome());
         restaurante.setCategoria(restauranteRequest.getCategoria());

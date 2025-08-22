@@ -18,9 +18,28 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pedidos")
+@RequestMapping("/api/pedidos")
 @Tag(name = "Pedidos", description = "Criação, consulta e atualização de pedidos realizados pelos clientes.")
 public class PedidoController {
+
+    @Operation(summary = "Buscar pedido por ID", description = "Retorna um pedido pelo seu identificador.")
+    @GetMapping("/{id}")
+    public ResponseEntity<PedidoResponse> buscarPorId(@PathVariable Long id) {
+        try {
+            Pedido pedido = pedidoService.buscarPorId(id);
+            if (pedido == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(mapToResponse(pedido));
+        } catch (RuntimeException ex) {
+            if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("não encontrado")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
     private final PedidoService pedidoService;
 
     public PedidoController(PedidoService pedidoService) {
