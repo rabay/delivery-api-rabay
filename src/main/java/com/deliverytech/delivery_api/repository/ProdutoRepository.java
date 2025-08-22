@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     List<Produto> findByRestaurante(Restaurante restaurante);
+    List<Produto> findByRestauranteId(Long restauranteId);
     List<Produto> findByCategoria(String categoria);
     List<Produto> findByDisponivelTrue();
+    List<Produto> findByPrecoLessThanEqual(java.math.BigDecimal preco);
 }

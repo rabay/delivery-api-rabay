@@ -33,11 +33,87 @@ public class DataLoader implements CommandLineRunner {
         inserirRestaurantes();
         inserirPedidos();
 
+    // Validação das consultas derivadas
+    validarConsultas();
+
         System.out.println("=== CARGA DE DADOS CONCLUÍDA ===");
         System.out.println("\n✅ Spring Boot Application iniciada com sucesso!");
         System.out.println("\n🎯 SISTEMA DE CAPTURA AUTOMÁTICA ATIVO!");
         System.out.println("📁 Respostas serão salvas em: ./entregaveis/");
         System.out.println("🔄 Faça requisições para /api/* e veja os arquivos sendo gerados!\n");
+    }
+    private void validarConsultas() {
+        System.out.println("\n=== Validação das Consultas Derivadas ===");
+
+        // ClienteRepository
+        System.out.println("\nClientes ativos:");
+        clienteRepository.findByAtivoTrue().forEach(c -> System.out.println("- " + c.getNome() + " (" + c.getEmail() + ")"));
+
+        System.out.println("\nCliente por email (joao@email.com):");
+        clienteRepository.findByEmail("joao@email.com").ifPresentOrElse(
+            c -> System.out.println("Encontrado: " + c.getNome()),
+            () -> System.out.println("Não encontrado")
+        );
+
+        System.out.println("\nExiste cliente com email maria@email.com? " + clienteRepository.existsByEmail("maria@email.com"));
+
+        System.out.println("\nClientes com nome contendo 'Silva':");
+        clienteRepository.findByNomeContainingIgnoreCase("Silva").forEach(c -> System.out.println("- " + c.getNome()));
+
+        // RestauranteRepository
+        System.out.println("\nRestaurantes por categoria 'Italiana':");
+        restauranteRepository.findByCategoria("Italiana").forEach(r -> System.out.println("- " + r.getNome()));
+
+        System.out.println("\nRestaurantes ativos:");
+        restauranteRepository.findByAtivoTrue().forEach(r -> System.out.println("- " + r.getNome()));
+
+        System.out.println("\nRestaurantes com taxa de entrega <= 5.00:");
+        restauranteRepository.findByTaxaEntregaLessThanEqual(new java.math.BigDecimal("5.00")).forEach(r -> System.out.println("- " + r.getNome()));
+
+        System.out.println("\nTop 5 restaurantes por nome:");
+        restauranteRepository.findTop5ByOrderByNomeAsc().forEach(r -> System.out.println("- " + r.getNome()));
+
+        // ProdutoRepository
+        var restaurantes = restauranteRepository.findAll();
+        if (!restaurantes.isEmpty()) {
+            var primeiroRestaurante = restaurantes.get(0);
+            System.out.println("\nProdutos do restaurante '" + primeiroRestaurante.getNome() + "':");
+            produtoRepository.findByRestauranteId(primeiroRestaurante.getId()).forEach(p -> System.out.println("- " + p.getNome()));
+        }
+
+        System.out.println("\nProdutos disponíveis:");
+        produtoRepository.findByDisponivelTrue().forEach(p -> System.out.println("- " + p.getNome()));
+
+        System.out.println("\nProdutos da categoria 'Pizza':");
+        produtoRepository.findByCategoria("Pizza").forEach(p -> System.out.println("- " + p.getNome()));
+
+        System.out.println("\nProdutos com preço <= 30.00:");
+        produtoRepository.findByPrecoLessThanEqual(new java.math.BigDecimal("30.00")).forEach(p -> System.out.println("- " + p.getNome()));
+
+        // PedidoRepository
+        var clientes = clienteRepository.findAll();
+        if (!clientes.isEmpty()) {
+            var primeiroCliente = clientes.get(0);
+            System.out.println("\nPedidos do cliente '" + primeiroCliente.getNome() + "':");
+            pedidoRepository.findByClienteId(primeiroCliente.getId()).forEach(p -> System.out.println("- Pedido ID: " + p.getId() + ", Status: " + p.getStatus()));
+        }
+
+        System.out.println("\nPedidos com status CRIADO:");
+        pedidoRepository.findByStatus(com.deliverytech.delivery_api.model.StatusPedido.CRIADO).forEach(p -> System.out.println("- Pedido ID: " + p.getId()));
+
+        System.out.println("\nTop 10 pedidos mais recentes:");
+        pedidoRepository.findTop10ByOrderByDataPedidoDesc().forEach(p -> System.out.println("- Pedido ID: " + p.getId() + ", Data: " + p.getDataPedido()));
+
+        var agora = java.time.LocalDateTime.now();
+        var ontem = agora.minusDays(1);
+        System.out.println("\nPedidos entre ontem e agora:");
+        pedidoRepository.findByDataPedidoBetween(ontem, agora).forEach(p -> System.out.println("- Pedido ID: " + p.getId()));
+
+        // Relacionamentos
+        System.out.println("\nItens dos pedidos:");
+        pedidoRepository.findAllWithItens().forEach(p -> {
+            System.out.println("Pedido ID: " + p.getId() + ", Cliente: " + (p.getCliente() != null ? p.getCliente().getNome() : "-") + ", Itens: " + (p.getItens() != null ? p.getItens().size() : 0));
+        });
     }
 
     private void inserirPedidos() {

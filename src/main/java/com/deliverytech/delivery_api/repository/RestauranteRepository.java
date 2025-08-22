@@ -12,7 +12,8 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     List<Restaurante> findByAtivoTrue();
     List<Restaurante> findAllByOrderByAvaliacaoDesc();
     List<Restaurante> findByAvaliacaoGreaterThanEqual(BigDecimal minAvaliacao);
-    List<Restaurante> findByTaxaEntregaLessThanEqual(BigDecimal maxTaxa);
+    List<Restaurante> findByTaxaEntregaLessThanEqual(BigDecimal taxa);
     List<Restaurante> findByAtivoFalse();
     List<Restaurante> findByCategoriaAndAtivo(String categoria, Boolean ativo);
+    List<Restaurante> findTop5ByOrderByNomeAsc();
 }
