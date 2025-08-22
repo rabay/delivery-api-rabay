@@ -43,12 +43,38 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 ---
 
 
+
 ## ✅ Funcionalidades e Refatorações Recentes
+---
+
+
+## 🆕 Implementações e Correções Recentes (Agosto/2025)
+
+- [x] **Soft Delete (Exclusão Lógica) implementado para Cliente, Restaurante e Produto:**
+	- Todas as entidades principais agora possuem o campo `excluido` (Boolean).
+	- Endpoints DELETE marcam o registro como `excluido=true` ao invés de remover fisicamente.
+	- Todas as consultas, buscas e listagens foram refatoradas para considerar apenas registros com `excluido=false`.
+	- O campo `excluido` é retornado nas respostas detalhadas (por ID).
+- [x] **Refatoração dos repositórios:**
+	- Métodos derivados atualizados para incluir o filtro `AndExcluidoFalse` (ex: `findByAtivoTrueAndExcluidoFalse`, `findByCategoriaAndExcluidoFalse`).
+	- Métodos com ordem corrigidos para o padrão correto do Spring Data JPA (ex: `findAllByExcluidoFalseOrderByAvaliacaoDesc`).
+- [x] **Atualização do DataLoader e serviços:**
+	- Todos os usos de métodos antigos dos repositórios foram atualizados para as novas assinaturas.
+	- DataLoader validando queries e exemplos de uso com soft delete.
+- [x] **Testes automatizados revisados:**
+	- Testes de repositório e service atualizados para cobrir cenários de soft delete.
+	- Todos os testes passam e a build está verde.
+- [x] **Correção de build:**
+	- Corrigidos erros de contexto do Spring causados por métodos derivados inválidos.
+	- Projeto compila e executa normalmente após as correções.
+
+---
 
 - [x] Refatoração completa dos serviços seguindo padrão interface/implementação, alinhado a projeto de referência
 - [x] **Padronização de transações:** Todos os serviços (Cliente, Produto, Restaurante, Pedido) agora utilizam `@Transactional` no nível de classe e `@Transactional(readOnly = true)` nos métodos de leitura, conforme boas práticas do projeto de referência. Isso garante integridade transacional, melhor performance em consultas e alinhamento com padrões Spring modernos.
 - [x] Criação e uso de DTOs para requisições e respostas (ex: ClienteRequest, RestauranteRequest, ItemPedidoRequest, **PedidoRequest, PedidoResponse, StatusUpdateRequest, ItemPedidoResponse**)
 - [x] **PedidoController refatorado:** Agora utiliza DTOs, validação com `@Valid`, mapeamento explícito entre entidades e DTOs, e respostas REST padronizadas. Endpoints de pedido aceitam e retornam apenas DTOs, alinhando a API ao padrão moderno e desacoplando o domínio da camada web.
+	- **Novo contrato de resposta:** O endpoint de criação de pedido (`POST /pedidos`) agora retorna um objeto `cliente` (com `id` e `nome`) dentro do `PedidoResponse`, e não apenas o campo `clienteId`. Isso garante maior clareza e aderência ao padrão REST.
 - [x] **Campo enderecoEntrega** adicionado ao modelo Pedido, com mapeamento JPA e integração total com DTOs e controller.
 - [x] Métodos utilitários de mapeamento implementados no controller para conversão entre entidades e DTOs.
 - [x] Enum StatusPedido implementado para status de pedidos, eliminando uso de String.
@@ -184,15 +210,17 @@ O summary traz:
 - **Dependency-Check:** `dependency-check-report/index.html` (local ou artefato do CI)
 
 
-### Teste Manual
+
+### Teste Manual e Automatizado (Postman/Newman)
 
 Importe a collection Postman:
 
 - `entregaveis/delivery-api-rabay.postman_collection.json`
+
+#### Execução manual:
 - Execute todos os endpoints para validar regras de negócio e dados de exemplo.
 
-
-### Teste Automatizado (Newman)
+#### Execução automatizada (Newman):
 
 Com a aplicação rodando, execute:
 
@@ -200,7 +228,15 @@ Com a aplicação rodando, execute:
 newman run entregaveis/delivery-api-rabay.postman_collection.json --reporters cli --insecure
 ```
 
-Saída esperada: todos os requests com status 2xx/201/204, sem falhas.
+**Validação automatizada:**
+- Todos os requests principais possuem scripts de teste (assertions) para status code, campos obrigatórios e estrutura do corpo.
+- Os fluxos de pedidos validam que o campo `cliente` está presente no retorno, além de `id`, `status` e demais campos.
+- O resultado esperado é: todos os requests com status 2xx/201/204, sem falhas de assertions.
+
+**Cobertura dos testes automatizados:**
+- Criação, atualização, exclusão lógica e consulta de clientes, restaurantes, produtos e pedidos.
+- Validação de soft delete e isolamento de dados de teste.
+- Testes de fluxo completo de pedidos, incluindo assertions detalhados no retorno.
 
 ---
 
@@ -243,12 +279,39 @@ POST /produtos
 ```
 
 
+
 ### Criar Pedido
 
 ```json
 POST /pedidos
 {
-	"clienteId": 1,
+		"clienteId": 1,
+		"restauranteId": 1,
+		"enderecoEntrega": {
+				"rua": "Rua Exemplo",
+				"numero": "123",
+				"bairro": "Centro",
+				"cidade": "São Paulo",
+				"estado": "SP",
+				"cep": "01000-000",
+				"complemento": "Apto 101"
+		},
+		"itens": [
+				{ "produtoId": 1, "quantidade": 2 },
+				{ "produtoId": 2, "quantidade": 1 }
+		]
+}
+```
+
+#### Exemplo de resposta do endpoint de criação de pedido
+
+```json
+{
+	"id": 10,
+	"cliente": {
+		"id": 1,
+		"nome": "João Silva"
+	},
 	"restauranteId": 1,
 	"enderecoEntrega": {
 		"rua": "Rua Exemplo",
@@ -259,9 +322,12 @@ POST /pedidos
 		"cep": "01000-000",
 		"complemento": "Apto 101"
 	},
+	"valorTotal": 99.90,
+	"status": "CRIADO",
+	"dataPedido": "2025-08-22T09:00:00",
 	"itens": [
-		{ "produtoId": 1, "quantidade": 2 },
-		{ "produtoId": 2, "quantidade": 1 }
+		{ "produtoId": 1, "nomeProduto": "Pizza Margherita", "quantidade": 2, "precoUnitario": 30.00 },
+		{ "produtoId": 2, "nomeProduto": "Pizza Pepperoni", "quantidade": 1, "precoUnitario": 39.90 }
 	]
 }
 ```
@@ -277,6 +343,37 @@ PUT /pedidos/{id}/status
 
 ---
 
+
+## 🗑️ Exclusão Lógica (Soft Delete)
+
+Desde agosto/2025, a exclusão de clientes, restaurantes e produtos é feita por soft delete:
+
+- As entidades possuem o campo `excluido` (Boolean, default false).
+- Ao excluir (DELETE), o registro não é removido do banco, apenas marcado como `excluido=true`.
+- Consultas e buscas retornam apenas registros com `excluido=false`.
+- O campo `excluido` pode ser visualizado ao buscar por ID.
+
+### Exemplo de resposta após exclusão lógica
+
+```json
+{
+	"id": 1,
+	"nome": "Restaurante Exemplo",
+	"excluido": true,
+	...
+}
+```
+
+### Endpoints afetados
+
+- `DELETE /clientes/{id}`: marca cliente como excluído
+- `DELETE /restaurantes/{id}`: marca restaurante como excluído
+- `DELETE /produtos/{id}`: marca produto como excluído
+- Listagens e buscas ignoram registros excluídos
+
+---
+
+
 ## 📋 Endpoints Principais
 
 - `GET /clientes`, `POST /clientes`, `PUT /clientes/{id}`, `DELETE /clientes/{id}`
@@ -286,6 +383,91 @@ PUT /pedidos/{id}/status
 - `POST /pedidos`: Cria pedido (recebe PedidoRequest, retorna PedidoResponse)
 - `PUT /pedidos/{id}/status`: Atualiza status do pedido (recebe StatusUpdateRequest, retorna PedidoResponse)
 - `GET /health`, `GET /info`, `GET /h2-console`
+
+---
+
+## 📊 Endpoints de Relatórios (Analytics)
+
+A API de relatórios expõe endpoints REST para consultas analíticas sobre vendas, produtos, clientes e faturamento, utilizando projeções e consultas otimizadas.
+
+Base URL: `/api/relatorios`
+
+### 1. Vendas por Restaurante
+- **GET** `/api/relatorios/vendas-por-restaurante`
+- **Parâmetros:**
+	- `inicio` (yyyy-MM-dd, obrigatório)
+	- `fim` (yyyy-MM-dd, obrigatório)
+- **Resposta:**
+	- Lista de objetos:
+		- `nomeRestaurante` (String)
+		- `totalVendas` (BigDecimal)
+		- `quantidadePedidos` (Long)
+
+### 2. Produtos Mais Vendidos
+- **GET** `/api/relatorios/produtos-mais-vendidos`
+- **Parâmetros:**
+	- `limite` (int, opcional, padrão 5)
+	- `inicio` (yyyy-MM-dd, obrigatório)
+	- `fim` (yyyy-MM-dd, obrigatório)
+- **Resposta:**
+	- Lista de objetos:
+		- `idProduto` (Long)
+		- `nomeProduto` (String)
+		- `totalVendas` (BigDecimal)
+		- `quantidadeItemPedido` (Long)
+
+### 3. Clientes Ativos (Ranking)
+- **GET** `/api/relatorios/clientes-ativos`
+- **Parâmetros:**
+	- `limite` (int, opcional, padrão 10)
+	- `inicio` (yyyy-MM-dd, obrigatório)
+	- `fim` (yyyy-MM-dd, obrigatório)
+- **Resposta:**
+	- Lista de objetos:
+		- `idCliente` (Long)
+		- `nomeCliente` (String)
+		- `totalCompras` (BigDecimal)
+		- `quantidadePedidos` (Long)
+
+### 4. Pedidos por Período e Status
+- **GET** `/api/relatorios/pedidos-por-periodo`
+- **Parâmetros:**
+	- `inicio` (yyyy-MM-dd, obrigatório)
+	- `fim` (yyyy-MM-dd, obrigatório)
+	- `status` (String, obrigatório)
+- **Resposta:**
+	- Lista de objetos:
+		- `periodo` (String)
+		- `status` (String)
+		- `totalPedidos` (int)
+
+### 5. Faturamento por Categoria
+- **GET** `/api/relatorios/faturamento-por-categoria`
+- **Parâmetros:**
+	- `inicio` (yyyy-MM-dd, obrigatório)
+	- `fim` (yyyy-MM-dd, obrigatório)
+- **Resposta:**
+	- Lista de objetos:
+		- `categoria` (String)
+		- `totalFaturado` (BigDecimal)
+
+### 6. Resumo Geral de Vendas
+- **GET** `/api/relatorios/resumo-vendas`
+- **Parâmetros:**
+	- `inicio` (yyyy-MM-dd, obrigatório)
+	- `fim` (yyyy-MM-dd, obrigatório)
+- **Resposta:**
+	- Objeto:
+		- `totalPedidos` (int)
+		- `valorTotalVendas` (double)
+
+#### Observações
+- Todos os endpoints retornam dados em formato JSON.
+- Datas devem ser informadas no padrão ISO (yyyy-MM-dd).
+- Os relatórios utilizam projeções para otimizar a consulta e trafegar apenas os campos necessários.
+- Para mais detalhes sobre as projeções, consulte o pacote `com.deliverytech.delivery_api.projection`.
+
+*Documentação gerada automaticamente conforme implementação do módulo de relatórios.*
 
 ---
 

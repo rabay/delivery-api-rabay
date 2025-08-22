@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.deliverytech.delivery_api.projection.RelatorioVendas;
+
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByClienteId(Long clienteId);
     List<Pedido> findByRestauranteId(Long restauranteId);
@@ -29,4 +31,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByStatusAndDataPedidoBetween(StatusPedido status, LocalDateTime inicio, LocalDateTime fim);
     List<Pedido> findByDataPedidoGreaterThanEqual(LocalDateTime data);
     List<Pedido> findByDataPedidoLessThanEqual(LocalDateTime data);
+    // === CONSULTAS CUSTOMIZADAS ===
+    @Query("SELECT p.restaurante.nome as nomeRestaurante, SUM(p.valorTotal) as totalVendas, COUNT(p.id) as quantidadePedidos FROM Pedido p GROUP BY p.restaurante.nome ORDER BY totalVendas DESC")
+    List<RelatorioVendas> calcularTotalVendasPorRestaurante();
+
+    @Query("SELECT p FROM Pedido p WHERE p.valorTotal > :valor ORDER BY p.valorTotal DESC")
+    List<Pedido> buscarPedidosComValorAcimaDe(@Param("valor") java.math.BigDecimal valor);
+
+    @Query("SELECT p FROM Pedido p WHERE p.dataPedido BETWEEN :inicio AND :fim AND p.status = :status ORDER BY p.dataPedido DESC")
+    List<Pedido> relatorioPedidosPorPeriodoEStatus(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim, @Param("status") StatusPedido status);
 }

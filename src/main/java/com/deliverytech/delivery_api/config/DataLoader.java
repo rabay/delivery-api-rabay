@@ -47,48 +47,50 @@ public class DataLoader implements CommandLineRunner {
 
         // ClienteRepository
         System.out.println("\nClientes ativos:");
-        clienteRepository.findByAtivoTrue().forEach(c -> System.out.println("- " + c.getNome() + " (" + c.getEmail() + ")"));
+    clienteRepository.findByAtivoTrueAndExcluidoFalse().forEach(c -> System.out.println("- " + c.getNome() + " (" + c.getEmail() + ")"));
 
         System.out.println("\nCliente por email (joao@email.com):");
-        clienteRepository.findByEmail("joao@email.com").ifPresentOrElse(
+    clienteRepository.findByEmailAndExcluidoFalse("joao@email.com").ifPresentOrElse(
             c -> System.out.println("Encontrado: " + c.getNome()),
             () -> System.out.println("Não encontrado")
         );
 
-        System.out.println("\nExiste cliente com email maria@email.com? " + clienteRepository.existsByEmail("maria@email.com"));
+    // System.out.println("\nExiste cliente com email maria@email.com? " + clienteRepository.existsByEmail("maria@email.com")); // método removido
+    // Atualizado para considerar excluido=false
+    System.out.println("Existe cliente com email maria@email.com e não excluído? " + clienteRepository.existsByEmailAndExcluidoFalse("maria@email.com"));
 
         System.out.println("\nClientes com nome contendo 'Silva':");
-        clienteRepository.findByNomeContainingIgnoreCase("Silva").forEach(c -> System.out.println("- " + c.getNome()));
+    clienteRepository.findByNomeContainingIgnoreCaseAndExcluidoFalse("Silva").forEach(c -> System.out.println("- " + c.getNome()));
 
         // RestauranteRepository
         System.out.println("\nRestaurantes por categoria 'Italiana':");
-        restauranteRepository.findByCategoria("Italiana").forEach(r -> System.out.println("- " + r.getNome()));
+    restauranteRepository.findByCategoriaAndExcluidoFalse("Italiana").forEach(r -> System.out.println("- " + r.getNome()));
 
         System.out.println("\nRestaurantes ativos:");
-        restauranteRepository.findByAtivoTrue().forEach(r -> System.out.println("- " + r.getNome()));
+    restauranteRepository.findByAtivoTrueAndExcluidoFalse().forEach(r -> System.out.println("- " + r.getNome()));
 
         System.out.println("\nRestaurantes com taxa de entrega <= 5.00:");
-        restauranteRepository.findByTaxaEntregaLessThanEqual(new java.math.BigDecimal("5.00")).forEach(r -> System.out.println("- " + r.getNome()));
+    restauranteRepository.findByTaxaEntregaLessThanEqualAndExcluidoFalse(new java.math.BigDecimal("5.00")).forEach(r -> System.out.println("- " + r.getNome()));
 
         System.out.println("\nTop 5 restaurantes por nome:");
-        restauranteRepository.findTop5ByOrderByNomeAsc().forEach(r -> System.out.println("- " + r.getNome()));
+    restauranteRepository.findTop5ByExcluidoFalseOrderByNomeAsc().forEach(r -> System.out.println("- " + r.getNome()));
 
         // ProdutoRepository
         var restaurantes = restauranteRepository.findAll();
         if (!restaurantes.isEmpty()) {
             var primeiroRestaurante = restaurantes.get(0);
             System.out.println("\nProdutos do restaurante '" + primeiroRestaurante.getNome() + "':");
-            produtoRepository.findByRestauranteId(primeiroRestaurante.getId()).forEach(p -> System.out.println("- " + p.getNome()));
+            produtoRepository.findByRestauranteIdAndExcluidoFalse(primeiroRestaurante.getId()).forEach(p -> System.out.println("- " + p.getNome()));
         }
 
         System.out.println("\nProdutos disponíveis:");
-        produtoRepository.findByDisponivelTrue().forEach(p -> System.out.println("- " + p.getNome()));
+    produtoRepository.findByDisponivelTrueAndExcluidoFalse().forEach(p -> System.out.println("- " + p.getNome()));
 
         System.out.println("\nProdutos da categoria 'Pizza':");
-        produtoRepository.findByCategoria("Pizza").forEach(p -> System.out.println("- " + p.getNome()));
+    produtoRepository.findByCategoriaAndExcluidoFalse("Pizza").forEach(p -> System.out.println("- " + p.getNome()));
 
         System.out.println("\nProdutos com preço <= 30.00:");
-        produtoRepository.findByPrecoLessThanEqual(new java.math.BigDecimal("30.00")).forEach(p -> System.out.println("- " + p.getNome()));
+    produtoRepository.findByPrecoLessThanEqualAndExcluidoFalse(new java.math.BigDecimal("30.00")).forEach(p -> System.out.println("- " + p.getNome()));
 
         // PedidoRepository
         var clientes = clienteRepository.findAll();

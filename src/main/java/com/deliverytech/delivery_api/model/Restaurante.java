@@ -17,6 +17,7 @@ public class Restaurante {
     private Integer tempoEntregaMinutos;
     private boolean ativo;
     private BigDecimal avaliacao;
+    private Boolean excluido = false;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -38,4 +39,6 @@ public class Restaurante {
     public void setAtivo(boolean ativo) { this.ativo = ativo; }
     public BigDecimal getAvaliacao() { return avaliacao; }
     public void setAvaliacao(BigDecimal avaliacao) { this.avaliacao = avaliacao; }
+    public Boolean getExcluido() { return excluido; }
+    public void setExcluido(Boolean excluido) { this.excluido = excluido; }
 }

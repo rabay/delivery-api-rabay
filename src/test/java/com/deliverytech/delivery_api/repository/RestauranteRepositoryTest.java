@@ -20,7 +20,7 @@ class RestauranteRepositoryTest {
     r.setAtivo(true);
     r.setAvaliacao(new java.math.BigDecimal("4.5"));
         restauranteRepository.save(r);
-        List<Restaurante> results = restauranteRepository.findByNomeContainingIgnoreCase("pizza");
+    List<Restaurante> results = restauranteRepository.findByNomeContainingIgnoreCaseAndExcluidoFalse("pizza");
         assertThat(results).isNotEmpty();
     }
 
@@ -32,6 +32,6 @@ class RestauranteRepositoryTest {
     r.setAtivo(true);
     r.setAvaliacao(new java.math.BigDecimal("4.8"));
         restauranteRepository.save(r);
-        assertThat(restauranteRepository.findByCategoria("Japonesa")).extracting(Restaurante::getNome).contains("Sushi Bar");
+    assertThat(restauranteRepository.findByCategoriaAndExcluidoFalse("Japonesa")).extracting(Restaurante::getNome).contains("Sushi Bar");
     }
 }

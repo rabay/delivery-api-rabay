@@ -30,27 +30,51 @@ public class PedidoController {
     @Operation(summary = "Criar novo pedido", description = "Cria um novo pedido para um cliente em um restaurante.")
     @PostMapping
     public ResponseEntity<PedidoResponse> criar(@Valid @RequestBody PedidoRequest pedidoRequest) {
-        Pedido pedido = mapToEntity(pedidoRequest);
-        Pedido novo = pedidoService.criar(pedido);
-        PedidoResponse response = mapToResponse(novo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        try {
+            System.out.println("[DEBUG] Recebido PedidoRequest: " + pedidoRequest);
+            Pedido pedido = mapToEntity(pedidoRequest);
+            System.out.println("[DEBUG] Pedido mapeado: " + pedido);
+            Pedido novo = pedidoService.criar(pedido);
+            PedidoResponse response = mapToResponse(novo);
+            System.out.println("[DEBUG] Pedido criado com sucesso: " + response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException ex) {
+            System.err.println("[ERRO] Erro de negócio ao criar pedido: " + ex.getMessage());
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception ex) {
+            System.err.println("[ERRO] Erro inesperado ao criar pedido: " + ex.getMessage());
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @Operation(summary = "Listar pedidos de um cliente", description = "Retorna todos os pedidos realizados por um cliente específico.")
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<List<PedidoResponse>> buscarPorCliente(@PathVariable Long clienteId) {
-        List<Pedido> pedidos = pedidoService.buscarPorCliente(clienteId);
-        List<PedidoResponse> responses = pedidos.stream().map(this::mapToResponse).toList();
-        return ResponseEntity.ok(responses);
+        try {
+            List<Pedido> pedidos = pedidoService.buscarPorCliente(clienteId);
+            if (pedidos == null || pedidos.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            List<PedidoResponse> responses = pedidos.stream().map(this::mapToResponse).toList();
+            return ResponseEntity.ok(responses);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @Operation(summary = "Atualizar status do pedido", description = "Atualiza o status de um pedido existente (ex: CRIADO, ENTREGUE, CANCELADO).")
     @PutMapping("/{id}/status")
     public ResponseEntity<PedidoResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusUpdateRequest statusUpdateRequest) {
-        StatusPedido status = StatusPedido.valueOf(statusUpdateRequest.getStatus());
-        Pedido atualizado = pedidoService.atualizarStatus(id, status);
-        PedidoResponse response = mapToResponse(atualizado);
-        return ResponseEntity.ok(response);
+    StatusPedido status = StatusPedido.valueOf(statusUpdateRequest.getStatus());
+    Pedido atualizado = pedidoService.atualizarStatus(id, status);
+    // Buscar novamente o pedido com itens para evitar LazyInitializationException
+    return pedidoService.buscarPorIdComItens(atualizado.getId())
+        .map(pedidoComItens -> ResponseEntity.ok(mapToResponse(pedidoComItens)))
+        .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     // Métodos utilitários de mapeamento
@@ -74,7 +98,11 @@ public class PedidoController {
     private PedidoResponse mapToResponse(Pedido pedido) {
         return new PedidoResponse(
             pedido.getId(),
-            pedido.getCliente() != null ? pedido.getCliente().getId() : null,
+            (pedido.getCliente() != null)
+                ? new com.deliverytech.delivery_api.dto.response.ClienteResumoResponse(
+                    pedido.getCliente().getId(),
+                    pedido.getCliente().getNome())
+                : null,
             pedido.getRestaurante() != null ? pedido.getRestaurante().getId() : null,
             pedido.getEnderecoEntrega(),
             pedido.getValorTotal(),

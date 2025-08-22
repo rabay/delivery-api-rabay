@@ -49,25 +49,25 @@ public class RestauranteServiceImpl implements RestauranteService {
     @Override
     @Transactional(readOnly = true)
     public List<Restaurante> listarAtivos() {
-        return restauranteRepository.findByAtivoTrue();
+        return restauranteRepository.findByAtivoTrueAndExcluidoFalse();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Restaurante> buscarPorCategoria(String categoria) {
-        return restauranteRepository.findByCategoria(categoria);
+        return restauranteRepository.findByCategoriaAndExcluidoFalse(categoria);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Restaurante> buscarPorAvaliacao(BigDecimal minAvaliacao) {
-        return restauranteRepository.findByAvaliacaoGreaterThanEqual(minAvaliacao);
+        return restauranteRepository.findByAvaliacaoGreaterThanEqualAndExcluidoFalse(minAvaliacao);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Restaurante> buscarPorTaxaEntrega(BigDecimal maxTaxa) {
-        return restauranteRepository.findByTaxaEntregaLessThanEqual(maxTaxa);
+        return restauranteRepository.findByTaxaEntregaLessThanEqualAndExcluidoFalse(maxTaxa);
     }
 
     @Override
@@ -92,6 +92,7 @@ public class RestauranteServiceImpl implements RestauranteService {
             .ifPresentOrElse(
                 restaurante -> {
                     restaurante.setAtivo(false);
+                    restaurante.setExcluido(true);
                     restauranteRepository.save(restaurante);
                 },
                 () -> {
@@ -138,7 +139,7 @@ public class RestauranteServiceImpl implements RestauranteService {
     @Override
     @Transactional(readOnly = true)
     public List<Restaurante> buscarProximos(String cep) {
-        List<Restaurante> restaurantesAtivos = restauranteRepository.findByAtivoTrue();
+    List<Restaurante> restaurantesAtivos = restauranteRepository.findByAtivoTrueAndExcluidoFalse();
         String primeirosDigitos = cep.substring(0, Math.min(2, cep.length()));
         try {
             int codigoRegiao = Integer.parseInt(primeirosDigitos);
@@ -158,14 +159,14 @@ public class RestauranteServiceImpl implements RestauranteService {
     @Transactional(readOnly = true)
     public List<Restaurante> listarComFiltros(String categoria, Boolean ativo) {
         if (categoria == null && ativo == null) {
-            return restauranteRepository.findAll();
+            return restauranteRepository.findByAtivoTrueAndExcluidoFalse();
         }
         if (categoria != null && ativo == null) {
-            return restauranteRepository.findByCategoria(categoria);
+            return restauranteRepository.findByCategoriaAndExcluidoFalse(categoria);
         }
         if (categoria == null && ativo != null) {
-            return ativo ? restauranteRepository.findByAtivoTrue() : restauranteRepository.findByAtivoFalse();
+            return ativo ? restauranteRepository.findByAtivoTrueAndExcluidoFalse() : restauranteRepository.findByAtivoFalseAndExcluidoFalse();
         }
-        return restauranteRepository.findByCategoriaAndAtivo(categoria, ativo);
+        return restauranteRepository.findByCategoriaAndAtivoAndExcluidoFalse(categoria, ativo);
     }
 }

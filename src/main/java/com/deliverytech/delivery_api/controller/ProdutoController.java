@@ -56,10 +56,10 @@ public class ProdutoController {
         return ResponseEntity.ok(atualizado);
     }
 
-    @Operation(summary = "Deletar produto", description = "Remove (ou inativa) um produto pelo seu ID.")
+    @Operation(summary = "Deletar produto", description = "Remove (soft delete) um produto pelo seu ID.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        // Não implementado: deletar produto (poderia ser inativar)
+        produtoService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 

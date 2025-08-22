@@ -1,14 +1,27 @@
+
 package com.deliverytech.delivery_api.repository;
 
 import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.model.Restaurante;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import org.springframework.data.jpa.repository.Query;
+
+import com.deliverytech.delivery_api.projection.RelatorioVendasProdutos;
 
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
-    List<Produto> findByRestaurante(Restaurante restaurante);
-    List<Produto> findByRestauranteId(Long restauranteId);
-    List<Produto> findByCategoria(String categoria);
-    List<Produto> findByDisponivelTrue();
-    List<Produto> findByPrecoLessThanEqual(java.math.BigDecimal preco);
+    List<Produto> findByRestauranteAndExcluidoFalse(Restaurante restaurante);
+    List<Produto> findByRestauranteIdAndExcluidoFalse(Long restauranteId);
+    List<Produto> findByCategoriaAndExcluidoFalse(String categoria);
+    List<Produto> findByDisponivelTrueAndExcluidoFalse();
+
+    List<Produto> findByPrecoLessThanEqualAndExcluidoFalse(java.math.BigDecimal preco);
+
+    // === CONSULTA NATIVA: Produtos mais vendidos ===
+    @Query(value = "SELECT p.id as idProduto, p.nome as nomeProduto, SUM(ip.quantidade * ip.preco_unitario) as totalVendas, COUNT(ip.id) as quantidadeItemPedido FROM produto p LEFT JOIN item_pedido ip ON p.id = ip.produto_id WHERE p.excluido = false GROUP BY p.id, p.nome ORDER BY totalVendas DESC LIMIT 5", nativeQuery = true)
+    List<RelatorioVendasProdutos> produtosMaisVendidos();
+
+    // === CONSULTA NATIVA: Faturamento por categoria ===
+    @Query(value = "SELECT p.categoria as categoria, SUM(ip.quantidade * ip.preco_unitario) as totalFaturado FROM produto p LEFT JOIN item_pedido ip ON p.id = ip.produto_id WHERE p.excluido = false GROUP BY p.categoria ORDER BY totalFaturado DESC", nativeQuery = true)
+    List<Object[]> faturamentoPorCategoria();
 }

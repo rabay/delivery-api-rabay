@@ -13,11 +13,11 @@ import java.util.List;
 public class PedidoResponse {
     @Schema(description = "ID do pedido.", example = "10")
     private Long id;
-    @Schema(description = "ID do cliente.", example = "1")
-    private Long clienteId;
+    @Schema(description = "Resumo do cliente.")
+    private ClienteResumoResponse cliente;
     @Schema(description = "ID do restaurante.", example = "2")
     private Long restauranteId;
-    @Schema(description = "Endereço de entrega do pedido.")
+    @Schema(description = "Endere\u00e7o de entrega do pedido.")
     private Endereco enderecoEntrega;
     @Schema(description = "Valor total do pedido.", example = "99.90")
     private BigDecimal valorTotal;
@@ -30,9 +30,9 @@ public class PedidoResponse {
 
     public PedidoResponse() {}
 
-    public PedidoResponse(Long id, Long clienteId, Long restauranteId, Endereco enderecoEntrega, BigDecimal valorTotal, StatusPedido status, LocalDateTime dataPedido, List<ItemPedidoResponse> itens) {
+    public PedidoResponse(Long id, ClienteResumoResponse cliente, Long restauranteId, Endereco enderecoEntrega, BigDecimal valorTotal, StatusPedido status, LocalDateTime dataPedido, List<ItemPedidoResponse> itens) {
         this.id = id;
-        this.clienteId = clienteId;
+        this.cliente = cliente;
         this.restauranteId = restauranteId;
         this.enderecoEntrega = enderecoEntrega;
         this.valorTotal = valorTotal;
@@ -43,8 +43,8 @@ public class PedidoResponse {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public Long getClienteId() { return clienteId; }
-    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
+    public ClienteResumoResponse getCliente() { return cliente; }
+    public void setCliente(ClienteResumoResponse cliente) { this.cliente = cliente; }
     public Long getRestauranteId() { return restauranteId; }
     public void setRestauranteId(Long restauranteId) { this.restauranteId = restauranteId; }
     public Endereco getEnderecoEntrega() { return enderecoEntrega; }

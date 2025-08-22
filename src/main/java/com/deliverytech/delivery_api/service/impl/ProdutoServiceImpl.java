@@ -39,13 +39,13 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     @Transactional(readOnly = true)
     public List<Produto> buscarPorRestaurante(Restaurante restaurante) {
-        return produtoRepository.findByRestaurante(restaurante);
+        return produtoRepository.findByRestauranteAndExcluidoFalse(restaurante);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Produto> buscarDisponiveis() {
-        return produtoRepository.findByDisponivelTrue();
+        return produtoRepository.findByDisponivelTrueAndExcluidoFalse();
     }
 
     @Override
@@ -82,24 +82,25 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     @Override
     public void deletar(Long id) {
-        if (!produtoRepository.existsById(id)) {
-            throw new RuntimeException("Produto não encontrado");
-        }
-        produtoRepository.deleteById(id);
+        Produto produto = produtoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        produto.setDisponivel(false);
+        produto.setExcluido(true);
+        produtoRepository.save(produto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Produto> buscarPorCategoria(String categoria) {
-        return produtoRepository.findByCategoria(categoria);
+        return produtoRepository.findByCategoriaAndExcluidoFalse(categoria);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Produto> buscarPorNome(String nome) {
-        // Supondo que exista um método customizado no repository, senão filtra em memória
-        // return produtoRepository.findByNomeContainingIgnoreCase(nome);
-        List<Produto> todos = produtoRepository.findAll();
+        // Se existir método customizado, usar:
+        // return produtoRepository.findByNomeContainingIgnoreCaseAndExcluidoFalse(nome);
+        List<Produto> todos = produtoRepository.findByDisponivelTrueAndExcluidoFalse();
         return todos.stream()
             .filter(p -> p.getNome() != null && p.getNome().toLowerCase().contains(nome.toLowerCase()))
             .toList();

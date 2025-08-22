@@ -10,6 +10,7 @@ public class Cliente {
     private String nome;
     private String email;
     private boolean ativo;
+    private Boolean excluido = false;
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNome() { return nome; }
@@ -18,4 +19,6 @@ public class Cliente {
     public void setEmail(String email) { this.email = email; }
     public boolean isAtivo() { return ativo; }
     public void setAtivo(boolean ativo) { this.ativo = ativo; }
+    public Boolean getExcluido() { return excluido; }
+    public void setExcluido(Boolean excluido) { this.excluido = excluido; }
 }

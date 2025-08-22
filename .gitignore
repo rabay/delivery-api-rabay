@@ -38,3 +38,6 @@ build/
 *.log
 temp*
 bin/
+
+# Ignorar arquivo de memória do agente
+.github/instructions/memory.instruction.md

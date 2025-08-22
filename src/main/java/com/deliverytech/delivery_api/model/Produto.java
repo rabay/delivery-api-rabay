@@ -13,6 +13,7 @@ public class Produto {
     private String descricao;
     private BigDecimal preco;
     private Boolean disponivel = true;
+    private Boolean excluido = false;
 
     @ManyToOne
     @JoinColumn(name = "restaurante_id")
@@ -34,4 +35,6 @@ public class Produto {
     public void setRestaurante(Restaurante restaurante) { this.restaurante = restaurante; }
     public boolean getAtivo() { return this.disponivel != null ? this.disponivel : false; }
     public void setAtivo(boolean ativo) { this.disponivel = ativo; }
+    public Boolean getExcluido() { return excluido; }
+    public void setExcluido(Boolean excluido) { this.excluido = excluido; }
 }

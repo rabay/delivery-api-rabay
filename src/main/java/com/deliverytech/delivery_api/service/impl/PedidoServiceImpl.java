@@ -7,6 +7,10 @@ import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.service.PedidoService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +21,7 @@ import java.util.Optional;
 @Service
 @Transactional
 public class PedidoServiceImpl implements PedidoService {
+    private static final Logger log = LoggerFactory.getLogger(PedidoServiceImpl.class);
     private final PedidoRepository pedidoRepository;
     private final ProdutoRepository produtoRepository;
 
@@ -27,10 +32,39 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public Pedido criar(Pedido pedido) {
-        pedido.setStatus(StatusPedido.CRIADO);
-        pedido.setDataPedido(LocalDateTime.now());
-        pedido.setValorTotal(BigDecimal.ZERO);
-        return pedidoRepository.save(pedido);
+        try {
+            pedido.setStatus(StatusPedido.CRIADO);
+            pedido.setDataPedido(LocalDateTime.now());
+            if (pedido.getItens() == null || pedido.getItens().isEmpty()) {
+                log.warn("Tentativa de criar pedido sem itens. ClienteId={}, RestauranteId={}",
+                        pedido.getCliente() != null ? pedido.getCliente().getId() : null,
+                        pedido.getRestaurante() != null ? pedido.getRestaurante().getId() : null);
+                throw new RuntimeException("Pedido deve conter ao menos um item.");
+            }
+            BigDecimal total = BigDecimal.ZERO;
+            for (ItemPedido item : pedido.getItens()) {
+                Long produtoId = item.getProduto() != null ? item.getProduto().getId() : null;
+                Produto produto = produtoRepository.findById(produtoId)
+                        .orElseThrow(() -> {
+                            log.warn("Produto não encontrado ao criar pedido: produtoId={}", produtoId);
+                            return new RuntimeException("Produto não encontrado: ID " + produtoId);
+                        });
+                if (Boolean.TRUE.equals(produto.getExcluido()) || !produto.getAtivo()) {
+                    log.warn("Produto indisponível ou excluído ao criar pedido: produtoId={}", produto.getId());
+                    throw new RuntimeException("Produto indisponível ou excluído: ID " + produto.getId());
+                }
+                item.setProduto(produto);
+                item.setPrecoUnitario(produto.getPreco());
+                item.setSubtotal();
+                total = total.add(item.getSubtotal());
+                item.setPedido(pedido);
+            }
+            pedido.setValorTotal(total);
+            return pedidoRepository.save(pedido);
+        } catch (Exception e) {
+            log.error("Erro ao criar pedido: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Override
@@ -43,7 +77,12 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     @Transactional(readOnly = true)
     public List<Pedido> buscarPorCliente(Long clienteId) {
-        return pedidoRepository.findByClienteId(clienteId);
+        List<Pedido> pedidos = pedidoRepository.findByClienteId(clienteId);
+        if (pedidos == null || pedidos.isEmpty()) {
+            log.warn("Nenhum pedido encontrado para clienteId={}", clienteId);
+            throw new RuntimeException("Nenhum pedido encontrado para o cliente informado.");
+        }
+        return pedidos;
     }
 
     @Override
@@ -61,7 +100,18 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public Pedido atualizarStatus(Long id, StatusPedido status) {
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("Tentativa de atualizar status de pedido inexistente: pedidoId={}", id);
+                    return new RuntimeException("Pedido não encontrado");
+                });
+        if (pedido.getStatus() == StatusPedido.CANCELADO) {
+            log.warn("Tentativa de atualizar status de pedido já cancelado: pedidoId={}", id);
+            throw new RuntimeException("Pedido já está cancelado");
+        }
+        if (pedido.getStatus() == StatusPedido.ENTREGUE) {
+            log.warn("Tentativa de atualizar status de pedido já entregue: pedidoId={}", id);
+            throw new RuntimeException("Não é possível atualizar um pedido já entregue");
+        }
         pedido.setStatus(status);
         return pedidoRepository.save(pedido);
     }
