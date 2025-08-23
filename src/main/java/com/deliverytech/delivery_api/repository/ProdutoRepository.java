@@ -6,8 +6,11 @@ import com.deliverytech.delivery_api.model.Restaurante;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
 
 import com.deliverytech.delivery_api.projection.RelatorioVendasProdutos;
+import com.deliverytech.delivery_api.projection.FaturamentoPorCategoriaProjection;
 
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     List<Produto> findByRestauranteAndExcluidoFalse(Restaurante restaurante);
@@ -18,10 +21,10 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     List<Produto> findByPrecoLessThanEqualAndExcluidoFalse(java.math.BigDecimal preco);
 
     // === CONSULTA NATIVA: Produtos mais vendidos ===
-    @Query(value = "SELECT p.id as idProduto, p.nome as nomeProduto, SUM(ip.quantidade * ip.preco_unitario) as totalVendas, COUNT(ip.id) as quantidadeItemPedido FROM produto p LEFT JOIN item_pedido ip ON p.id = ip.produto_id WHERE p.excluido = false GROUP BY p.id, p.nome ORDER BY totalVendas DESC LIMIT 5", nativeQuery = true)
-    List<RelatorioVendasProdutos> produtosMaisVendidos();
+    @Query(value = "SELECT p.id as idProduto, p.nome as nomeProduto, SUM(ip.quantidade * ip.preco_unitario) as totalVendas, COUNT(ip.id) as quantidadeItemPedido FROM produto p LEFT JOIN item_pedido ip ON p.id = ip.produto_id LEFT JOIN pedido ped ON ip.pedido_id = ped.id WHERE p.excluido = false AND ped.data_pedido BETWEEN :inicio AND :fim GROUP BY p.id, p.nome ORDER BY totalVendas DESC", nativeQuery = true)
+    List<RelatorioVendasProdutos> produtosMaisVendidos(@Param("inicio") java.time.LocalDateTime inicio, @Param("fim") java.time.LocalDateTime fim, Pageable pageable);
 
     // === CONSULTA NATIVA: Faturamento por categoria ===
-    @Query(value = "SELECT p.categoria as categoria, SUM(ip.quantidade * ip.preco_unitario) as totalFaturado FROM produto p LEFT JOIN item_pedido ip ON p.id = ip.produto_id WHERE p.excluido = false GROUP BY p.categoria ORDER BY totalFaturado DESC", nativeQuery = true)
-    List<Object[]> faturamentoPorCategoria();
+    @Query(value = "SELECT p.categoria as categoria, SUM(ip.quantidade * ip.preco_unitario) as totalFaturado FROM produto p LEFT JOIN item_pedido ip ON p.id = ip.produto_id WHERE p.excluido = false AND ip.created_at BETWEEN :inicio AND :fim GROUP BY p.categoria ORDER BY totalFaturado DESC", nativeQuery = true)
+    List<FaturamentoPorCategoriaProjection> faturamentoPorCategoria(@Param("inicio") java.time.LocalDateTime inicio, @Param("fim") java.time.LocalDateTime fim);
 }

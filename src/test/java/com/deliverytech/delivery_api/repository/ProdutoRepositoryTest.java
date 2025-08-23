@@ -17,6 +17,8 @@ class ProdutoRepositoryTest {
     private ProdutoRepository produtoRepository;
     @Autowired
     private RestauranteRepository restauranteRepository;
+    @Autowired
+    private org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager entityManager;
 
     @Test
     void testProdutosMaisVendidos() {
@@ -35,10 +37,38 @@ class ProdutoRepositoryTest {
         p.setPreco(new BigDecimal("10.00"));
         produtoRepository.save(p);
 
-        // Não há vendas reais, mas consulta deve retornar produto com quantidade 0
-        List<RelatorioVendasProdutos> ranking = produtoRepository.produtosMaisVendidos();
-        assertThat(ranking).isNotEmpty();
-        assertThat(ranking.get(0).getNomeProduto()).isEqualTo("Coxinha");
+    // Criar um pedido e item_pedido para gerar vendas e persistir via TestEntityManager
+    com.deliverytech.delivery_api.model.Cliente cliente = new com.deliverytech.delivery_api.model.Cliente();
+    cliente.setNome("Cliente Teste");
+    cliente.setEmail("cliente@teste.com");
+    entityManager.persist(cliente);
+
+    com.deliverytech.delivery_api.model.Pedido pedido = new com.deliverytech.delivery_api.model.Pedido();
+    pedido.setCliente(cliente);
+    pedido.setRestaurante(r);
+    pedido.setValorTotal(new java.math.BigDecimal("10.00"));
+    pedido.setSubtotal(new java.math.BigDecimal("10.00"));
+    pedido.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CONFIRMADO);
+    pedido.setDataPedido(java.time.LocalDateTime.now());
+    entityManager.persist(pedido);
+
+    com.deliverytech.delivery_api.model.ItemPedido item = new com.deliverytech.delivery_api.model.ItemPedido();
+    item.setProduto(p);
+    item.setQuantidade(1);
+    item.setPrecoUnitario(p.getPreco());
+    item.setPedido(pedido);
+    item.setSubtotal(p.getPreco());
+    entityManager.persist(item);
+
+    // flush to ensure data visible to native queries
+    entityManager.flush();
+
+    var inicio = java.time.LocalDateTime.now().minusYears(1);
+    var fim = java.time.LocalDateTime.now();
+    var pageable = org.springframework.data.domain.PageRequest.of(0, 5);
+    List<RelatorioVendasProdutos> ranking = produtoRepository.produtosMaisVendidos(inicio, fim, pageable);
+    assertThat(ranking).isNotEmpty();
+    assertThat(ranking.get(0).getNomeProduto()).isEqualTo("Coxinha");
     }
 
     @Test

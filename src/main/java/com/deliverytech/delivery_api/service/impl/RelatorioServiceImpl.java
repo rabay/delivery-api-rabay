@@ -27,17 +27,19 @@ public class RelatorioServiceImpl implements RelatorioService {
 
     @Override
     public List<RelatorioVendas> relatorioVendasPorRestaurante(LocalDate dataInicio, LocalDate dataFim) {
-        return pedidoRepository.calcularTotalVendasPorRestaurante();
+    return pedidoRepository.calcularTotalVendasPorRestaurante(dataInicio.atStartOfDay(), dataFim.atTime(23,59,59));
     }
 
     @Override
     public List<RelatorioVendasProdutos> relatorioProdutosMaisVendidos(int limite, LocalDate dataInicio, LocalDate dataFim) {
-        return produtoRepository.produtosMaisVendidos();
+    var pageable = org.springframework.data.domain.PageRequest.of(0, Math.max(1, limite));
+    return produtoRepository.produtosMaisVendidos(dataInicio.atStartOfDay(), dataFim.atTime(23,59,59), pageable);
     }
 
     @Override
     public List<RelatorioVendasClientes> relatorioClientesAtivos(int limite, LocalDate dataInicio, LocalDate dataFim) {
-        return clienteRepository.rankingClientesPorPedidos();
+    var pageable = org.springframework.data.domain.PageRequest.of(0, Math.max(1, limite));
+    return clienteRepository.rankingClientesPorPedidos(dataInicio.atStartOfDay(), dataFim.atTime(23,59,59), pageable);
     }
 
     @Override
@@ -56,12 +58,12 @@ public class RelatorioServiceImpl implements RelatorioService {
 
     @Override
     public List<Map<String, Object>> faturamentoPorCategoria(LocalDate dataInicio, LocalDate dataFim) {
-        List<Object[]> dados = produtoRepository.faturamentoPorCategoria();
+        List<com.deliverytech.delivery_api.projection.FaturamentoPorCategoriaProjection> dados = produtoRepository.faturamentoPorCategoria(dataInicio.atStartOfDay(), dataFim.atTime(23,59,59));
         List<Map<String, Object>> result = new java.util.ArrayList<>();
-        for (Object[] row : dados) {
+        for (com.deliverytech.delivery_api.projection.FaturamentoPorCategoriaProjection row : dados) {
             Map<String, Object> map = new HashMap<>();
-            map.put("categoria", row[0]);
-            map.put("totalFaturado", row[1]);
+            map.put("categoria", row.getCategoria());
+            map.put("totalFaturado", row.getTotalFaturado());
             result.add(map);
         }
         return result;

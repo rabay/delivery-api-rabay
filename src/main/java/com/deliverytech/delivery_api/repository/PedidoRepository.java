@@ -35,6 +35,9 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     @Query("SELECT p.restaurante.nome as nomeRestaurante, SUM(p.valorTotal) as totalVendas, COUNT(p.id) as quantidadePedidos FROM Pedido p GROUP BY p.restaurante.nome ORDER BY totalVendas DESC")
     List<RelatorioVendas> calcularTotalVendasPorRestaurante();
 
+    @Query("SELECT p.restaurante.nome as nomeRestaurante, SUM(p.valorTotal) as totalVendas, COUNT(p.id) as quantidadePedidos FROM Pedido p WHERE p.dataPedido BETWEEN :inicio AND :fim GROUP BY p.restaurante.nome ORDER BY totalVendas DESC")
+    List<RelatorioVendas> calcularTotalVendasPorRestaurante(@Param("inicio") java.time.LocalDateTime inicio, @Param("fim") java.time.LocalDateTime fim);
+
     @Query("SELECT p FROM Pedido p WHERE p.valorTotal > :valor ORDER BY p.valorTotal DESC")
     List<Pedido> buscarPedidosComValorAcimaDe(@Param("valor") java.math.BigDecimal valor);
 

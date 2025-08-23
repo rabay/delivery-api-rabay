@@ -42,8 +42,8 @@ class RelatorioServiceImplTest {
             public BigDecimal getTotalVendas() { return new BigDecimal("100.00"); }
             public Long getQuantidadePedidos() { return 1L; }
         };
-        when(pedidoRepository.calcularTotalVendasPorRestaurante()).thenReturn(List.of(relatorio));
-        List<RelatorioVendas> result = relatorioService.relatorioVendasPorRestaurante(LocalDate.now(), LocalDate.now());
+    when(pedidoRepository.calcularTotalVendasPorRestaurante(any(), any())).thenReturn(List.of(relatorio));
+    List<RelatorioVendas> result = relatorioService.relatorioVendasPorRestaurante(LocalDate.now(), LocalDate.now());
         assertThat(result).isNotEmpty();
         assertThat(result.get(0).getNomeRestaurante()).isEqualTo("Restaurante Teste");
     }

@@ -46,3 +46,7 @@ bin/
 entregaveis/newman-result.json
 
 plan/
+
+# Logs gerados por execução local
+nohup.out
+app.log
