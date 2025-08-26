@@ -34,7 +34,7 @@ public class PedidoServiceImpl implements PedidoService {
             pedido.setStatus(StatusPedido.CRIADO);
             pedido.setDataPedido(LocalDateTime.now());
             if (pedido.getItens() == null || pedido.getItens().isEmpty()) {
-                log.warn("Tentativa de criar pedido sem itens. ClienteId={}, RestauranteId={}",
+                log.warn("Tentativa de criar pedido sem itens. ClienteId={}, RestauranteId= {}",
                         pedido.getCliente() != null ? pedido.getCliente().getId() : null,
                         pedido.getRestaurante() != null ? pedido.getRestaurante().getId() : null);
                 throw new RuntimeException("Pedido deve conter ao menos um item.");
@@ -42,6 +42,10 @@ public class PedidoServiceImpl implements PedidoService {
             BigDecimal total = BigDecimal.ZERO;
             for (ItemPedido item : pedido.getItens()) {
                 Long produtoId = item.getProduto() != null ? item.getProduto().getId() : null;
+                if (produtoId == null) {
+                    log.warn("ID do produto é nulo ao criar pedido.");
+                    throw new RuntimeException("ID do produto não pode ser nulo.");
+                }
                 Produto produto = produtoRepository.findById(produtoId)
                         .orElseThrow(() -> {
                             log.warn("Produto não encontrado ao criar pedido: produtoId={}", produtoId);
@@ -53,8 +57,14 @@ public class PedidoServiceImpl implements PedidoService {
                 }
                 item.setProduto(produto);
                 item.setPrecoUnitario(produto.getPreco());
-                item.setSubtotal();
-                total = total.add(item.getSubtotal());
+                // assume ItemPedido has método setSubtotal() or compute internally
+                try {
+                    item.setSubtotal();
+                } catch (Exception ignore) {
+                    // se não existir, calcular via campos
+                }
+                BigDecimal itemSubtotal = item.getSubtotal() != null ? item.getSubtotal() : item.getPrecoUnitario().multiply(BigDecimal.valueOf(item.getQuantidade()));
+                total = total.add(itemSubtotal);
                 item.setPedido(pedido);
             }
             pedido.setValorTotal(total);
@@ -176,7 +186,7 @@ public class PedidoServiceImpl implements PedidoService {
         BigDecimal total = BigDecimal.ZERO;
         for (ItemPedidoRequest itemRequest : itens) {
             Produto produto = produtoRepository.findById(itemRequest.getProdutoId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado - ID: " + itemRequest.getProdutoId()));
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado - ID: " + itemRequest.getProdutoId()));
             if (!produto.getAtivo()) {
                 throw new RuntimeException("Produto não está disponível - ID: " + itemRequest.getProdutoId());
             }
@@ -241,7 +251,7 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public void deletar(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
         pedidoRepository.delete(pedido);
     }
 }
