@@ -224,6 +224,17 @@ O summary traz:
 - H2 Console: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
 	- JDBC URL: `jdbc:h2:mem:testdb` | User: `sa` | Senha: (em branco)
 
+#### Endpoints de inspeção do banco (desenvolvimento)
+
+Adicionalmente, a aplicação expõe endpoints de inspeção do banco para uso em ambiente de desenvolvimento. Eles consultam o H2 em memória a partir da própria JVM da aplicação e são úteis quando o console externo não consegue acessar a mesma instância "in-memory".
+
+- GET `/db/schema` — lista tabelas, constraints, contagens e metadados opcionais
+- GET `/db/schema?table=NAME` — retorna colunas/metadados da tabela informada
+- GET `/db/integrity` — executa um teste de inserção inválida para confirmar enforcement de FKs
+- POST `/db/query` — executa apenas queries `SELECT` passadas em JSON (ex.: `{ "sql": "SELECT * FROM CLIENTE LIMIT 10" }`)
+
+Segurança: esses endpoints são destinados ao ambiente de desenvolvimento; proteja-os com `@Profile("dev")` ou autenticação antes de expor em ambientes públicos.
+
 ### 10. Relatórios
 
 - **Cobertura Jacoco:** `target/site/jacoco/index.html`
@@ -490,6 +501,14 @@ Todos os endpoints agora utilizam DTOs para entrada e saída, garantindo desacop
 - `POST /pedidos`: Cria pedido (recebe PedidoRequest, retorna PedidoResponse)
 - `PUT /pedidos/{id}/status`: Atualiza status do pedido (recebe StatusUpdateRequest, retorna PedidoResponse)
 - `GET /health`, `GET /info`, `GET /h2-console`
+ - `GET /clientes`, `POST /clientes`, `PUT /clientes/{id}`, `DELETE /clientes/{id}`
+ - `GET /restaurantes`, `POST /restaurantes`, ...
+ - `GET /produtos`, `POST /produtos`, ...
+ - `GET /pedidos/cliente/{clienteId}`: Lista pedidos de um cliente (retorna lista de PedidoResponse)
+ - `POST /pedidos`: Cria pedido (recebe PedidoRequest, retorna PedidoResponse)
+ - `PUT /pedidos/{id}/status`: Atualiza status do pedido (recebe StatusUpdateRequest, retorna PedidoResponse)
+ - `GET /health`, `GET /info`, `GET /h2-console`
+ - `GET /db/schema`, `GET /db/schema?table={name}`, `GET /db/integrity`, `POST /db/query` (endpoints de inspeção - ambiente dev)
 
 ---
 

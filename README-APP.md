@@ -12,7 +12,7 @@ post_date: "2025-08-22"
 ---
 
 
-## Projeto: Delivery API Rabay
+# Projeto: Delivery API Rabay
 
 API backend desenvolvida em Java 21 com Spring Boot 3.2.x, servindo como base robusta e escalável para sistemas de delivery. O projeto oferece estrutura para cadastro de usuários, restaurantes, catálogo de produtos, gestão de pedidos, integração com pagamentos e monitoramento via Actuator.
 
@@ -26,8 +26,6 @@ API backend desenvolvida em Java 21 com Spring Boot 3.2.x, servindo como base ro
 - **Thymeleaf** (templates)
 - **Docker** (multi-stage)
 
-
-
 ## Arquitetura do Projeto
 
 - Arquitetura baseada em camadas (Controller, Service, Repository)
@@ -36,8 +34,6 @@ API backend desenvolvida em Java 21 com Spring Boot 3.2.x, servindo como base ro
 - Eventos de domínio (@DomainEvents)
 - RBAC com Spring Security (ROLE_CUSTOMER, ROLE_RESTAURANT_OWNER, ROLE_ADMIN)
 - Observabilidade com Micrometer e logs estruturados (MDC)
-
-
 
 ## Como Começar
 

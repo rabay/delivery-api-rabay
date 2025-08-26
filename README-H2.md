@@ -102,13 +102,49 @@ logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
 
 - O projeto inclui `src/main/resources/data.sql` com inserts idempotentes (MERGE) usados em ambiente de desenvolvimento. Se `spring.jpa.hibernate.ddl-auto=create-drop` estiver ativo, o schema é recriado a cada start e o `data.sql` é aplicado.
 
+## Novos endpoints de inspeção do banco (para desenvolvimento)
+
+Durante a Atividade 4 foi implementado um conjunto de endpoints REST que permitem inspecionar o estado do H2 em memória a partir da própria JVM da aplicação. Isso evita problemas ao tentar usar ferramentas externas contra bancos "in-memory" que vivem em uma instância diferente.
+
+- GET `/db/schema`
+  - Retorna lista de tabelas, constraints, metadados (quando solicitado) e uma contagem rápida de registros por tabela.
+  - Exemplo: `curl -s http://localhost:8080/db/schema | jq .`
+
+- GET `/db/schema?table=PEDIDO`
+  - Retorna metadados (colunas) para a tabela informada. O nome da tabela é case-insensitive.
+  - Exemplo: `curl -s "http://localhost:8080/db/schema?table=PEDIDO" | jq .`
+
+- GET `/db/integrity`
+  - Executa um teste de integridade simples: tenta inserir um registro inválido em `ITEM_PEDIDO` (chaves estrangeiras incorretas) e retorna o resultado da operação. Útil para confirmar que FK estão efetivamente aplicadas.
+  - Exemplo: `curl -s http://localhost:8080/db/integrity | jq .`
+
+- POST `/db/query`
+  - Aceita um JSON com `{ "sql": "SELECT ..." }` e executa apenas queries `SELECT` (validação simples impede DML/DDL). Retorna linhas e contagem.
+  - Uso: `curl -s -X POST -H "Content-Type: application/json" -d '{"sql":"SELECT * FROM CLIENTE LIMIT 10"}' http://localhost:8080/db/query | jq .`
+
+Segurança: esses endpoints são destinados a ambiente de desenvolvimento; se for commitar ou expor o código, proteja-os via `@Profile("dev")` e/ou autenticação.
+
 ## Testes rápidos
 
 1. Inicie a aplicação: `./scripts/start_server.sh --port 8080 --no-tail`
-2. Abra o H2 Console e execute as queries acima
+2. Abra o H2 Console e execute as queries acima ou use os endpoints internos `/db/*` para inspeção programática
 3. Verifique em `TABLE_CONSTRAINTS`, `REFERENTIAL_CONSTRAINTS` e `KEY_COLUMN_USAGE` se as FKs aparecem conforme esperado
 
-Se quiser, posso executar automaticamente as queries de verificação (extração programática de `TABLE_CONSTRAINTS` / `KEY_COLUMN_USAGE`) e colar os resultados aqui — diga apenas “execute” e eu retorno com a saída.
+## Checklist da solicitação
+
+Este checklist mostra o status atual dos requisitos solicitados na Atividade 4 (H2, logs e validação):
+
+- [x] Configurar H2 (in-memory) e H2 Console ativado para dev
+- [x] Fornecer `data.sql` idempotente e evitar sua execução automática quando conflitar com DataLoader
+- [x] Habilitar logging de SQL (`org.hibernate.SQL=DEBUG`)
+- [x] Capturar bind values (BasicBinder) — habilitado temporariamente para verificação; revertido depois
+- [x] Implementar endpoints de inspeção em-JVM (`/db/schema`, `/db/integrity`, `/db/query`)
+- [x] Remover scripts bash de verificação externos (scripts experimentais removidos)
+- [x] Atualizar documentação (`README-H2.md` e README principal) com instruções de uso
+- [x] Reverter TRACE root e reduzir verbosidade de logs (feito)
+- [ ] Proteger endpoints `/db/*` com `@Profile("dev")` e/ou autenticação (recomendado)
+
+Se precisar, eu aplico a proteção por profile nos controllers de inspeção e atualizo a documentação.
 
 ---
-Arquivo gerado automaticamente para a Atividade 4 (H2). Mantê-lo em `README-H2.md` na raiz do projeto.
+Arquivo gerado e atualizado para a Atividade 4 (H2). Mantê-lo em `README-H2.md` na raiz do projeto.
