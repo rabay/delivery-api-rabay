@@ -54,3 +54,5 @@ app.log
 config.json
 
 tasks/**
+
+entregaveis/newman-report.json

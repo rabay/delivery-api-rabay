@@ -5,11 +5,11 @@
     },
     "item": [
       {
-        "id": "80720845-9764-4399-b11a-2ef72e707d00",
+        "id": "7527df28-94cc-42bc-917e-7e0e09d90162",
         "name": "Clientes",
         "item": [
           {
-            "id": "205c6fff-8d59-4025-9f56-b043c5e60aeb",
+            "id": "1a2190e5-44d9-4059-bfd6-6968cf80f580",
             "name": "Criar Cliente",
             "request": {
               "url": {
@@ -41,18 +41,18 @@
               {
                 "listen": "prerequest",
                 "script": {
-                  "id": "c9439f10-0788-4b40-9056-afc5214bdf3e",
+                  "id": "b8f4ac92-cd8d-498d-8e85-ba730d29054b",
                   "type": "text/javascript",
                   "exec": [
                     "pm.environment.set('uniqueEmail', 'cliente_' + Date.now() + '@email.com');"
                   ],
-                  "_lastExecutionId": "d4d50267-96e7-40af-abce-0e4cd9f90c6b"
+                  "_lastExecutionId": "f210792d-8002-4aeb-962e-22f4f3089c87"
                 }
               },
               {
                 "listen": "test",
                 "script": {
-                  "id": "69449b1f-3300-4bee-84c8-827e639b852b",
+                  "id": "9e1ce5e9-b081-443f-b662-ce2582cf41a5",
                   "type": "text/javascript",
                   "exec": [
                     "var json = pm.response.json();",
@@ -60,13 +60,13 @@
                     "pm.test('Body possui id e nome', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('nome'); });",
                     "if(json && json.id){ pm.environment.set('clienteId', json.id); }"
                   ],
-                  "_lastExecutionId": "dbb07db7-0224-4333-af66-e4d4baabec7b"
+                  "_lastExecutionId": "6c632863-01c8-41f5-9b09-5db01d771b42"
                 }
               }
             ]
           },
           {
-            "id": "b86a670c-6a08-45dc-b827-f1e8f490b61b",
+            "id": "a27c349f-a29a-4ae2-9a2f-b546f5f77cc5",
             "name": "Criar Cliente com E-mail Duplicado",
             "request": {
               "url": {
@@ -98,19 +98,19 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "dcd01bfb-b7a2-4d6e-a858-0f8aea8aa1af",
+                  "id": "2ac49ef2-662c-4dee-9881-06edcf4418be",
                   "type": "text/javascript",
                   "exec": [
                     "pm.test('Status 409 Conflict', function () { pm.response.to.have.status(409); });",
                     "pm.test('Mensagem de erro de e-mail duplicado', function () { pm.expect(pm.response.text()).to.include('E-mail já cadastrado'); });"
                   ],
-                  "_lastExecutionId": "71ab4302-40c8-4114-89b6-4fa4a7ddf14b"
+                  "_lastExecutionId": "874ea15f-cd77-41da-9ac3-3e2fcc0eb09a"
                 }
               }
             ]
           },
           {
-            "id": "63810e34-df03-4acf-9170-0430e3ac19e2",
+            "id": "3a9f3ff8-259d-420f-9fc6-ffad39ac41c6",
             "name": "Listar Clientes",
             "request": {
               "url": {
@@ -132,20 +132,20 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "900cf454-6700-49b2-b78d-7c3021f4afe8",
+                  "id": "de1a873f-c36c-43b9-80d1-9d2293676e36",
                   "type": "text/javascript",
                   "exec": [
                     "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                     "var json = pm.response.json();",
                     "pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
                   ],
-                  "_lastExecutionId": "a7185774-1a13-4c92-832d-b65b0df9a12e"
+                  "_lastExecutionId": "9244a6d8-d26c-4dbd-b701-85e5cc165110"
                 }
               }
             ]
           },
           {
-            "id": "f3514a09-13ae-4417-88fa-73b8888b530e",
+            "id": "5bee659c-b283-49ca-ae0b-159290bd8711",
             "name": "Buscar Cliente por ID",
             "request": {
               "url": {
@@ -168,19 +168,19 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "374a44e7-a6ab-4f09-be3f-1f0ae4f4e8a1",
+                  "id": "5d2298c3-0fb3-4674-86d5-b96bbeecc6cb",
                   "type": "text/javascript",
                   "exec": [
                     "pm.test('Status 200 ou 405', function () { pm.expect([200,405]).to.include(pm.response.code); });",
                     "if(pm.response.code === 200){ var json = pm.response.json(); pm.test('Body possui id', function () { pm.expect(json).to.have.property('id'); }); }"
                   ],
-                  "_lastExecutionId": "0736a4eb-0568-4f1a-b84d-88cf985ce74d"
+                  "_lastExecutionId": "c90d3bc7-c62c-472a-8b7b-8ffb28aaab00"
                 }
               }
             ]
           },
           {
-            "id": "6d074105-b584-473f-812d-c5771925bf23",
+            "id": "6dd09db1-4875-4054-9b72-ec9bbe230156",
             "name": "Atualizar Cliente",
             "request": {
               "url": {
@@ -213,26 +213,27 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "a6cf18ed-b887-4c1b-951c-2289100e4509",
+                  "id": "b5fae1ee-2bdc-4ed8-96d1-73a1bcde2416",
                   "type": "text/javascript",
                   "exec": [
                     "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                     "var json = pm.response.json();",
                     "pm.test('Body possui nome atualizado', function () { pm.expect(json.nome).to.eql('Cliente Atualizado'); });"
                   ],
-                  "_lastExecutionId": "9798c971-542f-467d-80ff-567b293418b6"
+                  "_lastExecutionId": "67f3d07c-025e-47ab-bc6e-76c83cc721d3"
                 }
               }
             ]
           },
           {
-            "id": "e9ee2330-4490-4e22-b6ce-9b1dc5a72d16",
+            "id": "33d78e04-4a8d-4d06-b15a-668bb935bbb2",
             "name": "Criar Pedido",
             "request": {
               "url": {
                 "protocol": "http",
                 "port": "8080",
                 "path": [
+                  "api",
                   "pedidos"
                 ],
                 "host": [
@@ -257,7 +258,7 @@
             "event": []
           },
           {
-            "id": "63fb018b-fe1a-4c74-b108-87d20e1507eb",
+            "id": "e5a20c8b-44c0-41fe-88f8-f12434e116b7",
             "name": "Inativar Cliente",
             "request": {
               "url": {
@@ -282,11 +283,11 @@
         "event": []
       },
       {
-        "id": "634f05a1-f22d-4b8b-b341-5ad22acf2d2e",
+        "id": "b8b3726c-9679-44fe-95df-2dc0a9372581",
         "name": "Restaurantes",
         "item": [
           {
-            "id": "bd2862e4-d953-45be-bcbb-de21390c25ec",
+            "id": "8d45d3f4-5431-4421-8447-9530c3d1545e",
             "name": "Criar Restaurante",
             "request": {
               "url": {
@@ -318,7 +319,7 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "980eb3b0-c268-477a-acfb-cdb40780a30c",
+                  "id": "2eb24e60-0446-438f-afec-ea71d43129a3",
                   "type": "text/javascript",
                   "exec": [
                     "var json = pm.response.json();",
@@ -326,13 +327,13 @@
                     "pm.test('Body possui id e nome', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('nome'); });",
                     "if(json && json.id){ pm.environment.set('restauranteId', json.id); } else { pm.environment.unset('restauranteId'); }"
                   ],
-                  "_lastExecutionId": "94ab24b2-e2b3-4ff2-bc89-470c4bd7c1b5"
+                  "_lastExecutionId": "f52a3c90-eaa3-4e8a-adef-740bb559d47b"
                 }
               }
             ]
           },
           {
-            "id": "a8c14d3e-1b02-4705-b24e-a1383e910273",
+            "id": "8ce31625-331e-4639-94b8-8b650a0f47dc",
             "name": "Listar Restaurantes",
             "request": {
               "url": {
@@ -354,20 +355,20 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "453fcd65-490c-4460-8f11-b181858664ed",
+                  "id": "5d23aad1-ccd0-4682-ac4e-0ac59554d572",
                   "type": "text/javascript",
                   "exec": [
                     "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                     "var json = pm.response.json();",
                     "pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
                   ],
-                  "_lastExecutionId": "b25be723-f9ff-46b1-acec-bb6960fbf2c4"
+                  "_lastExecutionId": "376bcc22-a19b-4239-81d8-43c73284bf78"
                 }
               }
             ]
           },
           {
-            "id": "3ce9bba0-b9b8-4c19-ab3e-5d4da4345bb8",
+            "id": "1a129b33-5b25-43d7-95f8-0e62b41c1155",
             "name": "Buscar Restaurante por ID",
             "request": {
               "url": {
@@ -390,20 +391,20 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "b367b1b8-d734-4ee4-b628-d8a5e55898dd",
+                  "id": "5a85039d-97e0-46a4-bb68-e20e5ffbfe72",
                   "type": "text/javascript",
                   "exec": [
                     "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                     "var json = pm.response.json();",
                     "pm.test('Body possui id', function () { pm.expect(json).to.have.property('id'); });"
                   ],
-                  "_lastExecutionId": "7cd6b34b-d529-4d43-acb8-3f1c81e47742"
+                  "_lastExecutionId": "661924a4-2c79-4cfd-b5d7-b804208c0de7"
                 }
               }
             ]
           },
           {
-            "id": "b84dca54-eb7a-47ca-b246-86d8ed24491e",
+            "id": "2beadb6e-a853-4505-840f-ad58dbe11b07",
             "name": "Atualizar Restaurante",
             "request": {
               "url": {
@@ -436,20 +437,20 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "f06b1d08-49ca-4441-a84d-987be334ceda",
+                  "id": "3a8bd9df-000f-474c-afa7-b9a181453648",
                   "type": "text/javascript",
                   "exec": [
                     "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                     "var json = pm.response.json();",
                     "pm.test('Body possui nome atualizado', function () { pm.expect(json.nome).to.eql('Restaurante Atualizado'); });"
                   ],
-                  "_lastExecutionId": "509ad33d-d1af-441b-bb5b-ce4c3890007b"
+                  "_lastExecutionId": "baa334f8-9c12-482b-a200-6670e084a17a"
                 }
               }
             ]
           },
           {
-            "id": "c193853d-d077-47ad-9cd7-5b1eea7a8946",
+            "id": "dad65589-07d2-44bd-924a-5bf3d6b96901",
             "name": "Inativar Restaurante",
             "request": {
               "url": {
@@ -471,7 +472,7 @@
             "event": []
           },
           {
-            "id": "2abdf312-312c-4e97-b475-3cce515f2004",
+            "id": "9a61948a-bd00-471a-80b6-b29f8b3a9cac",
             "name": "Buscar por Categoria",
             "request": {
               "url": {
@@ -497,11 +498,11 @@
         "event": []
       },
       {
-        "id": "1e26ba06-d2d1-484d-89af-460cde8130bb",
+        "id": "bcc35c33-cb97-4686-9d59-736a3d7bd5ae",
         "name": "Produtos",
         "item": [
           {
-            "id": "1eb25a75-e568-474d-b708-5d8b4130a0a4",
+            "id": "b1cad910-497e-4c25-af17-01fe0b42aed1",
             "name": "Criar Produto",
             "request": {
               "url": {
@@ -533,18 +534,18 @@
               {
                 "listen": "prerequest",
                 "script": {
-                  "id": "41c00304-6431-4c14-987e-a2e3656cf79f",
+                  "id": "fc1864f9-91ea-4163-b94d-e607bcecaf3d",
                   "type": "text/javascript",
                   "exec": [
                     "console.log('restauranteId usado:', pm.environment.get('restauranteId'));"
                   ],
-                  "_lastExecutionId": "b5c0da45-7b45-455d-bbf1-dbd5343b9033"
+                  "_lastExecutionId": "de9b3995-b5ab-4be8-b605-213b69bd8659"
                 }
               },
               {
                 "listen": "test",
                 "script": {
-                  "id": "2fa1316c-9afd-4f31-bb70-116efd77e526",
+                  "id": "b923f1f2-768a-4cf4-8426-30b205d3b7d4",
                   "type": "text/javascript",
                   "exec": [
                     "var json = pm.response.json();",
@@ -552,13 +553,13 @@
                     "pm.test('Body possui id, nome e restaurante', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('nome'); pm.expect(json).to.have.property('restaurante'); });",
                     "if(json && json.id){ pm.environment.set('produtoId', json.id); }"
                   ],
-                  "_lastExecutionId": "d42d5c0d-63b4-4771-b01c-fc0c098d6028"
+                  "_lastExecutionId": "dbb5d73a-6585-43cc-a212-fe063193de08"
                 }
               }
             ]
           },
           {
-            "id": "4dab7e75-80f3-49b5-b412-bfa4ac8a019a",
+            "id": "16fd429b-af4f-45c7-bd43-fd29bdc8d333",
             "name": "Listar Produtos",
             "request": {
               "url": {
@@ -579,7 +580,7 @@
             "event": []
           },
           {
-            "id": "e49ac62c-b8ba-4b75-a2b7-3fb376498d79",
+            "id": "62b2b101-1c3c-435e-ac61-4e44b7e01002",
             "name": "Buscar Produto por ID",
             "request": {
               "url": {
@@ -601,7 +602,7 @@
             "event": []
           },
           {
-            "id": "e6ae8396-da54-4c60-b0f8-7c51a70595cb",
+            "id": "e04fecfe-cb99-4ae1-9aed-d74f8583ef8f",
             "name": "Atualizar Produto",
             "request": {
               "url": {
@@ -633,7 +634,7 @@
             "event": []
           },
           {
-            "id": "20f1418e-d9e8-49ce-8bc2-9b27e66626b0",
+            "id": "5ef661f2-6cd7-443d-8e5e-f233366c5e66",
             "name": "Buscar Produtos por Restaurante",
             "request": {
               "url": {
@@ -659,11 +660,11 @@
         "event": []
       },
       {
-        "id": "c46e6a46-ce06-421a-9a76-ce14dec68fb6",
+        "id": "3ac7fa14-2820-47c5-b609-0fa53cebaa81",
         "name": "Pedidos",
         "item": [
           {
-            "id": "f40c06ff-87ce-4e0f-889a-f5a17744a4ac",
+            "id": "876c47d5-3c62-44e7-8057-e5b76a9d5143",
             "name": "Criar Pedido",
             "request": {
               "url": {
@@ -696,7 +697,7 @@
               {
                 "listen": "prerequest",
                 "script": {
-                  "id": "3c41f62c-bcb3-4fbd-be21-627e56a55fcb",
+                  "id": "6e579791-8aab-4f8c-b548-10001f84f776",
                   "type": "text/javascript",
                   "exec": [
                     "// Garante que clienteId, restauranteId e produtoId existam; cria automaticamente se necessário",
@@ -749,13 +750,13 @@
                     "  ensureRestauranteAndProduto();",
                     "} catch(e) { console.error('Erro no prerequest automatico:', e); }"
                   ],
-                  "_lastExecutionId": "09b463e5-e169-4d7e-8604-8a8cad55c940"
+                  "_lastExecutionId": "61eed0ef-28db-47f7-993c-68880d0122e7"
                 }
               },
               {
                 "listen": "test",
                 "script": {
-                  "id": "8e8f3a50-b087-48c2-97fe-f6f98c0c6ceb",
+                  "id": "9ee65a5b-efac-4f8f-a0fa-4d2feccfc0bf",
                   "type": "text/javascript",
                   "exec": [
                     "var json = pm.response.json();",
@@ -763,13 +764,13 @@
                     "pm.test('Body possui id, clienteId e status', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('cliente'); pm.expect(json).to.have.property('status'); });",
                     "if(json && json.id){ pm.environment.set('pedidoId', json.id); }"
                   ],
-                  "_lastExecutionId": "93d3ca15-a913-4ee3-a74e-1f552100abc1"
+                  "_lastExecutionId": "bb18fe46-167f-42b8-85c4-2178348d120c"
                 }
               }
             ]
           },
           {
-            "id": "b749f8c6-67c7-408e-ba39-234564c52841",
+            "id": "4823524f-2a6d-4332-845c-502df657791d",
             "name": "Buscar Pedidos por Cliente",
             "request": {
               "url": {
@@ -794,18 +795,18 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "fb622fa5-1242-40d8-a5a6-fc39870c1664",
+                  "id": "f0a027a2-63dc-41a7-b8d2-11203c6a3e8e",
                   "type": "text/javascript",
                   "exec": [
-                    "pm.test('Status 200 ou 400', function () { pm.expect([200,400]).to.include(pm.response.code); });"
+                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });\n                    var json = pm.response.json();\n                    pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
                   ],
-                  "_lastExecutionId": "9be369dc-45f8-4d8a-b921-c7f31e1d00c7"
+                  "_lastExecutionId": "536a0014-53ea-47c5-9a38-500d3bfea292"
                 }
               }
             ]
           },
           {
-            "id": "fc1141b7-e5cd-40d7-ba97-c786ab517ba0",
+            "id": "fc9051e3-6cb2-4c39-bf42-da5ebaaf54e1",
             "name": "Atualizar Status do Pedido",
             "request": {
               "url": {
@@ -840,14 +841,14 @@
               {
                 "listen": "test",
                 "script": {
-                  "id": "f9740fe3-05a2-4683-ae96-b3b0c8fb332d",
+                  "id": "e1a1da17-0127-4f1e-a181-8769e7142b37",
                   "type": "text/javascript",
                   "exec": [
                     "var json = pm.response.json();",
                     "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                     "pm.test('Status do pedido atualizado', function () { pm.expect(json.status).to.eql('ENTREGUE'); });"
                   ],
-                  "_lastExecutionId": "8796955b-c0e8-41a2-ba95-5eb7ecd2da73"
+                  "_lastExecutionId": "35d1dbdb-0d33-4456-94c5-19886f63545d"
                 }
               }
             ]
@@ -865,37 +866,37 @@
     }
   },
   "environment": {
-    "id": "488c1802-89a7-4ce6-9d95-1ed5c2916de1",
+    "id": "6cd61edf-b26b-41c2-968b-88f7483140e4",
     "values": [
       {
         "type": "any",
-        "value": "cliente_1755919023485@email.com",
+        "value": "cliente_1756175378252@email.com",
         "key": "uniqueEmail"
       },
       {
         "type": "any",
-        "value": 9,
+        "value": 8,
         "key": "clienteId"
       },
       {
         "type": "any",
-        "value": 9,
+        "value": 8,
         "key": "restauranteId"
       },
       {
         "type": "any",
-        "value": 14,
+        "value": 13,
         "key": "produtoId"
       },
       {
         "type": "any",
-        "value": 5,
+        "value": 6,
         "key": "pedidoId"
       }
     ]
   },
   "globals": {
-    "id": "ccb8095f-5979-4807-bc67-245660c7d862",
+    "id": "a0388e77-47aa-469b-aaf0-9d6fea163e10",
     "values": []
   },
   "run": {
@@ -913,7 +914,7 @@
       "scripts": {
         "total": 16,
         "pending": 0,
-        "failed": 0
+        "failed": 1
       },
       "prerequests": {
         "total": 21,
@@ -933,12 +934,12 @@
       "assertions": {
         "total": 24,
         "pending": 0,
-        "failed": 0
+        "failed": 1
       },
       "testScripts": {
         "total": 13,
         "pending": 0,
-        "failed": 0
+        "failed": 1
       },
       "prerequestScripts": {
         "total": 3,
@@ -947,10 +948,10 @@
       }
     },
     "timings": {
-      "responseAverage": 8.047619047619047,
+      "responseAverage": 7.9523809523809526,
       "responseMin": 4,
-      "responseMax": 40,
-      "responseSd": 7.37096097938642,
+      "responseMax": 41,
+      "responseSd": 7.5433742006522415,
       "dnsAverage": 0,
       "dnsMin": 0,
       "dnsMax": 0,
@@ -959,8 +960,8 @@
       "firstByteMin": 0,
       "firstByteMax": 0,
       "firstByteSd": 0,
-      "started": 1755919023458,
-      "completed": 1755919023982
+      "started": 1756175378225,
+      "completed": 1756175378764
     },
     "executions": [
       {
@@ -973,11 +974,11 @@
           "eof": false,
           "bof": true,
           "cr": false,
-          "ref": "56290864-7bce-40ae-9e40-00bb5b3f0f2f",
-          "httpRequestId": "de15564d-abda-4267-8a25-c29ab21f11ac"
+          "ref": "0f42a81d-526b-4765-b756-1eb15fddfb0b",
+          "httpRequestId": "95e4d91d-f770-49c0-9c9c-3827d5426db3"
         },
         "item": {
-          "id": "205c6fff-8d59-4025-9f56-b043c5e60aeb",
+          "id": "1a2190e5-44d9-4059-bfd6-6968cf80f580",
           "name": "Criar Cliente",
           "request": {
             "url": {
@@ -1009,18 +1010,18 @@
             {
               "listen": "prerequest",
               "script": {
-                "id": "c9439f10-0788-4b40-9056-afc5214bdf3e",
+                "id": "b8f4ac92-cd8d-498d-8e85-ba730d29054b",
                 "type": "text/javascript",
                 "exec": [
                   "pm.environment.set('uniqueEmail', 'cliente_' + Date.now() + '@email.com');"
                 ],
-                "_lastExecutionId": "d4d50267-96e7-40af-abce-0e4cd9f90c6b"
+                "_lastExecutionId": "f210792d-8002-4aeb-962e-22f4f3089c87"
               }
             },
             {
               "listen": "test",
               "script": {
-                "id": "69449b1f-3300-4bee-84c8-827e639b852b",
+                "id": "9e1ce5e9-b081-443f-b662-ce2582cf41a5",
                 "type": "text/javascript",
                 "exec": [
                   "var json = pm.response.json();",
@@ -1028,7 +1029,7 @@
                   "pm.test('Body possui id e nome', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('nome'); });",
                   "if(json && json.id){ pm.environment.set('clienteId', json.id); }"
                 ],
-                "_lastExecutionId": "dbb07db7-0224-4333-af66-e4d4baabec7b"
+                "_lastExecutionId": "6c632863-01c8-41f5-9b09-5db01d771b42"
               }
             }
           ]
@@ -1068,7 +1069,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "9c3732c5-bf91-4bf3-a97b-2c24c9b7ceba",
+              "value": "8706141c-75c3-433e-9f65-2b93b4de1cd9",
               "system": true
             },
             {
@@ -1095,11 +1096,11 @@
           "method": "POST",
           "body": {
             "mode": "raw",
-            "raw": "{\n  \"nome\": \"Novo Cliente\",\n  \"email\": \"cliente_1755919023485@email.com\",\n  \"telefone\": \"11999999999\",\n  \"endereco\": \"Rua Teste, 123\"\n}"
+            "raw": "{\n  \"nome\": \"Novo Cliente\",\n  \"email\": \"cliente_1756175378252@email.com\",\n  \"telefone\": \"11999999999\",\n  \"endereco\": \"Rua Teste, 123\"\n}"
           }
         },
         "response": {
-          "id": "655ac77d-47da-4224-a4aa-eec844d521dd",
+          "id": "ebe318ac-5915-4409-9055-38911869e828",
           "status": "Created",
           "code": 201,
           "header": [
@@ -1113,7 +1114,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -1133,7 +1134,7 @@
               100,
               34,
               58,
-              57,
+              56,
               44,
               34,
               110,
@@ -1177,16 +1178,16 @@
               49,
               55,
               53,
-              53,
-              57,
+              54,
               49,
-              57,
-              48,
-              50,
-              51,
-              52,
-              56,
+              55,
               53,
+              51,
+              55,
+              56,
+              50,
+              53,
+              50,
               64,
               101,
               109,
@@ -1268,10 +1269,10 @@
             ]
           },
           "cookie": [],
-          "responseTime": 40,
+          "responseTime": 41,
           "responseSize": 138
         },
-        "id": "205c6fff-8d59-4025-9f56-b043c5e60aeb",
+        "id": "1a2190e5-44d9-4059-bfd6-6968cf80f580",
         "assertions": [
           {
             "assertion": "Status 201 Created",
@@ -1285,15 +1286,15 @@
       },
       {
         "cursor": {
-          "ref": "fea269a6-4be0-4bbb-9edc-97de3642bcc0",
+          "ref": "0fe90bf2-b55e-47d7-a3f9-68c5f3b1c0d8",
           "length": 21,
           "cycles": 1,
           "position": 1,
           "iteration": 0,
-          "httpRequestId": "2fb906c4-d399-4a33-9291-1c9dfe93b49e"
+          "httpRequestId": "a97afed7-c053-4023-8edd-1f96013798a7"
         },
         "item": {
-          "id": "b86a670c-6a08-45dc-b827-f1e8f490b61b",
+          "id": "a27c349f-a29a-4ae2-9a2f-b546f5f77cc5",
           "name": "Criar Cliente com E-mail Duplicado",
           "request": {
             "url": {
@@ -1325,13 +1326,13 @@
             {
               "listen": "test",
               "script": {
-                "id": "dcd01bfb-b7a2-4d6e-a858-0f8aea8aa1af",
+                "id": "2ac49ef2-662c-4dee-9881-06edcf4418be",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 409 Conflict', function () { pm.response.to.have.status(409); });",
                   "pm.test('Mensagem de erro de e-mail duplicado', function () { pm.expect(pm.response.text()).to.include('E-mail já cadastrado'); });"
                 ],
-                "_lastExecutionId": "71ab4302-40c8-4114-89b6-4fa4a7ddf14b"
+                "_lastExecutionId": "874ea15f-cd77-41da-9ac3-3e2fcc0eb09a"
               }
             }
           ]
@@ -1371,7 +1372,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "ba98d391-57ec-4602-91be-f3062e306786",
+              "value": "cb7b63fb-9796-4923-9006-6c0301997ebf",
               "system": true
             },
             {
@@ -1398,11 +1399,11 @@
           "method": "POST",
           "body": {
             "mode": "raw",
-            "raw": "{\n  \"nome\": \"Cliente Duplicado\",\n  \"email\": \"cliente_1755919023485@email.com\",\n  \"telefone\": \"11999999999\",\n  \"endereco\": \"Rua Teste, 123\"\n}"
+            "raw": "{\n  \"nome\": \"Cliente Duplicado\",\n  \"email\": \"cliente_1756175378252@email.com\",\n  \"telefone\": \"11999999999\",\n  \"endereco\": \"Rua Teste, 123\"\n}"
           }
         },
         "response": {
-          "id": "d09ab068-e5a0-41ee-a8af-54321821ebf0",
+          "id": "8fd64f52-35cb-433a-b1e2-b54ada958d29",
           "status": "Conflict",
           "code": 409,
           "header": [
@@ -1416,7 +1417,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -1464,16 +1465,16 @@
               49,
               55,
               53,
-              53,
-              57,
+              54,
               49,
-              57,
-              48,
-              50,
-              51,
-              52,
-              56,
+              55,
               53,
+              51,
+              55,
+              56,
+              50,
+              53,
+              50,
               64,
               101,
               109,
@@ -1487,10 +1488,10 @@
             ]
           },
           "cookie": [],
-          "responseTime": 8,
+          "responseTime": 9,
           "responseSize": 54
         },
-        "id": "b86a670c-6a08-45dc-b827-f1e8f490b61b",
+        "id": "a27c349f-a29a-4ae2-9a2f-b546f5f77cc5",
         "assertions": [
           {
             "assertion": "Status 409 Conflict",
@@ -1504,15 +1505,15 @@
       },
       {
         "cursor": {
-          "ref": "7fec8d18-a19b-4b0c-8070-06a3861eeedf",
+          "ref": "8a974b34-c0ce-4549-965e-c793e9966ea3",
           "length": 21,
           "cycles": 1,
           "position": 2,
           "iteration": 0,
-          "httpRequestId": "fb7e4be6-1b97-4bfc-9c61-accd4a710c1f"
+          "httpRequestId": "cc1b5a13-d98e-4314-a3f8-1014c9381a20"
         },
         "item": {
-          "id": "63810e34-df03-4acf-9170-0430e3ac19e2",
+          "id": "3a9f3ff8-259d-420f-9fc6-ffad39ac41c6",
           "name": "Listar Clientes",
           "request": {
             "url": {
@@ -1534,14 +1535,14 @@
             {
               "listen": "test",
               "script": {
-                "id": "900cf454-6700-49b2-b78d-7c3021f4afe8",
+                "id": "de1a873f-c36c-43b9-80d1-9d2293676e36",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                   "var json = pm.response.json();",
                   "pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
                 ],
-                "_lastExecutionId": "a7185774-1a13-4c92-832d-b65b0df9a12e"
+                "_lastExecutionId": "9244a6d8-d26c-4dbd-b701-85e5cc165110"
               }
             }
           ]
@@ -1577,7 +1578,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "59f81d4d-0691-4a6f-bc6b-7d3ff22502d2",
+              "value": "ea73df00-1809-4358-aca4-69a18610d4c7",
               "system": true
             },
             {
@@ -1599,7 +1600,7 @@
           "method": "GET"
         },
         "response": {
-          "id": "0b19c847-d057-4469-a883-d2bec21ef117",
+          "id": "d245461a-d2dc-4806-be42-2505ae543a3a",
           "status": "OK",
           "code": 200,
           "header": [
@@ -1613,7 +1614,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -1983,16 +1984,16 @@
               49,
               55,
               53,
-              53,
-              57,
+              54,
               49,
-              56,
               55,
-              48,
-              56,
-              48,
               50,
+              55,
               52,
+              51,
+              48,
+              55,
+              53,
               64,
               101,
               109,
@@ -2122,155 +2123,16 @@
               49,
               55,
               53,
-              53,
-              57,
+              54,
               49,
-              56,
               55,
-              50,
-              48,
-              55,
-              48,
-              48,
-              64,
-              101,
-              109,
-              97,
-              105,
-              108,
-              46,
-              99,
-              111,
-              109,
-              34,
-              44,
-              34,
-              116,
-              101,
-              108,
-              101,
-              102,
-              111,
-              110,
-              101,
-              34,
-              58,
-              34,
-              49,
-              49,
-              57,
-              57,
-              57,
-              57,
-              57,
-              57,
-              57,
-              57,
-              57,
-              34,
-              44,
-              34,
-              101,
-              110,
-              100,
-              101,
-              114,
-              101,
-              99,
-              111,
-              34,
-              58,
-              34,
-              82,
-              117,
-              97,
-              32,
-              84,
-              101,
-              115,
-              116,
-              101,
-              44,
-              32,
-              49,
-              50,
               51,
-              34,
-              44,
-              34,
-              97,
-              116,
-              105,
-              118,
-              111,
-              34,
-              58,
-              116,
-              114,
-              117,
-              101,
-              125,
-              44,
-              123,
-              34,
-              105,
-              100,
-              34,
-              58,
-              56,
-              44,
-              34,
-              110,
-              111,
-              109,
-              101,
-              34,
-              58,
-              34,
-              78,
-              111,
-              118,
-              111,
-              32,
-              67,
-              108,
-              105,
-              101,
-              110,
-              116,
-              101,
-              34,
-              44,
-              34,
-              101,
-              109,
-              97,
-              105,
-              108,
-              34,
-              58,
-              34,
-              99,
-              108,
-              105,
-              101,
-              110,
-              116,
-              101,
-              95,
-              49,
-              55,
               53,
-              53,
-              57,
-              49,
-              56,
-              57,
-              48,
+              50,
               56,
               54,
-              48,
               49,
+              48,
               64,
               101,
               109,
@@ -2356,7 +2218,7 @@
               100,
               34,
               58,
-              57,
+              56,
               44,
               34,
               110,
@@ -2400,16 +2262,16 @@
               49,
               55,
               53,
-              53,
-              57,
+              54,
               49,
-              57,
-              48,
-              50,
-              51,
-              52,
-              56,
+              55,
               53,
+              51,
+              55,
+              56,
+              50,
+              53,
+              50,
               64,
               101,
               109,
@@ -2493,9 +2355,9 @@
           },
           "cookie": [],
           "responseTime": 6,
-          "responseSize": 862
+          "responseSize": 723
         },
-        "id": "63810e34-df03-4acf-9170-0430e3ac19e2",
+        "id": "3a9f3ff8-259d-420f-9fc6-ffad39ac41c6",
         "assertions": [
           {
             "assertion": "Status 200 OK",
@@ -2509,15 +2371,15 @@
       },
       {
         "cursor": {
-          "ref": "b488b6a3-9a04-409e-8441-bb5e987578fb",
+          "ref": "20b108aa-8999-484c-81c0-e55d6130a64c",
           "length": 21,
           "cycles": 1,
           "position": 3,
           "iteration": 0,
-          "httpRequestId": "d87118ad-00e9-4be4-9cd8-ea6f7fee52f2"
+          "httpRequestId": "0381a28d-1e67-4f23-a83d-ddb2dd9f0e5a"
         },
         "item": {
-          "id": "f3514a09-13ae-4417-88fa-73b8888b530e",
+          "id": "5bee659c-b283-49ca-ae0b-159290bd8711",
           "name": "Buscar Cliente por ID",
           "request": {
             "url": {
@@ -2540,13 +2402,13 @@
             {
               "listen": "test",
               "script": {
-                "id": "374a44e7-a6ab-4f09-be3f-1f0ae4f4e8a1",
+                "id": "5d2298c3-0fb3-4674-86d5-b96bbeecc6cb",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 200 ou 405', function () { pm.expect([200,405]).to.include(pm.response.code); });",
                   "if(pm.response.code === 200){ var json = pm.response.json(); pm.test('Body possui id', function () { pm.expect(json).to.have.property('id'); }); }"
                 ],
-                "_lastExecutionId": "0736a4eb-0568-4f1a-b84d-88cf985ce74d"
+                "_lastExecutionId": "c90d3bc7-c62c-472a-8b7b-8ffb28aaab00"
               }
             }
           ]
@@ -2583,7 +2445,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "76604c42-b80a-4571-90f2-1eda807552c9",
+              "value": "1ec94458-fb86-4894-8dde-11a1495610f5",
               "system": true
             },
             {
@@ -2605,7 +2467,7 @@
           "method": "GET"
         },
         "response": {
-          "id": "e889a926-b262-46b7-b6b6-4932fce6d3f0",
+          "id": "0a3b8be2-a497-4862-8b09-060f51b206b2",
           "status": "Method Not Allowed",
           "code": 405,
           "header": [
@@ -2623,7 +2485,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -2660,20 +2522,20 @@
               56,
               45,
               50,
-              51,
+              54,
               84,
               48,
+              50,
+              58,
+              50,
+              57,
+              58,
               51,
-              58,
-              49,
-              55,
-              58,
+              56,
+              46,
+              52,
               48,
               51,
-              46,
-              54,
-              51,
-              49,
               43,
               48,
               48,
@@ -2751,7 +2613,7 @@
           "responseTime": 5,
           "responseSize": 108
         },
-        "id": "f3514a09-13ae-4417-88fa-73b8888b530e",
+        "id": "5bee659c-b283-49ca-ae0b-159290bd8711",
         "assertions": [
           {
             "assertion": "Status 200 ou 405",
@@ -2761,15 +2623,15 @@
       },
       {
         "cursor": {
-          "ref": "4434bff0-aa05-4c60-8250-409e2bced159",
+          "ref": "ab9e393c-a8ef-4f59-acee-046970117636",
           "length": 21,
           "cycles": 1,
           "position": 4,
           "iteration": 0,
-          "httpRequestId": "b62110a3-31fe-4e82-897a-f7a047e430a5"
+          "httpRequestId": "66286650-d8ac-4d0f-b9cb-814e0aa04681"
         },
         "item": {
-          "id": "6d074105-b584-473f-812d-c5771925bf23",
+          "id": "6dd09db1-4875-4054-9b72-ec9bbe230156",
           "name": "Atualizar Cliente",
           "request": {
             "url": {
@@ -2802,14 +2664,14 @@
             {
               "listen": "test",
               "script": {
-                "id": "a6cf18ed-b887-4c1b-951c-2289100e4509",
+                "id": "b5fae1ee-2bdc-4ed8-96d1-73a1bcde2416",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                   "var json = pm.response.json();",
                   "pm.test('Body possui nome atualizado', function () { pm.expect(json.nome).to.eql('Cliente Atualizado'); });"
                 ],
-                "_lastExecutionId": "9798c971-542f-467d-80ff-567b293418b6"
+                "_lastExecutionId": "67f3d07c-025e-47ab-bc6e-76c83cc721d3"
               }
             }
           ]
@@ -2850,7 +2712,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "e240dc41-55e9-4322-9a42-445f96357dfc",
+              "value": "66205009-b016-469f-88b1-6f2a323da022",
               "system": true
             },
             {
@@ -2881,7 +2743,7 @@
           }
         },
         "response": {
-          "id": "6d351efe-8af0-4d6c-905d-06688716faef",
+          "id": "61a58cc5-ea90-4d77-a31f-54acd9f7232f",
           "status": "OK",
           "code": 200,
           "header": [
@@ -2895,7 +2757,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -3048,7 +2910,7 @@
           "responseTime": 7,
           "responseSize": 133
         },
-        "id": "6d074105-b584-473f-812d-c5771925bf23",
+        "id": "6dd09db1-4875-4054-9b72-ec9bbe230156",
         "assertions": [
           {
             "assertion": "Status 200 OK",
@@ -3062,21 +2924,22 @@
       },
       {
         "cursor": {
-          "ref": "bce364b9-390e-4aa2-a6cc-29deda3f22bb",
+          "ref": "0e0ae322-b22e-4331-a8d3-9fcbfe6bfeee",
           "length": 21,
           "cycles": 1,
           "position": 5,
           "iteration": 0,
-          "httpRequestId": "c50f61cd-a651-4bcf-8d17-ef01aedd911e"
+          "httpRequestId": "ccce4e13-5c34-4d75-82f1-12fefc0a08a3"
         },
         "item": {
-          "id": "e9ee2330-4490-4e22-b6ce-9b1dc5a72d16",
+          "id": "33d78e04-4a8d-4d06-b15a-668bb935bbb2",
           "name": "Criar Pedido",
           "request": {
             "url": {
               "protocol": "http",
               "port": "8080",
               "path": [
+                "api",
                 "pedidos"
               ],
               "host": [
@@ -3105,6 +2968,7 @@
             "protocol": "http",
             "port": "8080",
             "path": [
+              "api",
               "pedidos"
             ],
             "host": [
@@ -3135,7 +2999,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "9f751760-3512-4ac5-b45e-14421801d2e5",
+              "value": "dcf7dcfb-804c-4c49-841c-9639df0a77da",
               "system": true
             },
             {
@@ -3162,26 +3026,14 @@
           "method": "POST",
           "body": {
             "mode": "raw",
-            "raw": "{\n  \"clienteId\": 9,\n  \"restauranteId\": {{restauranteId}},\n  \"enderecoEntrega\": {\n    \"rua\": \"Rua Exemplo\",\n    \"numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01000-000\",\n    \"complemento\": \"Apto 1\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": {{produtoId}},\n      \"quantidade\": 2\n    },\n    {\n      \"produtoId\": 2,\n      \"quantidade\": 1\n    }\n  ]\n}"
+            "raw": "{\n  \"clienteId\": 8,\n  \"restauranteId\": {{restauranteId}},\n  \"enderecoEntrega\": {\n    \"rua\": \"Rua Exemplo\",\n    \"numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01000-000\",\n    \"complemento\": \"Apto 1\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": {{produtoId}},\n      \"quantidade\": 2\n    },\n    {\n      \"produtoId\": 2,\n      \"quantidade\": 1\n    }\n  ]\n}"
           }
         },
         "response": {
-          "id": "a0861c45-6428-4ec8-91e4-0314ba4eee19",
-          "status": "Not Found",
-          "code": 404,
+          "id": "c62f22bd-f2b5-45c3-9126-b38df046c23a",
+          "status": "Bad Request",
+          "code": 400,
           "header": [
-            {
-              "key": "Vary",
-              "value": "Origin"
-            },
-            {
-              "key": "Vary",
-              "value": "Access-Control-Request-Method"
-            },
-            {
-              "key": "Vary",
-              "value": "Access-Control-Request-Headers"
-            },
             {
               "key": "Content-Type",
               "value": "application/json"
@@ -3192,15 +3044,11 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
-            },
-            {
-              "key": "Keep-Alive",
-              "value": "timeout=60"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Connection",
-              "value": "keep-alive"
+              "value": "close"
             }
           ],
           "stream": {
@@ -3229,20 +3077,20 @@
               56,
               45,
               50,
-              51,
+              54,
               84,
               48,
-              51,
+              50,
               58,
-              49,
-              55,
+              50,
+              57,
               58,
-              48,
               51,
-              46,
-              54,
-              55,
               56,
+              46,
+              52,
+              53,
+              51,
               43,
               48,
               48,
@@ -3262,7 +3110,7 @@
               58,
               52,
               48,
-              52,
+              48,
               44,
               34,
               101,
@@ -3273,15 +3121,17 @@
               34,
               58,
               34,
-              78,
-              111,
-              116,
-              32,
-              70,
-              111,
-              117,
-              110,
+              66,
+              97,
               100,
+              32,
+              82,
+              101,
+              113,
+              117,
+              101,
+              115,
+              116,
               34,
               44,
               34,
@@ -3292,6 +3142,10 @@
               34,
               58,
               34,
+              47,
+              97,
+              112,
+              105,
               47,
               112,
               101,
@@ -3305,22 +3159,22 @@
             ]
           },
           "cookie": [],
-          "responseTime": 6,
-          "responseSize": 96
+          "responseTime": 5,
+          "responseSize": 102
         },
-        "id": "e9ee2330-4490-4e22-b6ce-9b1dc5a72d16"
+        "id": "33d78e04-4a8d-4d06-b15a-668bb935bbb2"
       },
       {
         "cursor": {
-          "ref": "0fa4f903-f1b5-4d83-b3fc-76a42876a66b",
+          "ref": "10849489-310c-4640-9b43-d65c61ea517d",
           "length": 21,
           "cycles": 1,
           "position": 6,
           "iteration": 0,
-          "httpRequestId": "1da3d231-cda5-4fe6-bc7e-f2acc6be8708"
+          "httpRequestId": "c4b5a876-28b0-4824-9e0a-a6bde80e32cc"
         },
         "item": {
-          "id": "63fb018b-fe1a-4c74-b108-87d20e1507eb",
+          "id": "e5a20c8b-44c0-41fe-88f8-f12434e116b7",
           "name": "Inativar Cliente",
           "request": {
             "url": {
@@ -3373,7 +3227,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "ee8db6af-b976-466c-87d7-d4f6b898f89c",
+              "value": "c9b00689-868c-4f81-94a4-b4e2a6721cf9",
               "system": true
             },
             {
@@ -3395,13 +3249,13 @@
           "method": "DELETE"
         },
         "response": {
-          "id": "90a1bb80-6407-48d7-aae2-e80801c318e8",
+          "id": "c0f2c573-ba96-4188-877e-195d3f482a50",
           "status": "No Content",
           "code": 204,
           "header": [
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -3417,22 +3271,22 @@
             "data": []
           },
           "cookie": [],
-          "responseTime": 5,
+          "responseTime": 6,
           "responseSize": 0
         },
-        "id": "63fb018b-fe1a-4c74-b108-87d20e1507eb"
+        "id": "e5a20c8b-44c0-41fe-88f8-f12434e116b7"
       },
       {
         "cursor": {
-          "ref": "fbe5c589-7461-46e0-856d-2f79951dc61b",
+          "ref": "9cb80656-f154-4446-a61e-7c7923fabd3e",
           "length": 21,
           "cycles": 1,
           "position": 7,
           "iteration": 0,
-          "httpRequestId": "3456072c-552e-40a2-ad59-66eebaedc3b9"
+          "httpRequestId": "defb0629-0cc1-4a9f-808d-38296254b1da"
         },
         "item": {
-          "id": "bd2862e4-d953-45be-bcbb-de21390c25ec",
+          "id": "8d45d3f4-5431-4421-8447-9530c3d1545e",
           "name": "Criar Restaurante",
           "request": {
             "url": {
@@ -3464,7 +3318,7 @@
             {
               "listen": "test",
               "script": {
-                "id": "980eb3b0-c268-477a-acfb-cdb40780a30c",
+                "id": "2eb24e60-0446-438f-afec-ea71d43129a3",
                 "type": "text/javascript",
                 "exec": [
                   "var json = pm.response.json();",
@@ -3472,7 +3326,7 @@
                   "pm.test('Body possui id e nome', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('nome'); });",
                   "if(json && json.id){ pm.environment.set('restauranteId', json.id); } else { pm.environment.unset('restauranteId'); }"
                 ],
-                "_lastExecutionId": "94ab24b2-e2b3-4ff2-bc89-470c4bd7c1b5"
+                "_lastExecutionId": "f52a3c90-eaa3-4e8a-adef-740bb559d47b"
               }
             }
           ]
@@ -3512,7 +3366,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "7c30a2e3-a4fc-4eab-9aba-14956000d0d9",
+              "value": "39262976-ebf6-4965-ba3f-371fe3126829",
               "system": true
             },
             {
@@ -3543,7 +3397,7 @@
           }
         },
         "response": {
-          "id": "3b3ed475-31fa-46dc-a740-154679147e20",
+          "id": "e15a7b84-9185-43d2-bd10-e4970966aae5",
           "status": "Created",
           "code": 201,
           "header": [
@@ -3557,7 +3411,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -3577,7 +3431,7 @@
               100,
               34,
               58,
-              57,
+              56,
               44,
               34,
               110,
@@ -3771,7 +3625,7 @@
           "responseTime": 6,
           "responseSize": 194
         },
-        "id": "bd2862e4-d953-45be-bcbb-de21390c25ec",
+        "id": "8d45d3f4-5431-4421-8447-9530c3d1545e",
         "assertions": [
           {
             "assertion": "Status 201 Created",
@@ -3785,15 +3639,15 @@
       },
       {
         "cursor": {
-          "ref": "b4a5d860-4357-4a46-be22-4fb74971896b",
+          "ref": "5b42d454-99ea-4f27-973a-4cae28545455",
           "length": 21,
           "cycles": 1,
           "position": 8,
           "iteration": 0,
-          "httpRequestId": "b194c517-116c-4822-a117-789c287476e6"
+          "httpRequestId": "bce0c860-1493-4a95-8182-7118b7b2361f"
         },
         "item": {
-          "id": "a8c14d3e-1b02-4705-b24e-a1383e910273",
+          "id": "8ce31625-331e-4639-94b8-8b650a0f47dc",
           "name": "Listar Restaurantes",
           "request": {
             "url": {
@@ -3815,14 +3669,14 @@
             {
               "listen": "test",
               "script": {
-                "id": "453fcd65-490c-4460-8f11-b181858664ed",
+                "id": "5d23aad1-ccd0-4682-ac4e-0ac59554d572",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                   "var json = pm.response.json();",
                   "pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
                 ],
-                "_lastExecutionId": "b25be723-f9ff-46b1-acec-bb6960fbf2c4"
+                "_lastExecutionId": "376bcc22-a19b-4239-81d8-43c73284bf78"
               }
             }
           ]
@@ -3858,7 +3712,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "b0ce307a-3e70-4a00-a7ba-fde33dbf1057",
+              "value": "7caf695c-0924-403a-9056-f6a0e63f80cc",
               "system": true
             },
             {
@@ -3880,7 +3734,7 @@
           "method": "GET"
         },
         "response": {
-          "id": "b968e9ec-2b81-4af0-a2e8-962707f38dbc",
+          "id": "cc075c93-bedf-4dc2-9a82-8d6864391481",
           "status": "OK",
           "code": 200,
           "header": [
@@ -3894,7 +3748,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -5271,210 +5125,14 @@
               115,
               101,
               125,
-              44,
-              123,
-              34,
-              105,
-              100,
-              34,
-              58,
-              57,
-              44,
-              34,
-              110,
-              111,
-              109,
-              101,
-              34,
-              58,
-              34,
-              78,
-              111,
-              118,
-              111,
-              32,
-              82,
-              101,
-              115,
-              116,
-              97,
-              117,
-              114,
-              97,
-              110,
-              116,
-              101,
-              34,
-              44,
-              34,
-              99,
-              97,
-              116,
-              101,
-              103,
-              111,
-              114,
-              105,
-              97,
-              34,
-              58,
-              34,
-              73,
-              116,
-              97,
-              108,
-              105,
-              97,
-              110,
-              97,
-              34,
-              44,
-              34,
-              101,
-              110,
-              100,
-              101,
-              114,
-              101,
-              99,
-              111,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              97,
-              120,
-              97,
-              69,
-              110,
-              116,
-              114,
-              101,
-              103,
-              97,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              101,
-              108,
-              101,
-              102,
-              111,
-              110,
-              101,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              101,
-              109,
-              97,
-              105,
-              108,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              101,
-              109,
-              112,
-              111,
-              69,
-              110,
-              116,
-              114,
-              101,
-              103,
-              97,
-              77,
-              105,
-              110,
-              117,
-              116,
-              111,
-              115,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              97,
-              116,
-              105,
-              118,
-              111,
-              34,
-              58,
-              116,
-              114,
-              117,
-              101,
-              44,
-              34,
-              97,
-              118,
-              97,
-              108,
-              105,
-              97,
-              99,
-              97,
-              111,
-              34,
-              58,
-              52,
-              46,
-              53,
-              48,
-              44,
-              34,
-              101,
-              120,
-              99,
-              108,
-              117,
-              105,
-              100,
-              111,
-              34,
-              58,
-              102,
-              97,
-              108,
-              115,
-              101,
-              125,
               93
             ]
           },
           "cookie": [],
-          "responseTime": 7,
-          "responseSize": 1560
+          "responseTime": 6,
+          "responseSize": 1364
         },
-        "id": "a8c14d3e-1b02-4705-b24e-a1383e910273",
+        "id": "8ce31625-331e-4639-94b8-8b650a0f47dc",
         "assertions": [
           {
             "assertion": "Status 200 OK",
@@ -5488,15 +5146,15 @@
       },
       {
         "cursor": {
-          "ref": "02dd0d5f-7515-443a-848a-65fc184a6751",
+          "ref": "53b7c98e-eb5c-4a38-98b7-d0239ba6225d",
           "length": 21,
           "cycles": 1,
           "position": 9,
           "iteration": 0,
-          "httpRequestId": "f8ba4a6c-a66b-462b-b1df-807b243baf8a"
+          "httpRequestId": "f84c9f97-1e72-40c4-92d9-c3b545461ce7"
         },
         "item": {
-          "id": "3ce9bba0-b9b8-4c19-ab3e-5d4da4345bb8",
+          "id": "1a129b33-5b25-43d7-95f8-0e62b41c1155",
           "name": "Buscar Restaurante por ID",
           "request": {
             "url": {
@@ -5519,14 +5177,14 @@
             {
               "listen": "test",
               "script": {
-                "id": "b367b1b8-d734-4ee4-b628-d8a5e55898dd",
+                "id": "5a85039d-97e0-46a4-bb68-e20e5ffbfe72",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                   "var json = pm.response.json();",
                   "pm.test('Body possui id', function () { pm.expect(json).to.have.property('id'); });"
                 ],
-                "_lastExecutionId": "7cd6b34b-d529-4d43-acb8-3f1c81e47742"
+                "_lastExecutionId": "661924a4-2c79-4cfd-b5d7-b804208c0de7"
               }
             }
           ]
@@ -5563,7 +5221,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "6096ab0e-634e-4155-a74a-a9abab3701cc",
+              "value": "e22808f8-c64a-4089-a108-639e48d8227a",
               "system": true
             },
             {
@@ -5585,7 +5243,7 @@
           "method": "GET"
         },
         "response": {
-          "id": "8675bd52-5b04-4b0c-ac86-5e2dd8c82ee3",
+          "id": "5e26b92c-92df-4072-910a-7d716d872c77",
           "status": "OK",
           "code": 200,
           "header": [
@@ -5599,7 +5257,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -5820,7 +5478,7 @@
           "responseTime": 5,
           "responseSize": 201
         },
-        "id": "3ce9bba0-b9b8-4c19-ab3e-5d4da4345bb8",
+        "id": "1a129b33-5b25-43d7-95f8-0e62b41c1155",
         "assertions": [
           {
             "assertion": "Status 200 OK",
@@ -5834,15 +5492,15 @@
       },
       {
         "cursor": {
-          "ref": "d8bb2bf1-2463-481e-9ba4-b3acb2e708e4",
+          "ref": "86e1338a-74c2-480b-93c7-2db0dd70b59c",
           "length": 21,
           "cycles": 1,
           "position": 10,
           "iteration": 0,
-          "httpRequestId": "b97c4262-4b2e-4336-af78-1f3119abe9d8"
+          "httpRequestId": "278f953b-15b6-4e7d-a309-099eb0a02946"
         },
         "item": {
-          "id": "b84dca54-eb7a-47ca-b246-86d8ed24491e",
+          "id": "2beadb6e-a853-4505-840f-ad58dbe11b07",
           "name": "Atualizar Restaurante",
           "request": {
             "url": {
@@ -5875,14 +5533,14 @@
             {
               "listen": "test",
               "script": {
-                "id": "f06b1d08-49ca-4441-a84d-987be334ceda",
+                "id": "3a8bd9df-000f-474c-afa7-b9a181453648",
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                   "var json = pm.response.json();",
                   "pm.test('Body possui nome atualizado', function () { pm.expect(json.nome).to.eql('Restaurante Atualizado'); });"
                 ],
-                "_lastExecutionId": "509ad33d-d1af-441b-bb5b-ce4c3890007b"
+                "_lastExecutionId": "baa334f8-9c12-482b-a200-6670e084a17a"
               }
             }
           ]
@@ -5923,7 +5581,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "d54f9280-7708-4be0-ac63-d41a2b2ebffc",
+              "value": "ff884d36-4533-4ed1-a681-32fd24967410",
               "system": true
             },
             {
@@ -5954,7 +5612,7 @@
           }
         },
         "response": {
-          "id": "a88c8ef2-1bb0-4b31-8b6d-8dba70a88115",
+          "id": "93c9b3e7-9432-4434-a34a-994276af8afa",
           "status": "OK",
           "code": 200,
           "header": [
@@ -5968,7 +5626,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -6188,7 +5846,7 @@
           "responseTime": 5,
           "responseSize": 200
         },
-        "id": "b84dca54-eb7a-47ca-b246-86d8ed24491e",
+        "id": "2beadb6e-a853-4505-840f-ad58dbe11b07",
         "assertions": [
           {
             "assertion": "Status 200 OK",
@@ -6202,15 +5860,15 @@
       },
       {
         "cursor": {
-          "ref": "449b3991-7c53-4425-aff1-0db601135e06",
+          "ref": "cda61b32-4bf7-4585-b20f-15833528d7f8",
           "length": 21,
           "cycles": 1,
           "position": 11,
           "iteration": 0,
-          "httpRequestId": "f0b84cee-410b-4161-add8-5ada66eedee8"
+          "httpRequestId": "ca3fd066-b60c-4e7d-b893-512c81d6a168"
         },
         "item": {
-          "id": "c193853d-d077-47ad-9cd7-5b1eea7a8946",
+          "id": "dad65589-07d2-44bd-924a-5bf3d6b96901",
           "name": "Inativar Restaurante",
           "request": {
             "url": {
@@ -6263,7 +5921,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "6f1b4067-c0c9-4d26-8c47-ef753ce1720c",
+              "value": "a8d87766-3e3b-425c-9a38-b4e55443c857",
               "system": true
             },
             {
@@ -6285,13 +5943,13 @@
           "method": "DELETE"
         },
         "response": {
-          "id": "3e4d0821-fe68-4245-a1d2-74b3673395c1",
+          "id": "259afd19-ad15-42c1-b1d4-ece433717f0f",
           "status": "No Content",
           "code": 204,
           "header": [
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -6307,22 +5965,22 @@
             "data": []
           },
           "cookie": [],
-          "responseTime": 4,
+          "responseTime": 5,
           "responseSize": 0
         },
-        "id": "c193853d-d077-47ad-9cd7-5b1eea7a8946"
+        "id": "dad65589-07d2-44bd-924a-5bf3d6b96901"
       },
       {
         "cursor": {
-          "ref": "affe4fc7-2772-4ee7-982a-c5119b585fc7",
+          "ref": "f54605f8-e3b8-49e4-ba0b-9aa571acf8b6",
           "length": 21,
           "cycles": 1,
           "position": 12,
           "iteration": 0,
-          "httpRequestId": "3ca8db02-a03f-411e-b416-2d83983b46df"
+          "httpRequestId": "b9d6135e-93bb-464b-827b-34d692ad9f67"
         },
         "item": {
-          "id": "2abdf312-312c-4e97-b475-3cce515f2004",
+          "id": "9a61948a-bd00-471a-80b6-b29f8b3a9cac",
           "name": "Buscar por Categoria",
           "request": {
             "url": {
@@ -6377,7 +6035,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "766b1184-06eb-4c8e-bead-d141a5a85e45",
+              "value": "2c48d85c-2e34-416b-9d6d-1c6a511dbdc8",
               "system": true
             },
             {
@@ -6399,7 +6057,7 @@
           "method": "GET"
         },
         "response": {
-          "id": "5fa656a0-988f-4c47-aee4-ed876cf31274",
+          "id": "7ad37fab-1ff0-44ee-bc2c-191146ae14f4",
           "status": "OK",
           "code": 200,
           "header": [
@@ -6413,7 +6071,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -7015,222 +6673,26 @@
               115,
               101,
               125,
-              44,
-              123,
-              34,
-              105,
-              100,
-              34,
-              58,
-              57,
-              44,
-              34,
-              110,
-              111,
-              109,
-              101,
-              34,
-              58,
-              34,
-              78,
-              111,
-              118,
-              111,
-              32,
-              82,
-              101,
-              115,
-              116,
-              97,
-              117,
-              114,
-              97,
-              110,
-              116,
-              101,
-              34,
-              44,
-              34,
-              99,
-              97,
-              116,
-              101,
-              103,
-              111,
-              114,
-              105,
-              97,
-              34,
-              58,
-              34,
-              73,
-              116,
-              97,
-              108,
-              105,
-              97,
-              110,
-              97,
-              34,
-              44,
-              34,
-              101,
-              110,
-              100,
-              101,
-              114,
-              101,
-              99,
-              111,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              97,
-              120,
-              97,
-              69,
-              110,
-              116,
-              114,
-              101,
-              103,
-              97,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              101,
-              108,
-              101,
-              102,
-              111,
-              110,
-              101,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              101,
-              109,
-              97,
-              105,
-              108,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              101,
-              109,
-              112,
-              111,
-              69,
-              110,
-              116,
-              114,
-              101,
-              103,
-              97,
-              77,
-              105,
-              110,
-              117,
-              116,
-              111,
-              115,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              97,
-              116,
-              105,
-              118,
-              111,
-              34,
-              58,
-              116,
-              114,
-              117,
-              101,
-              44,
-              34,
-              97,
-              118,
-              97,
-              108,
-              105,
-              97,
-              99,
-              97,
-              111,
-              34,
-              58,
-              52,
-              46,
-              53,
-              48,
-              44,
-              34,
-              101,
-              120,
-              99,
-              108,
-              117,
-              105,
-              100,
-              111,
-              34,
-              58,
-              102,
-              97,
-              108,
-              115,
-              101,
-              125,
               93
             ]
           },
           "cookie": [],
-          "responseTime": 5,
-          "responseSize": 785
+          "responseTime": 6,
+          "responseSize": 589
         },
-        "id": "2abdf312-312c-4e97-b475-3cce515f2004"
+        "id": "9a61948a-bd00-471a-80b6-b29f8b3a9cac"
       },
       {
         "cursor": {
-          "ref": "1ddf8f60-938c-43f1-be32-857f5c206144",
+          "ref": "5eafc6ca-8355-4fff-b666-f6693dc492ce",
           "length": 21,
           "cycles": 1,
           "position": 13,
           "iteration": 0,
-          "httpRequestId": "b01a9b01-41fb-4c98-b62a-abf79cb879db"
+          "httpRequestId": "d2385936-e1a8-4acb-8104-6d7787cea2f7"
         },
         "item": {
-          "id": "1eb25a75-e568-474d-b708-5d8b4130a0a4",
+          "id": "b1cad910-497e-4c25-af17-01fe0b42aed1",
           "name": "Criar Produto",
           "request": {
             "url": {
@@ -7262,18 +6724,18 @@
             {
               "listen": "prerequest",
               "script": {
-                "id": "41c00304-6431-4c14-987e-a2e3656cf79f",
+                "id": "fc1864f9-91ea-4163-b94d-e607bcecaf3d",
                 "type": "text/javascript",
                 "exec": [
                   "console.log('restauranteId usado:', pm.environment.get('restauranteId'));"
                 ],
-                "_lastExecutionId": "b5c0da45-7b45-455d-bbf1-dbd5343b9033"
+                "_lastExecutionId": "de9b3995-b5ab-4be8-b605-213b69bd8659"
               }
             },
             {
               "listen": "test",
               "script": {
-                "id": "2fa1316c-9afd-4f31-bb70-116efd77e526",
+                "id": "b923f1f2-768a-4cf4-8426-30b205d3b7d4",
                 "type": "text/javascript",
                 "exec": [
                   "var json = pm.response.json();",
@@ -7281,7 +6743,7 @@
                   "pm.test('Body possui id, nome e restaurante', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('nome'); pm.expect(json).to.have.property('restaurante'); });",
                   "if(json && json.id){ pm.environment.set('produtoId', json.id); }"
                 ],
-                "_lastExecutionId": "d42d5c0d-63b4-4771-b01c-fc0c098d6028"
+                "_lastExecutionId": "dbb5d73a-6585-43cc-a212-fe063193de08"
               }
             }
           ]
@@ -7321,7 +6783,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "e6552fa7-595d-4695-ac2e-20209c02268c",
+              "value": "1e4bb342-0554-413c-8778-2ad2b9a9dbdf",
               "system": true
             },
             {
@@ -7348,11 +6810,11 @@
           "method": "POST",
           "body": {
             "mode": "raw",
-            "raw": "{\n  \"nome\": \"Produto Teste\",\n  \"categoria\": \"Pizza\",\n  \"preco\": 49.90,\n  \"disponivel\": true,\n  \"restaurante\": { \"id\": 9 }\n}"
+            "raw": "{\n  \"nome\": \"Produto Teste\",\n  \"categoria\": \"Pizza\",\n  \"preco\": 49.90,\n  \"disponivel\": true,\n  \"restaurante\": { \"id\": 8 }\n}"
           }
         },
         "response": {
-          "id": "f2c29506-add3-415a-98d5-c3c0f2543c12",
+          "id": "cf155f6b-4480-43a4-aa2c-38599d58a5b6",
           "status": "Created",
           "code": 201,
           "header": [
@@ -7366,7 +6828,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -7387,7 +6849,7 @@
               34,
               58,
               49,
-              52,
+              51,
               44,
               34,
               110,
@@ -7518,7 +6980,7 @@
               100,
               34,
               58,
-              57,
+              56,
               44,
               34,
               110,
@@ -7705,10 +7167,10 @@
             ]
           },
           "cookie": [],
-          "responseTime": 5,
+          "responseTime": 6,
           "responseSize": 322
         },
-        "id": "1eb25a75-e568-474d-b708-5d8b4130a0a4",
+        "id": "b1cad910-497e-4c25-af17-01fe0b42aed1",
         "assertions": [
           {
             "assertion": "Status 201 Created",
@@ -7722,15 +7184,15 @@
       },
       {
         "cursor": {
-          "ref": "464d5fa9-ecad-4c26-ad2b-6a07d4112799",
+          "ref": "1be8065c-4d69-4351-9c2e-dfd6b864c59d",
           "length": 21,
           "cycles": 1,
           "position": 14,
           "iteration": 0,
-          "httpRequestId": "4350a657-0f40-4534-a1e0-51d1a244d064"
+          "httpRequestId": "37103516-1c68-49ec-9ce3-60e32dcc88b8"
         },
         "item": {
-          "id": "4dab7e75-80f3-49b5-b412-bfa4ac8a019a",
+          "id": "16fd429b-af4f-45c7-bd43-fd29bdc8d333",
           "name": "Listar Produtos",
           "request": {
             "url": {
@@ -7781,7 +7243,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "4dbcc2b8-f204-4961-a068-ed07ef3232c2",
+              "value": "f5ade438-b6eb-48b9-833d-917411692e62",
               "system": true
             },
             {
@@ -7803,7 +7265,7 @@
           "method": "GET"
         },
         "response": {
-          "id": "711e52a6-0307-4c24-94ba-cb48616fd7af",
+          "id": "60540d3e-21f8-4434-8152-e1e3a3a37e6a",
           "status": "OK",
           "code": 200,
           "header": [
@@ -7817,7 +7279,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -12318,7 +11780,128 @@
               117,
               101,
               125,
-              44,
+              93
+            ]
+          },
+          "cookie": [],
+          "responseTime": 9,
+          "responseSize": 4488
+        },
+        "id": "16fd429b-af4f-45c7-bd43-fd29bdc8d333"
+      },
+      {
+        "cursor": {
+          "ref": "2fc29432-32b4-4714-b17e-cdd86a89b092",
+          "length": 21,
+          "cycles": 1,
+          "position": 15,
+          "iteration": 0,
+          "httpRequestId": "c8597094-fcb7-4706-8826-efba107d5fed"
+        },
+        "item": {
+          "id": "62b2b101-1c3c-435e-ac61-4e44b7e01002",
+          "name": "Buscar Produto por ID",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "8080",
+              "path": [
+                "produtos",
+                "1"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": []
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "8080",
+            "path": [
+              "produtos",
+              "1"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "8409ed46-a45b-4bf1-ab3f-c4ad09878400",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:8080",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "7aca4ece-468c-472a-ae09-248ec5727ac4",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
               123,
               34,
               105,
@@ -12326,7 +11909,6 @@
               34,
               58,
               49,
-              52,
               44,
               34,
               110,
@@ -12344,11 +11926,16 @@
               116,
               111,
               32,
-              84,
-              101,
-              115,
+              65,
               116,
-              101,
+              117,
+              97,
+              108,
+              105,
+              122,
+              97,
+              100,
+              111,
               34,
               44,
               34,
@@ -12396,11 +11983,10 @@
               111,
               34,
               58,
-              52,
-              57,
-              46,
-              57,
-              48,
+              110,
+              117,
+              108,
+              108,
               44,
               34,
               100,
@@ -12457,7 +12043,7 @@
               100,
               34,
               58,
-              57,
+              49,
               44,
               34,
               110,
@@ -12467,11 +12053,6 @@
               34,
               58,
               34,
-              78,
-              111,
-              118,
-              111,
-              32,
               82,
               101,
               115,
@@ -12483,6 +12064,17 @@
               110,
               116,
               101,
+              32,
+              65,
+              116,
+              117,
+              97,
+              108,
+              105,
+              122,
+              97,
+              100,
+              111,
               34,
               44,
               34,
@@ -12607,9 +12199,10 @@
               111,
               34,
               58,
-              116,
-              114,
-              117,
+              102,
+              97,
+              108,
+              115,
               101,
               44,
               34,
@@ -12626,7 +12219,7 @@
               58,
               52,
               46,
-              53,
+              55,
               48,
               44,
               34,
@@ -12640,10 +12233,9 @@
               111,
               34,
               58,
-              102,
-              97,
-              108,
-              115,
+              116,
+              114,
+              117,
               101,
               125,
               44,
@@ -12659,28 +12251,27 @@
               114,
               117,
               101,
-              125,
-              93
+              125
             ]
           },
           "cookie": [],
-          "responseTime": 11,
-          "responseSize": 4830
+          "responseTime": 4,
+          "responseSize": 350
         },
-        "id": "4dab7e75-80f3-49b5-b412-bfa4ac8a019a"
+        "id": "62b2b101-1c3c-435e-ac61-4e44b7e01002"
       },
       {
         "cursor": {
-          "ref": "0f3546a7-947f-406a-8494-7d70469c3102",
+          "ref": "dc391af4-c3a7-41bd-b2ca-e213ff516a78",
           "length": 21,
           "cycles": 1,
-          "position": 15,
+          "position": 16,
           "iteration": 0,
-          "httpRequestId": "9509ca33-b586-4d3b-a2f0-5d6dc7fa944b"
+          "httpRequestId": "9ed363ef-4861-453b-b0fd-e1540199d0fe"
         },
         "item": {
-          "id": "e49ac62c-b8ba-4b75-a2b7-3fb376498d79",
-          "name": "Buscar Produto por ID",
+          "id": "e04fecfe-cb99-4ae1-9aed-d74f8583ef8f",
+          "name": "Atualizar Produto",
           "request": {
             "url": {
               "protocol": "http",
@@ -12695,7 +12286,17 @@
               "query": [],
               "variable": []
             },
-            "method": "GET"
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nome\": \"Produto Atualizado\",\n  \"categoria\": \"Pizza\",\n  \"disponivel\": true,\n  \"restaurante\": {\"id\": 1}\n}"
+            }
           },
           "response": [],
           "event": []
@@ -12716,6 +12317,10 @@
           },
           "header": [
             {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
               "key": "User-Agent",
               "value": "PostmanRuntime/7.39.1",
               "system": true
@@ -12732,7 +12337,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "878155c0-371c-477a-892a-21dee20fb266",
+              "value": "fa39166e-179b-4c43-98fe-7ff59a4a173f",
               "system": true
             },
             {
@@ -12749,12 +12354,21 @@
               "key": "Connection",
               "value": "keep-alive",
               "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "119",
+              "system": true
             }
           ],
-          "method": "GET"
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"id\": 1,\n  \"nome\": \"Produto Atualizado\",\n  \"categoria\": \"Pizza\",\n  \"disponivel\": true,\n  \"restaurante\": {\"id\": 1}\n}"
+          }
         },
         "response": {
-          "id": "506102cd-919c-4ecf-b9e8-8686a61e3bd0",
+          "id": "6e82a0d9-febe-44f5-ad68-30bcab7fd856",
           "status": "OK",
           "code": 200,
           "header": [
@@ -12768,7 +12382,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -13138,513 +12752,19 @@
           "responseTime": 5,
           "responseSize": 350
         },
-        "id": "e49ac62c-b8ba-4b75-a2b7-3fb376498d79"
+        "id": "e04fecfe-cb99-4ae1-9aed-d74f8583ef8f"
       },
       {
         "cursor": {
-          "ref": "e4f5654f-7238-4987-ba8e-8ce0683b9360",
-          "length": 21,
-          "cycles": 1,
-          "position": 16,
-          "iteration": 0,
-          "httpRequestId": "12c2527b-1a30-4474-a318-4000b02a8d60"
-        },
-        "item": {
-          "id": "e6ae8396-da54-4c60-b0f8-7c51a70595cb",
-          "name": "Atualizar Produto",
-          "request": {
-            "url": {
-              "protocol": "http",
-              "port": "8080",
-              "path": [
-                "produtos",
-                "1"
-              ],
-              "host": [
-                "localhost"
-              ],
-              "query": [],
-              "variable": []
-            },
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "method": "PUT",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id\": 1,\n  \"nome\": \"Produto Atualizado\",\n  \"categoria\": \"Pizza\",\n  \"disponivel\": true,\n  \"restaurante\": {\"id\": 1}\n}"
-            }
-          },
-          "response": [],
-          "event": []
-        },
-        "request": {
-          "url": {
-            "protocol": "http",
-            "port": "8080",
-            "path": [
-              "produtos",
-              "1"
-            ],
-            "host": [
-              "localhost"
-            ],
-            "query": [],
-            "variable": []
-          },
-          "header": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "User-Agent",
-              "value": "PostmanRuntime/7.39.1",
-              "system": true
-            },
-            {
-              "key": "Accept",
-              "value": "*/*",
-              "system": true
-            },
-            {
-              "key": "Cache-Control",
-              "value": "no-cache",
-              "system": true
-            },
-            {
-              "key": "Postman-Token",
-              "value": "cd3882cc-a922-4ae7-9b37-e15ce1bc4682",
-              "system": true
-            },
-            {
-              "key": "Host",
-              "value": "localhost:8080",
-              "system": true
-            },
-            {
-              "key": "Accept-Encoding",
-              "value": "gzip, deflate, br",
-              "system": true
-            },
-            {
-              "key": "Connection",
-              "value": "keep-alive",
-              "system": true
-            },
-            {
-              "key": "Content-Length",
-              "value": "119",
-              "system": true
-            }
-          ],
-          "method": "PUT",
-          "body": {
-            "mode": "raw",
-            "raw": "{\n  \"id\": 1,\n  \"nome\": \"Produto Atualizado\",\n  \"categoria\": \"Pizza\",\n  \"disponivel\": true,\n  \"restaurante\": {\"id\": 1}\n}"
-          }
-        },
-        "response": {
-          "id": "bd6f310d-4c2a-4740-8a1c-612d6b74c83c",
-          "status": "OK",
-          "code": 200,
-          "header": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "Transfer-Encoding",
-              "value": "chunked"
-            },
-            {
-              "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
-            },
-            {
-              "key": "Keep-Alive",
-              "value": "timeout=60"
-            },
-            {
-              "key": "Connection",
-              "value": "keep-alive"
-            }
-          ],
-          "stream": {
-            "type": "Buffer",
-            "data": [
-              123,
-              34,
-              105,
-              100,
-              34,
-              58,
-              49,
-              44,
-              34,
-              110,
-              111,
-              109,
-              101,
-              34,
-              58,
-              34,
-              80,
-              114,
-              111,
-              100,
-              117,
-              116,
-              111,
-              32,
-              65,
-              116,
-              117,
-              97,
-              108,
-              105,
-              122,
-              97,
-              100,
-              111,
-              34,
-              44,
-              34,
-              99,
-              97,
-              116,
-              101,
-              103,
-              111,
-              114,
-              105,
-              97,
-              34,
-              58,
-              34,
-              80,
-              105,
-              122,
-              122,
-              97,
-              34,
-              44,
-              34,
-              100,
-              101,
-              115,
-              99,
-              114,
-              105,
-              99,
-              97,
-              111,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              112,
-              114,
-              101,
-              99,
-              111,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              100,
-              105,
-              115,
-              112,
-              111,
-              110,
-              105,
-              118,
-              101,
-              108,
-              34,
-              58,
-              116,
-              114,
-              117,
-              101,
-              44,
-              34,
-              101,
-              120,
-              99,
-              108,
-              117,
-              105,
-              100,
-              111,
-              34,
-              58,
-              102,
-              97,
-              108,
-              115,
-              101,
-              44,
-              34,
-              114,
-              101,
-              115,
-              116,
-              97,
-              117,
-              114,
-              97,
-              110,
-              116,
-              101,
-              34,
-              58,
-              123,
-              34,
-              105,
-              100,
-              34,
-              58,
-              49,
-              44,
-              34,
-              110,
-              111,
-              109,
-              101,
-              34,
-              58,
-              34,
-              82,
-              101,
-              115,
-              116,
-              97,
-              117,
-              114,
-              97,
-              110,
-              116,
-              101,
-              32,
-              65,
-              116,
-              117,
-              97,
-              108,
-              105,
-              122,
-              97,
-              100,
-              111,
-              34,
-              44,
-              34,
-              99,
-              97,
-              116,
-              101,
-              103,
-              111,
-              114,
-              105,
-              97,
-              34,
-              58,
-              34,
-              73,
-              116,
-              97,
-              108,
-              105,
-              97,
-              110,
-              97,
-              34,
-              44,
-              34,
-              101,
-              110,
-              100,
-              101,
-              114,
-              101,
-              99,
-              111,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              97,
-              120,
-              97,
-              69,
-              110,
-              116,
-              114,
-              101,
-              103,
-              97,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              101,
-              108,
-              101,
-              102,
-              111,
-              110,
-              101,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              101,
-              109,
-              97,
-              105,
-              108,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              116,
-              101,
-              109,
-              112,
-              111,
-              69,
-              110,
-              116,
-              114,
-              101,
-              103,
-              97,
-              77,
-              105,
-              110,
-              117,
-              116,
-              111,
-              115,
-              34,
-              58,
-              110,
-              117,
-              108,
-              108,
-              44,
-              34,
-              97,
-              116,
-              105,
-              118,
-              111,
-              34,
-              58,
-              102,
-              97,
-              108,
-              115,
-              101,
-              44,
-              34,
-              97,
-              118,
-              97,
-              108,
-              105,
-              97,
-              99,
-              97,
-              111,
-              34,
-              58,
-              52,
-              46,
-              55,
-              48,
-              44,
-              34,
-              101,
-              120,
-              99,
-              108,
-              117,
-              105,
-              100,
-              111,
-              34,
-              58,
-              116,
-              114,
-              117,
-              101,
-              125,
-              44,
-              34,
-              97,
-              116,
-              105,
-              118,
-              111,
-              34,
-              58,
-              116,
-              114,
-              117,
-              101,
-              125
-            ]
-          },
-          "cookie": [],
-          "responseTime": 6,
-          "responseSize": 350
-        },
-        "id": "e6ae8396-da54-4c60-b0f8-7c51a70595cb"
-      },
-      {
-        "cursor": {
-          "ref": "83a93513-31a0-4c83-8b0f-96dcc8cf0629",
+          "ref": "4cdc9ad3-a39e-437a-bbe2-547c992f13a1",
           "length": 21,
           "cycles": 1,
           "position": 17,
           "iteration": 0,
-          "httpRequestId": "1fe14ae1-1e74-4fc0-bef3-0711db81db4a"
+          "httpRequestId": "8829c1df-014c-4dac-9838-d48409a917fb"
         },
         "item": {
-          "id": "20f1418e-d9e8-49ce-8bc2-9b27e66626b0",
+          "id": "5ef661f2-6cd7-443d-8e5e-f233366c5e66",
           "name": "Buscar Produtos por Restaurante",
           "request": {
             "url": {
@@ -13699,7 +12819,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "24be87cd-83ac-4c3b-9a58-86d8a2d952c7",
+              "value": "9aa1ff5a-846b-4d2b-a9e5-432ed43f45cb",
               "system": true
             },
             {
@@ -13721,7 +12841,7 @@
           "method": "GET"
         },
         "response": {
-          "id": "2ccde195-d857-41bd-98d2-94601f390fb6",
+          "id": "8271ef4e-815e-4a89-8b14-87c48e0ad15f",
           "status": "OK",
           "code": 200,
           "header": [
@@ -13735,7 +12855,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -14452,22 +13572,22 @@
             ]
           },
           "cookie": [],
-          "responseTime": 7,
+          "responseTime": 6,
           "responseSize": 700
         },
-        "id": "20f1418e-d9e8-49ce-8bc2-9b27e66626b0"
+        "id": "5ef661f2-6cd7-443d-8e5e-f233366c5e66"
       },
       {
         "cursor": {
-          "ref": "ed2c8157-291e-4b00-a45d-a12971556a6a",
+          "ref": "3267a3f9-8065-4308-8fd7-d75e817fee94",
           "length": 21,
           "cycles": 1,
           "position": 18,
           "iteration": 0,
-          "httpRequestId": "092a44c6-2c0d-4b1d-a47e-f720ffa58c6d"
+          "httpRequestId": "5eb77d33-f162-41af-a53c-bad0c337477d"
         },
         "item": {
-          "id": "f40c06ff-87ce-4e0f-889a-f5a17744a4ac",
+          "id": "876c47d5-3c62-44e7-8057-e5b76a9d5143",
           "name": "Criar Pedido",
           "request": {
             "url": {
@@ -14500,7 +13620,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "id": "3c41f62c-bcb3-4fbd-be21-627e56a55fcb",
+                "id": "6e579791-8aab-4f8c-b548-10001f84f776",
                 "type": "text/javascript",
                 "exec": [
                   "// Garante que clienteId, restauranteId e produtoId existam; cria automaticamente se necessário",
@@ -14553,13 +13673,13 @@
                   "  ensureRestauranteAndProduto();",
                   "} catch(e) { console.error('Erro no prerequest automatico:', e); }"
                 ],
-                "_lastExecutionId": "09b463e5-e169-4d7e-8604-8a8cad55c940"
+                "_lastExecutionId": "61eed0ef-28db-47f7-993c-68880d0122e7"
               }
             },
             {
               "listen": "test",
               "script": {
-                "id": "8e8f3a50-b087-48c2-97fe-f6f98c0c6ceb",
+                "id": "9ee65a5b-efac-4f8f-a0fa-4d2feccfc0bf",
                 "type": "text/javascript",
                 "exec": [
                   "var json = pm.response.json();",
@@ -14567,7 +13687,7 @@
                   "pm.test('Body possui id, clienteId e status', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('cliente'); pm.expect(json).to.have.property('status'); });",
                   "if(json && json.id){ pm.environment.set('pedidoId', json.id); }"
                 ],
-                "_lastExecutionId": "93d3ca15-a913-4ee3-a74e-1f552100abc1"
+                "_lastExecutionId": "bb18fe46-167f-42b8-85c4-2178348d120c"
               }
             }
           ]
@@ -14608,7 +13728,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "f2ebccae-712a-409c-8b23-ee195e180e45",
+              "value": "c78d473a-2b6c-400c-90db-ea6d0d73f3e1",
               "system": true
             },
             {
@@ -14635,11 +13755,11 @@
           "method": "POST",
           "body": {
             "mode": "raw",
-            "raw": "{\n  \"clienteId\": 9,\n  \"restauranteId\": 9,\n  \"enderecoEntrega\": {\n    \"rua\": \"Rua Exemplo\",\n    \"numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01000-000\",\n    \"complemento\": \"Apto 1\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": 14,\n      \"quantidade\": 2\n    }\n  ]\n}"
+            "raw": "{\n  \"clienteId\": 8,\n  \"restauranteId\": 8,\n  \"enderecoEntrega\": {\n    \"rua\": \"Rua Exemplo\",\n    \"numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01000-000\",\n    \"complemento\": \"Apto 1\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": 13,\n      \"quantidade\": 2\n    }\n  ]\n}"
           }
         },
         "response": {
-          "id": "b841e957-a85a-4cbf-9c4e-f646ffa94b20",
+          "id": "02f2a278-ddc2-4033-a93c-e51ef1c9b159",
           "status": "Created",
           "code": 201,
           "header": [
@@ -14653,7 +13773,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -14673,7 +13793,7 @@
               100,
               34,
               58,
-              53,
+              54,
               44,
               34,
               99,
@@ -14691,7 +13811,7 @@
               100,
               34,
               58,
-              57,
+              56,
               44,
               34,
               110,
@@ -14722,7 +13842,7 @@
               100,
               34,
               58,
-              57,
+              56,
               44,
               34,
               101,
@@ -14934,26 +14054,26 @@
               56,
               45,
               50,
-              51,
-              84,
-              48,
-              48,
-              58,
-              49,
-              55,
-              58,
-              48,
-              51,
-              46,
-              57,
-              49,
               53,
-              52,
-              55,
-              49,
+              84,
+              50,
               51,
-              55,
-              49,
+              58,
+              50,
+              57,
+              58,
+              51,
+              56,
+              46,
+              54,
+              57,
+              48,
+              50,
+              56,
+              52,
+              50,
+              57,
+              56,
               34,
               44,
               34,
@@ -14979,7 +14099,7 @@
               34,
               58,
               49,
-              52,
+              51,
               44,
               34,
               110,
@@ -15056,7 +14176,7 @@
           "responseTime": 8,
           "responseSize": 383
         },
-        "id": "f40c06ff-87ce-4e0f-889a-f5a17744a4ac",
+        "id": "876c47d5-3c62-44e7-8057-e5b76a9d5143",
         "assertions": [
           {
             "assertion": "Status 201 Created",
@@ -15070,15 +14190,15 @@
       },
       {
         "cursor": {
-          "ref": "bb2cd613-f739-481b-9b33-e2c7659cda77",
+          "ref": "52147199-f0fa-417c-9f2a-2b790b2f28b9",
           "length": 21,
           "cycles": 1,
           "position": 19,
           "iteration": 0,
-          "httpRequestId": "9fec6a89-f84b-487f-aee8-4b6450ad679a"
+          "httpRequestId": "e27eacc7-5f32-4222-8e56-cfffe664973a"
         },
         "item": {
-          "id": "b749f8c6-67c7-408e-ba39-234564c52841",
+          "id": "4823524f-2a6d-4332-845c-502df657791d",
           "name": "Buscar Pedidos por Cliente",
           "request": {
             "url": {
@@ -15103,12 +14223,12 @@
             {
               "listen": "test",
               "script": {
-                "id": "fb622fa5-1242-40d8-a5a6-fc39870c1664",
+                "id": "f0a027a2-63dc-41a7-b8d2-11203c6a3e8e",
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status 200 ou 400', function () { pm.expect([200,400]).to.include(pm.response.code); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });\n                    var json = pm.response.json();\n                    pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
                 ],
-                "_lastExecutionId": "9be369dc-45f8-4d8a-b921-c7f31e1d00c7"
+                "_lastExecutionId": "536a0014-53ea-47c5-9a38-500d3bfea292"
               }
             }
           ]
@@ -15121,7 +14241,7 @@
               "api",
               "pedidos",
               "cliente",
-              "9"
+              "8"
             ],
             "host": [
               "localhost"
@@ -15147,7 +14267,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "3dcbfd47-e4f1-4d1a-b280-242077d0b708",
+              "value": "047f69ef-38a4-4ae3-b65b-8335b4415945",
               "system": true
             },
             {
@@ -15169,7 +14289,7 @@
           "method": "GET"
         },
         "response": {
-          "id": "98043886-a281-4971-93dc-70e7dc19a912",
+          "id": "f0d0cded-517f-4cb4-931b-b7e5d6a271c1",
           "status": "Bad Request",
           "code": 400,
           "header": [
@@ -15179,7 +14299,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Connection",
@@ -15194,25 +14314,45 @@
           "responseTime": 7,
           "responseSize": 0
         },
-        "id": "b749f8c6-67c7-408e-ba39-234564c52841",
+        "id": "4823524f-2a6d-4332-845c-502df657791d",
         "assertions": [
           {
-            "assertion": "Status 200 ou 400",
-            "skipped": false
+            "assertion": "Status 200 OK",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 0,
+              "test": "Status 200 OK",
+              "message": "expected response to have status code 200 but got 400",
+              "stack": "AssertionError: expected response to have status code 200 but got 400\n   at Object.eval sandbox-script.js:1:20)"
+            }
+          }
+        ],
+        "testScript": [
+          {
+            "error": {
+              "type": "Error",
+              "name": "JSONError",
+              "message": "No data, empty input at 1:1\n\n^",
+              "checksum": "dd12d8ea84467ec693558d8bb4288cb9",
+              "id": "32a98cfa-fd9d-4c81-a6cc-6cc7e4794cba",
+              "timestamp": 1756175378733,
+              "stacktrace": []
+            }
           }
         ]
       },
       {
         "cursor": {
-          "ref": "7f06fc20-9b60-44c1-a1ca-2a8ffc30be44",
+          "ref": "52787075-6c8c-4262-a90a-86a2a7be294e",
           "length": 21,
           "cycles": 1,
           "position": 20,
           "iteration": 0,
-          "httpRequestId": "58bec552-9c4e-428e-b1b1-efd2984f86fe"
+          "httpRequestId": "6172849d-dfbd-452f-8ddf-1bedeb444432"
         },
         "item": {
-          "id": "fc1141b7-e5cd-40d7-ba97-c786ab517ba0",
+          "id": "fc9051e3-6cb2-4c39-bf42-da5ebaaf54e1",
           "name": "Atualizar Status do Pedido",
           "request": {
             "url": {
@@ -15247,14 +14387,14 @@
             {
               "listen": "test",
               "script": {
-                "id": "f9740fe3-05a2-4683-ae96-b3b0c8fb332d",
+                "id": "e1a1da17-0127-4f1e-a181-8769e7142b37",
                 "type": "text/javascript",
                 "exec": [
                   "var json = pm.response.json();",
                   "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                   "pm.test('Status do pedido atualizado', function () { pm.expect(json.status).to.eql('ENTREGUE'); });"
                 ],
-                "_lastExecutionId": "8796955b-c0e8-41a2-ba95-5eb7ecd2da73"
+                "_lastExecutionId": "35d1dbdb-0d33-4456-94c5-19886f63545d"
               }
             }
           ]
@@ -15266,7 +14406,7 @@
             "path": [
               "api",
               "pedidos",
-              "5",
+              "6",
               "status"
             ],
             "host": [
@@ -15297,7 +14437,7 @@
             },
             {
               "key": "Postman-Token",
-              "value": "266ce88e-9274-47e4-86ca-92bd54e5547e",
+              "value": "78182d74-4acd-40f4-9815-6cf76e8e16a6",
               "system": true
             },
             {
@@ -15328,7 +14468,7 @@
           }
         },
         "response": {
-          "id": "f82d9d40-63d6-40af-a812-1c8cb797aaf1",
+          "id": "bb20871f-2b1d-4ac9-90c5-fd82635a4f37",
           "status": "OK",
           "code": 200,
           "header": [
@@ -15342,7 +14482,7 @@
             },
             {
               "key": "Date",
-              "value": "Sat, 23 Aug 2025 03:17:03 GMT"
+              "value": "Tue, 26 Aug 2025 02:29:38 GMT"
             },
             {
               "key": "Keep-Alive",
@@ -15362,7 +14502,7 @@
               100,
               34,
               58,
-              53,
+              54,
               44,
               34,
               99,
@@ -15380,7 +14520,7 @@
               100,
               34,
               58,
-              57,
+              56,
               44,
               34,
               110,
@@ -15421,7 +14561,7 @@
               100,
               34,
               58,
-              57,
+              56,
               44,
               34,
               101,
@@ -15635,23 +14775,23 @@
               56,
               45,
               50,
-              51,
-              84,
-              48,
-              48,
-              58,
-              49,
-              55,
-              58,
-              48,
-              51,
-              46,
-              57,
-              49,
               53,
+              84,
+              50,
+              51,
+              58,
+              50,
+              57,
+              58,
+              51,
+              56,
+              46,
+              54,
+              57,
+              48,
+              50,
+              56,
               52,
-              55,
-              49,
               34,
               44,
               34,
@@ -15677,7 +14817,7 @@
               34,
               58,
               49,
-              52,
+              51,
               44,
               34,
               110,
@@ -15751,10 +14891,10 @@
             ]
           },
           "cookie": [],
-          "responseTime": 11,
+          "responseTime": 10,
           "responseSize": 392
         },
-        "id": "fc1141b7-e5cd-40d7-ba97-c786ab517ba0",
+        "id": "fc9051e3-6cb2-4c39-bf42-da5ebaaf54e1",
         "assertions": [
           {
             "assertion": "Status 200 OK",
@@ -15768,9 +14908,531 @@
       }
     ],
     "transfers": {
-      "responseTotal": 11658
+      "responseTotal": 10791
     },
-    "failures": [],
+    "failures": [
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 0,
+          "test": "Status 200 OK",
+          "message": "expected response to have status code 200 but got 400",
+          "stack": "AssertionError: expected response to have status code 200 but got 400\n   at Object.eval sandbox-script.js:1:20)",
+          "checksum": "014934e05cc9621e9f702e8c5fe03912",
+          "id": "50c3c781-181a-4b05-ae99-7425ea2b6338",
+          "timestamp": 1756175378727,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 1,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 20,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:0 in test-script",
+        "source": {
+          "id": "4823524f-2a6d-4332-845c-502df657791d",
+          "name": "Buscar Pedidos por Cliente",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "8080",
+              "path": [
+                "api",
+                "pedidos",
+                "cliente",
+                "{{clienteId}}"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f0a027a2-63dc-41a7-b8d2-11203c6a3e8e",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });\n                    var json = pm.response.json();\n                    pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
+                ],
+                "_lastExecutionId": "536a0014-53ea-47c5-9a38-500d3bfea292"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "3ac7fa14-2820-47c5-b609-0fa53cebaa81",
+          "name": "Pedidos",
+          "item": [
+            {
+              "id": "876c47d5-3c62-44e7-8057-e5b76a9d5143",
+              "name": "Criar Pedido",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "pedidos"
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"clienteId\": {{clienteId}},\n  \"restauranteId\": {{restauranteId}},\n  \"enderecoEntrega\": {\n    \"rua\": \"Rua Exemplo\",\n    \"numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01000-000\",\n    \"complemento\": \"Apto 1\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": {{produtoId}},\n      \"quantidade\": 2\n    }\n  ]\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "6e579791-8aab-4f8c-b548-10001f84f776",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Garante que clienteId, restauranteId e produtoId existam; cria automaticamente se necessário",
+                      "try {",
+                      "  if(!pm.environment.get('clienteId')) {",
+                      "    pm.sendRequest({",
+                      "      url: 'http://localhost:8080/clientes',",
+                      "      method: 'POST',",
+                      "      header: { 'Content-Type': 'application/json' },",
+                      "      body: { mode: 'raw', raw: JSON.stringify({ nome: 'Cliente Auto', email: 'auto_' + Date.now() + '@example.com', telefone: '11900000000', endereco: 'Endereco automático' }) }",
+                      "    }, function (err, res) {",
+                      "      if(!err && res && res.code >= 200 && res.code < 300) { pm.environment.set('clienteId', res.json().id); console.log('clienteId criado', res.json().id); } else { console.warn('Falha ao criar cliente automático', err || (res && res.status)); }",
+                      "    });",
+                      "  }",
+                      "",
+                      "  var ensureRestauranteAndProduto = function() {",
+                      "    if(!pm.environment.get('restauranteId')) {",
+                      "      pm.sendRequest({",
+                      "        url: 'http://localhost:8080/restaurantes',",
+                      "        method: 'POST',",
+                      "        header: { 'Content-Type': 'application/json' },",
+                      "        body: { mode: 'raw', raw: JSON.stringify({ nome: 'Restaurante Auto ' + Date.now(), categoria: 'Geral', ativo: true, avaliacao: 4.0 }) }",
+                      "      }, function (err, res) {",
+                      "        if(!err && res && res.code >=200 && res.code <300) {",
+                      "          var rid = res.json().id; pm.environment.set('restauranteId', rid); console.log('restauranteId criado', rid);",
+                      "          // criar produto associado",
+                      "          pm.sendRequest({",
+                      "            url: 'http://localhost:8080/produtos',",
+                      "            method: 'POST',",
+                      "            header: { 'Content-Type': 'application/json' },",
+                      "            body: { mode: 'raw', raw: JSON.stringify({ nome: 'Produto Auto', categoria: 'Geral', preco: 9.9, disponivel: true, restaurante: { id: rid } }) }",
+                      "          }, function (err2, res2) {",
+                      "            if(!err2 && res2 && res2.code >=200 && res2.code <300) { pm.environment.set('produtoId', res2.json().id); console.log('produtoId criado', res2.json().id); } else { console.warn('Falha ao criar produto automático', err2 || (res2 && res2.status)); }",
+                      "          });",
+                      "        } else { console.warn('Falha ao criar restaurante automático', err || (res && res.status)); }",
+                      "      });",
+                      "    } else if(!pm.environment.get('produtoId')) {",
+                      "      // restaurante existe, criar produto apenas",
+                      "      var existingRid = pm.environment.get('restauranteId');",
+                      "      pm.sendRequest({",
+                      "        url: 'http://localhost:8080/produtos',",
+                      "        method: 'POST',",
+                      "        header: { 'Content-Type': 'application/json' },",
+                      "        body: { mode: 'raw', raw: JSON.stringify({ nome: 'Produto Auto', categoria: 'Geral', preco: 9.9, disponivel: true, restaurante: { id: existingRid } }) }",
+                      "      }, function (err3, res3) {",
+                      "        if(!err3 && res3 && res3.code >=200 && res3.code <300) { pm.environment.set('produtoId', res3.json().id); console.log('produtoId criado', res3.json().id); } else { console.warn('Falha ao criar produto automático', err3 || (res3 && res3.status)); }",
+                      "      });",
+                      "    }",
+                      "  };",
+                      "  ensureRestauranteAndProduto();",
+                      "} catch(e) { console.error('Erro no prerequest automatico:', e); }"
+                    ],
+                    "_lastExecutionId": "61eed0ef-28db-47f7-993c-68880d0122e7"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "9ee65a5b-efac-4f8f-a0fa-4d2feccfc0bf",
+                    "type": "text/javascript",
+                    "exec": [
+                      "var json = pm.response.json();",
+                      "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                      "pm.test('Body possui id, clienteId e status', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('cliente'); pm.expect(json).to.have.property('status'); });",
+                      "if(json && json.id){ pm.environment.set('pedidoId', json.id); }"
+                    ],
+                    "_lastExecutionId": "bb18fe46-167f-42b8-85c4-2178348d120c"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "4823524f-2a6d-4332-845c-502df657791d",
+              "name": "Buscar Pedidos por Cliente",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "pedidos",
+                    "cliente",
+                    "{{clienteId}}"
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "f0a027a2-63dc-41a7-b8d2-11203c6a3e8e",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });\n                    var json = pm.response.json();\n                    pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
+                    ],
+                    "_lastExecutionId": "536a0014-53ea-47c5-9a38-500d3bfea292"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "fc9051e3-6cb2-4c39-bf42-da5ebaaf54e1",
+              "name": "Atualizar Status do Pedido",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "pedidos",
+                    "{{pedidoId}}",
+                    "status"
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"ENTREGUE\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "e1a1da17-0127-4f1e-a181-8769e7142b37",
+                    "type": "text/javascript",
+                    "exec": [
+                      "var json = pm.response.json();",
+                      "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                      "pm.test('Status do pedido atualizado', function () { pm.expect(json.status).to.eql('ENTREGUE'); });"
+                    ],
+                    "_lastExecutionId": "35d1dbdb-0d33-4456-94c5-19886f63545d"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "52147199-f0fa-417c-9f2a-2b790b2f28b9",
+          "length": 21,
+          "cycles": 1,
+          "position": 19,
+          "iteration": 0,
+          "httpRequestId": "e27eacc7-5f32-4222-8e56-cfffe664973a",
+          "scriptId": "f0a027a2-63dc-41a7-b8d2-11203c6a3e8e",
+          "execution": "536a0014-53ea-47c5-9a38-500d3bfea292"
+        }
+      },
+      {
+        "error": {
+          "type": "Error",
+          "name": "JSONError",
+          "message": "No data, empty input at 1:1\n\n^",
+          "checksum": "dd12d8ea84467ec693558d8bb4288cb9",
+          "id": "32a98cfa-fd9d-4c81-a6cc-6cc7e4794cba",
+          "timestamp": 1756175378733,
+          "stacktrace": []
+        },
+        "at": "test-script",
+        "source": {
+          "id": "4823524f-2a6d-4332-845c-502df657791d",
+          "name": "Buscar Pedidos por Cliente",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "8080",
+              "path": [
+                "api",
+                "pedidos",
+                "cliente",
+                "{{clienteId}}"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f0a027a2-63dc-41a7-b8d2-11203c6a3e8e",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });\n                    var json = pm.response.json();\n                    pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
+                ],
+                "_lastExecutionId": "536a0014-53ea-47c5-9a38-500d3bfea292"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "3ac7fa14-2820-47c5-b609-0fa53cebaa81",
+          "name": "Pedidos",
+          "item": [
+            {
+              "id": "876c47d5-3c62-44e7-8057-e5b76a9d5143",
+              "name": "Criar Pedido",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "pedidos"
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"clienteId\": {{clienteId}},\n  \"restauranteId\": {{restauranteId}},\n  \"enderecoEntrega\": {\n    \"rua\": \"Rua Exemplo\",\n    \"numero\": \"123\",\n    \"bairro\": \"Centro\",\n    \"cidade\": \"São Paulo\",\n    \"estado\": \"SP\",\n    \"cep\": \"01000-000\",\n    \"complemento\": \"Apto 1\"\n  },\n  \"itens\": [\n    {\n      \"produtoId\": {{produtoId}},\n      \"quantidade\": 2\n    }\n  ]\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "6e579791-8aab-4f8c-b548-10001f84f776",
+                    "type": "text/javascript",
+                    "exec": [
+                      "// Garante que clienteId, restauranteId e produtoId existam; cria automaticamente se necessário",
+                      "try {",
+                      "  if(!pm.environment.get('clienteId')) {",
+                      "    pm.sendRequest({",
+                      "      url: 'http://localhost:8080/clientes',",
+                      "      method: 'POST',",
+                      "      header: { 'Content-Type': 'application/json' },",
+                      "      body: { mode: 'raw', raw: JSON.stringify({ nome: 'Cliente Auto', email: 'auto_' + Date.now() + '@example.com', telefone: '11900000000', endereco: 'Endereco automático' }) }",
+                      "    }, function (err, res) {",
+                      "      if(!err && res && res.code >= 200 && res.code < 300) { pm.environment.set('clienteId', res.json().id); console.log('clienteId criado', res.json().id); } else { console.warn('Falha ao criar cliente automático', err || (res && res.status)); }",
+                      "    });",
+                      "  }",
+                      "",
+                      "  var ensureRestauranteAndProduto = function() {",
+                      "    if(!pm.environment.get('restauranteId')) {",
+                      "      pm.sendRequest({",
+                      "        url: 'http://localhost:8080/restaurantes',",
+                      "        method: 'POST',",
+                      "        header: { 'Content-Type': 'application/json' },",
+                      "        body: { mode: 'raw', raw: JSON.stringify({ nome: 'Restaurante Auto ' + Date.now(), categoria: 'Geral', ativo: true, avaliacao: 4.0 }) }",
+                      "      }, function (err, res) {",
+                      "        if(!err && res && res.code >=200 && res.code <300) {",
+                      "          var rid = res.json().id; pm.environment.set('restauranteId', rid); console.log('restauranteId criado', rid);",
+                      "          // criar produto associado",
+                      "          pm.sendRequest({",
+                      "            url: 'http://localhost:8080/produtos',",
+                      "            method: 'POST',",
+                      "            header: { 'Content-Type': 'application/json' },",
+                      "            body: { mode: 'raw', raw: JSON.stringify({ nome: 'Produto Auto', categoria: 'Geral', preco: 9.9, disponivel: true, restaurante: { id: rid } }) }",
+                      "          }, function (err2, res2) {",
+                      "            if(!err2 && res2 && res2.code >=200 && res2.code <300) { pm.environment.set('produtoId', res2.json().id); console.log('produtoId criado', res2.json().id); } else { console.warn('Falha ao criar produto automático', err2 || (res2 && res2.status)); }",
+                      "          });",
+                      "        } else { console.warn('Falha ao criar restaurante automático', err || (res && res.status)); }",
+                      "      });",
+                      "    } else if(!pm.environment.get('produtoId')) {",
+                      "      // restaurante existe, criar produto apenas",
+                      "      var existingRid = pm.environment.get('restauranteId');",
+                      "      pm.sendRequest({",
+                      "        url: 'http://localhost:8080/produtos',",
+                      "        method: 'POST',",
+                      "        header: { 'Content-Type': 'application/json' },",
+                      "        body: { mode: 'raw', raw: JSON.stringify({ nome: 'Produto Auto', categoria: 'Geral', preco: 9.9, disponivel: true, restaurante: { id: existingRid } }) }",
+                      "      }, function (err3, res3) {",
+                      "        if(!err3 && res3 && res3.code >=200 && res3.code <300) { pm.environment.set('produtoId', res3.json().id); console.log('produtoId criado', res3.json().id); } else { console.warn('Falha ao criar produto automático', err3 || (res3 && res3.status)); }",
+                      "      });",
+                      "    }",
+                      "  };",
+                      "  ensureRestauranteAndProduto();",
+                      "} catch(e) { console.error('Erro no prerequest automatico:', e); }"
+                    ],
+                    "_lastExecutionId": "61eed0ef-28db-47f7-993c-68880d0122e7"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "9ee65a5b-efac-4f8f-a0fa-4d2feccfc0bf",
+                    "type": "text/javascript",
+                    "exec": [
+                      "var json = pm.response.json();",
+                      "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                      "pm.test('Body possui id, clienteId e status', function () { pm.expect(json).to.have.property('id'); pm.expect(json).to.have.property('cliente'); pm.expect(json).to.have.property('status'); });",
+                      "if(json && json.id){ pm.environment.set('pedidoId', json.id); }"
+                    ],
+                    "_lastExecutionId": "bb18fe46-167f-42b8-85c4-2178348d120c"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "4823524f-2a6d-4332-845c-502df657791d",
+              "name": "Buscar Pedidos por Cliente",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "pedidos",
+                    "cliente",
+                    "{{clienteId}}"
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "f0a027a2-63dc-41a7-b8d2-11203c6a3e8e",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });\n                    var json = pm.response.json();\n                    pm.test('Body é array', function () { pm.expect(Array.isArray(json)).to.be.true; });"
+                    ],
+                    "_lastExecutionId": "536a0014-53ea-47c5-9a38-500d3bfea292"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "fc9051e3-6cb2-4c39-bf42-da5ebaaf54e1",
+              "name": "Atualizar Status do Pedido",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "pedidos",
+                    "{{pedidoId}}",
+                    "status"
+                  ],
+                  "host": [
+                    "localhost"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"ENTREGUE\"\n}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "e1a1da17-0127-4f1e-a181-8769e7142b37",
+                    "type": "text/javascript",
+                    "exec": [
+                      "var json = pm.response.json();",
+                      "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                      "pm.test('Status do pedido atualizado', function () { pm.expect(json.status).to.eql('ENTREGUE'); });"
+                    ],
+                    "_lastExecutionId": "35d1dbdb-0d33-4456-94c5-19886f63545d"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "52147199-f0fa-417c-9f2a-2b790b2f28b9",
+          "length": 21,
+          "cycles": 1,
+          "position": 19,
+          "iteration": 0,
+          "httpRequestId": "e27eacc7-5f32-4222-8e56-cfffe664973a",
+          "scriptId": "f0a027a2-63dc-41a7-b8d2-11203c6a3e8e"
+        }
+      }
+    ],
     "error": null
   }
 }

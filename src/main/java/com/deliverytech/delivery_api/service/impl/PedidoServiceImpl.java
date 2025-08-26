@@ -76,9 +76,9 @@ public class PedidoServiceImpl implements PedidoService {
     @Transactional(readOnly = true)
     public List<Pedido> buscarPorCliente(Long clienteId) {
         List<Pedido> pedidos = pedidoRepository.findByClienteId(clienteId);
-        if (pedidos == null || pedidos.isEmpty()) {
-            log.warn("Nenhum pedido encontrado para clienteId={}", clienteId);
-            throw new RuntimeException("Nenhum pedido encontrado para o cliente informado.");
+        if (pedidos == null) {
+            log.debug("findByClienteId retornou null para clienteId={}", clienteId);
+            return List.of();
         }
         return pedidos;
     }
