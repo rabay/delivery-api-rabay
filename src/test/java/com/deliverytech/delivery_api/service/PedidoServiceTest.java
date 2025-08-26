@@ -1,6 +1,6 @@
 package com.deliverytech.delivery_api.service;
 
-import com.deliverytech.delivery_api.model.Pedido;
+// import com.deliverytech.delivery_api.model.Pedido;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

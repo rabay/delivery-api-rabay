@@ -1,6 +1,6 @@
 package com.deliverytech.delivery_api.service;
 
-import com.deliverytech.delivery_api.model.Pedido;
+// import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
 import com.deliverytech.delivery_api.service.impl.PedidoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
