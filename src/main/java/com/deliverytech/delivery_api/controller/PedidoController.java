@@ -16,11 +16,15 @@ import com.deliverytech.delivery_api.service.PedidoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/pedidos")
 @Tag(name = "Pedidos", description = "Criação, consulta e atualização de pedidos realizados pelos clientes.")
 public class PedidoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PedidoController.class);
 
     @Operation(summary = "Buscar pedido por ID", description = "Retorna um pedido pelo seu identificador.")
     @GetMapping("/{id}")
@@ -50,20 +54,18 @@ public class PedidoController {
     @PostMapping
     public ResponseEntity<PedidoResponse> criar(@Valid @RequestBody PedidoRequest pedidoRequest) {
         try {
-            System.out.println("[DEBUG] Recebido PedidoRequest: " + pedidoRequest);
+            logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
             Pedido pedido = mapToEntity(pedidoRequest);
-            System.out.println("[DEBUG] Pedido mapeado: " + pedido);
+            logger.debug("Pedido mapeado: {}", pedido);
             Pedido novo = pedidoService.criar(pedido);
             PedidoResponse response = mapToResponse(novo);
-            System.out.println("[DEBUG] Pedido criado com sucesso: " + response);
+            logger.info("Pedido criado com sucesso: id={} status={}", response.getId(), response.getStatus());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException ex) {
-            System.err.println("[ERRO] Erro de negócio ao criar pedido: " + ex.getMessage());
-            ex.printStackTrace();
+            logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } catch (Exception ex) {
-            System.err.println("[ERRO] Erro inesperado ao criar pedido: " + ex.getMessage());
-            ex.printStackTrace();
+            logger.error("Erro inesperado ao criar pedido: {}", ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -72,15 +74,16 @@ public class PedidoController {
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<List<PedidoResponse>> buscarPorCliente(@PathVariable Long clienteId) {
         try {
-            List<Pedido> pedidos = pedidoService.buscarPorCliente(clienteId);
-            if (pedidos == null || pedidos.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-            List<PedidoResponse> responses = pedidos.stream().map(this::mapToResponse).toList();
+            // Carregar pedidos com itens e produtos para evitar problemas de lazy loading ao mapear para DTOs
+            List<Pedido> pedidos = pedidoService.buscarPorClienteComItens(clienteId);
+            List<PedidoResponse> responses = pedidos == null ? List.of() : pedidos.stream().map(this::mapToResponse).toList();
             return ResponseEntity.ok(responses);
         } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            // Logar a exceção para diagnóstico e manter contrato da API retornando lista vazia
+            logger.error("Erro ao buscar pedidos para cliente {}: {}", clienteId, ex.getMessage(), ex);
+            return ResponseEntity.ok(List.of());
         } catch (Exception ex) {
+            logger.error("Erro inesperado ao buscar pedidos para cliente {}: {}", clienteId, ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
