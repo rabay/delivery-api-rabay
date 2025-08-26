@@ -129,22 +129,3 @@ Segurança: esses endpoints são destinados a ambiente de desenvolvimento; se fo
 1. Inicie a aplicação: `./scripts/start_server.sh --port 8080 --no-tail`
 2. Abra o H2 Console e execute as queries acima ou use os endpoints internos `/db/*` para inspeção programática
 3. Verifique em `TABLE_CONSTRAINTS`, `REFERENTIAL_CONSTRAINTS` e `KEY_COLUMN_USAGE` se as FKs aparecem conforme esperado
-
-## Checklist da solicitação
-
-Este checklist mostra o status atual dos requisitos solicitados na Atividade 4 (H2, logs e validação):
-
-- [x] Configurar H2 (in-memory) e H2 Console ativado para dev
-- [x] Fornecer `data.sql` idempotente e evitar sua execução automática quando conflitar com DataLoader
-- [x] Habilitar logging de SQL (`org.hibernate.SQL=DEBUG`)
-- [x] Capturar bind values (BasicBinder) — habilitado temporariamente para verificação; revertido depois
-- [x] Implementar endpoints de inspeção em-JVM (`/db/schema`, `/db/integrity`, `/db/query`)
-- [x] Remover scripts bash de verificação externos (scripts experimentais removidos)
-- [x] Atualizar documentação (`README-H2.md` e README principal) com instruções de uso
-- [x] Reverter TRACE root e reduzir verbosidade de logs (feito)
-- [ ] Proteger endpoints `/db/*` com `@Profile("dev")` e/ou autenticação (recomendado)
-
-Se precisar, eu aplico a proteção por profile nos controllers de inspeção e atualizo a documentação.
-
----
-Arquivo gerado e atualizado para a Atividade 4 (H2). Mantê-lo em `README-H2.md` na raiz do projeto.

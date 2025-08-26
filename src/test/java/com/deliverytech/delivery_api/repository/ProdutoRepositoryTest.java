@@ -87,5 +87,8 @@ class ProdutoRepositoryTest {
         produtoRepository.save(p);
     List<Produto> results = produtoRepository.findByRestauranteAndExcluidoFalse(r);
         assertThat(results).extracting(Produto::getNome).contains("X-Burguer");
+    // adicional: verificar busca por id do restaurante (findByRestauranteIdAndExcluidoFalse)
+    List<Produto> resultsById = produtoRepository.findByRestauranteIdAndExcluidoFalse(r.getId());
+        assertThat(resultsById).extracting(Produto::getNome).contains("X-Burguer");
     }
 }

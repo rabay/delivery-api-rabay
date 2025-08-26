@@ -70,4 +70,34 @@ class PedidoRepositoryTest {
         List<Pedido> results = pedidoRepository.findByClienteId(c.getId());
         assertThat(results).isNotEmpty();
     }
+
+    @Test
+    void testFindTop10ByOrderByDataPedidoDesc() {
+        Cliente c = new Cliente();
+        c.setNome("Cliente Recentes");
+        c.setEmail("recentes@teste.com");
+        c.setAtivo(true);
+        clienteRepository.save(c);
+
+        Restaurante r = new Restaurante();
+        r.setNome("Restaurante Recentes");
+        r.setCategoria("Teste");
+        r.setAtivo(true);
+        restauranteRepository.save(r);
+
+        // criar 12 pedidos com datas decrescentes
+        for (int i = 0; i < 12; i++) {
+            Pedido p = new Pedido();
+            p.setCliente(c);
+            p.setRestaurante(r);
+            p.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CRIADO);
+            p.setDataPedido(LocalDateTime.now().minusDays(i));
+            pedidoRepository.save(p);
+        }
+
+        List<Pedido> recentes = pedidoRepository.findTop10ByOrderByDataPedidoDesc();
+        assertThat(recentes).hasSize(10);
+        // verificar que a primeira posição é a mais recente
+        assertThat(recentes.get(0).getDataPedido()).isAfterOrEqualTo(recentes.get(9).getDataPedido());
+    }
 }

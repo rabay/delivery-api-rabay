@@ -34,4 +34,25 @@ class RestauranteRepositoryTest {
         restauranteRepository.save(r);
     assertThat(restauranteRepository.findByCategoriaAndExcluidoFalse("Japonesa")).extracting(Restaurante::getNome).contains("Sushi Bar");
     }
+
+    @Test
+    void testFindByTaxaEntregaLessThanEqual() {
+        Restaurante r1 = new Restaurante();
+        r1.setNome("Barra Rápida");
+        r1.setCategoria("Lanches");
+        r1.setAtivo(true);
+        r1.setTaxaEntrega(new java.math.BigDecimal("4.50"));
+        restauranteRepository.save(r1);
+
+        Restaurante r2 = new Restaurante();
+        r2.setNome("Entrega Cara");
+        r2.setCategoria("Lanches");
+        r2.setAtivo(true);
+        r2.setTaxaEntrega(new java.math.BigDecimal("6.00"));
+        restauranteRepository.save(r2);
+
+        List<Restaurante> resultados = restauranteRepository.findByTaxaEntregaLessThanEqualAndExcluidoFalse(new java.math.BigDecimal("5.00"));
+        assertThat(resultados).extracting(Restaurante::getNome).contains("Barra Rápida");
+        assertThat(resultados).extracting(Restaurante::getNome).doesNotContain("Entrega Cara");
+    }
 }
