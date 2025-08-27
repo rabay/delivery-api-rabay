@@ -22,7 +22,7 @@ class RestauranteServiceTest {
         req.setTelefone("999");
         req.setEmail("mail@r.com");
         req.setTempoEntregaMinutos(25);
-        req.setAvaliacao(java.math.BigDecimal.TEN);
+        req.setAvaliacao(java.math.BigDecimal.valueOf(4.5)); // Valid rating 0-5
         Restaurante restaurante = restauranteService.cadastrar(req);
         assertThat(restaurante).isNotNull();
         assertThat(restaurante.getNome()).isEqualTo("Restaurante Teste");
@@ -40,7 +40,7 @@ class RestauranteServiceTest {
         req.setTelefone("888");
         req.setEmail("atualiza@r.com");
         req.setTempoEntregaMinutos(40);
-        req.setAvaliacao(java.math.BigDecimal.valueOf(8));
+        req.setAvaliacao(java.math.BigDecimal.valueOf(4.0)); // Valid rating 0-5
         Restaurante restaurante = restauranteService.cadastrar(req);
         RestauranteRequest update = new RestauranteRequest();
         update.setNome("Restaurante Atualizado");
@@ -50,7 +50,7 @@ class RestauranteServiceTest {
         update.setTelefone("777");
         update.setEmail("novo@r.com");
         update.setTempoEntregaMinutos(50);
-        update.setAvaliacao(java.math.BigDecimal.valueOf(9));
+        update.setAvaliacao(java.math.BigDecimal.valueOf(4.5)); // Valid rating 0-5
         Restaurante atualizado = restauranteService.atualizar(restaurante.getId(), update);
         assertThat(atualizado.getNome()).isEqualTo("Restaurante Atualizado");
         assertThat(atualizado.getCategoria()).isEqualTo("Fusion");

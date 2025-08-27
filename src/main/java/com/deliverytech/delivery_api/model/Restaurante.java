@@ -1,44 +1,51 @@
 package com.deliverytech.delivery_api.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import java.math.BigDecimal;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Restaurante {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(nullable = false, length = 100)
     private String nome;
+    
+    @Column(length = 50)
     private String categoria;
+    
+    @Column(length = 255)
     private String endereco;
+    
+    @Column(precision = 8, scale = 2)
     private BigDecimal taxaEntrega;
+    
+    @Column(length = 15)
     private String telefone;
+    
+    @Column(unique = true, length = 100)
     private String email;
+    
     private Integer tempoEntregaMinutos;
+    
     private boolean ativo;
+    
+    @DecimalMin(value = "0.0", message = "Avaliação deve ser positiva")
+    @DecimalMax(value = "5.0", message = "Avaliação máxima é 5.0")
+    @Column(precision = 3, scale = 1)
     private BigDecimal avaliacao;
+    
+    @Column(nullable = false)
+    @Builder.Default
     private Boolean excluido = false;
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
-    public String getEndereco() { return endereco; }
-    public void setEndereco(String endereco) { this.endereco = endereco; }
-    public BigDecimal getTaxaEntrega() { return taxaEntrega; }
-    public void setTaxaEntrega(BigDecimal taxaEntrega) { this.taxaEntrega = taxaEntrega; }
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public Integer getTempoEntregaMinutos() { return tempoEntregaMinutos; }
-    public void setTempoEntregaMinutos(Integer tempoEntregaMinutos) { this.tempoEntregaMinutos = tempoEntregaMinutos; }
-    public boolean isAtivo() { return ativo; }
-    public void setAtivo(boolean ativo) { this.ativo = ativo; }
-    public BigDecimal getAvaliacao() { return avaliacao; }
-    public void setAvaliacao(BigDecimal avaliacao) { this.avaliacao = avaliacao; }
-    public Boolean getExcluido() { return excluido; }
-    public void setExcluido(Boolean excluido) { this.excluido = excluido; }
 }

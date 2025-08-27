@@ -1,7 +1,5 @@
 package com.deliverytech.delivery_api.controller;
 
-// import com.deliverytech.delivery_api.dto.request.PedidoRequest;
-// import com.deliverytech.delivery_api.dto.request.ItemPedidoRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,8 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
-
-// import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

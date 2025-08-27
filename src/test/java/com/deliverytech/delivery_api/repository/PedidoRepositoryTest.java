@@ -62,10 +62,20 @@ class PedidoRepositoryTest {
         c.setEmail("carlos@email.com");
         c.setAtivo(true);
         clienteRepository.save(c);
+        
+        // Create restaurante
+        Restaurante r = new Restaurante();
+        r.setNome("Restaurante Carlos");
+        r.setCategoria("Teste");
+        r.setAtivo(true);
+        restauranteRepository.save(r);
+        
         Pedido p = new Pedido();
         p.setCliente(c);
+        p.setRestaurante(r); // Add missing restaurante
         p.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CRIADO);
         p.setDataPedido(LocalDateTime.now());
+        p.setValorTotal(BigDecimal.valueOf(100.0)); // Add required field
         pedidoRepository.save(p);
         List<Pedido> results = pedidoRepository.findByClienteId(c.getId());
         assertThat(results).isNotEmpty();
@@ -92,6 +102,7 @@ class PedidoRepositoryTest {
             p.setRestaurante(r);
             p.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CRIADO);
             p.setDataPedido(LocalDateTime.now().minusDays(i));
+            p.setValorTotal(BigDecimal.valueOf(50.0 + i)); // Add required field with unique values
             pedidoRepository.save(p);
         }
 

@@ -1,6 +1,5 @@
 package com.deliverytech.delivery_api.service;
 
-// import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
 import com.deliverytech.delivery_api.service.impl.PedidoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,7 +77,7 @@ class PedidoServiceImplTest {
         var produto = new com.deliverytech.delivery_api.model.Produto();
         produto.setId(1L);
         produto.setPreco(java.math.BigDecimal.valueOf(15));
-        produto.setAtivo(true);
+        produto.setDisponivel(true);
         produto.setExcluido(false);
         var item = new com.deliverytech.delivery_api.model.ItemPedido();
         item.setProduto(produto);
@@ -96,7 +95,7 @@ class PedidoServiceImplTest {
         var produto = new com.deliverytech.delivery_api.model.Produto();
         produto.setId(1L);
         produto.setPreco(java.math.BigDecimal.TEN);
-        produto.setAtivo(true);
+        produto.setDisponivel(true);
         produto.setExcluido(false);
 
         var item = new com.deliverytech.delivery_api.model.ItemPedido();

@@ -51,7 +51,7 @@ public class PedidoServiceImpl implements PedidoService {
                             log.warn("Produto não encontrado ao criar pedido: produtoId={}", produtoId);
                             return new RuntimeException("Produto não encontrado: ID " + produtoId);
                         });
-                if (Boolean.TRUE.equals(produto.getExcluido()) || !produto.getAtivo()) {
+                if (Boolean.TRUE.equals(produto.getExcluido()) || !Boolean.TRUE.equals(produto.getDisponivel())) {
                     log.warn("Produto indisponível ou excluído ao criar pedido: produtoId={}", produto.getId());
                     throw new RuntimeException("Produto indisponível ou excluído: ID " + produto.getId());
                 }
@@ -187,7 +187,7 @@ public class PedidoServiceImpl implements PedidoService {
         for (ItemPedidoRequest itemRequest : itens) {
             Produto produto = produtoRepository.findById(itemRequest.getProdutoId())
                     .orElseThrow(() -> new RuntimeException("Produto não encontrado - ID: " + itemRequest.getProdutoId()));
-            if (!produto.getAtivo()) {
+            if (!Boolean.TRUE.equals(produto.getDisponivel())) {
                 throw new RuntimeException("Produto não está disponível - ID: " + itemRequest.getProdutoId());
             }
             BigDecimal precoUnitario = produto.getPreco();

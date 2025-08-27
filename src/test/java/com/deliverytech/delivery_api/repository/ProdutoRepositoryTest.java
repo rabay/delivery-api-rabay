@@ -40,7 +40,7 @@ class ProdutoRepositoryTest {
     // Criar um pedido e item_pedido para gerar vendas e persistir via TestEntityManager
     com.deliverytech.delivery_api.model.Cliente cliente = new com.deliverytech.delivery_api.model.Cliente();
     cliente.setNome("Cliente Teste");
-    cliente.setEmail("cliente@teste.com");
+    cliente.setEmail("cliente.produtos@teste.com"); // Unique email
     entityManager.persist(cliente);
 
     com.deliverytech.delivery_api.model.Pedido pedido = new com.deliverytech.delivery_api.model.Pedido();
@@ -84,6 +84,7 @@ class ProdutoRepositoryTest {
         p.setCategoria("Lanche");
         p.setDisponivel(true);
         p.setRestaurante(r);
+        p.setPreco(new BigDecimal("15.00")); // Add required field
         produtoRepository.save(p);
     List<Produto> results = produtoRepository.findByRestauranteAndExcluidoFalse(r);
         assertThat(results).extracting(Produto::getNome).contains("X-Burguer");

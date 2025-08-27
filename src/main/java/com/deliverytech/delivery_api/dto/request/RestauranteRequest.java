@@ -1,69 +1,44 @@
 package com.deliverytech.delivery_api.dto.request;
 
 import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RestauranteRequest {
 
-    @NotBlank
+    @NotBlank(message = "Nome é obrigatório")
+    @Size(max = 100, message = "Nome não pode ter mais de 100 caracteres")
     private String nome;
 
-    @NotBlank
+    @NotBlank(message = "Categoria é obrigatória")
+    @Size(max = 50, message = "Categoria não pode ter mais de 50 caracteres")
     private String categoria;
 
-    @NotBlank
+    @NotBlank(message = "Endereço é obrigatório")
+    @Size(max = 255, message = "Endereço não pode ter mais de 255 caracteres")
     private String endereco;
 
-    @DecimalMin("0.0")
+    @DecimalMin(value = "0.0", message = "Taxa de entrega deve ser positiva")
     @NotNull(message = "Taxa de entrega é obrigatória")
-    @Positive(message = "Taxa de entrega deve ser positiva")
     private BigDecimal taxaEntrega;
 
-    @NotNull
-    @Min(1)
+    @NotNull(message = "Tempo de entrega é obrigatório")
+    @Min(value = 1, message = "Tempo de entrega deve ser pelo menos 1 minuto")
     private Integer tempoEntregaMinutos;
 
+    @Pattern(regexp = "\\d{10,11}", message = "Telefone deve ter 10 ou 11 dígitos")
     private String telefone;
+    
+    @Email(message = "Email deve ter formato válido")
+    @Size(max = 100, message = "Email não pode ter mais de 100 caracteres")
     private String email;
 
-    @Positive(message = "Avaliação deve ser positiva")
+    @DecimalMin(value = "0.0", message = "Avaliação deve ser positiva")
     @DecimalMax(value = "5.0", message = "Avaliação máxima é 5.0")
     private BigDecimal avaliacao;
-
-    public RestauranteRequest() {}
-
-    public RestauranteRequest(String nome, String categoria, String endereco, BigDecimal taxaEntrega, Integer tempoEntregaMinutos, String telefone, String email, BigDecimal avaliacao) {
-        this.nome = nome;
-        this.categoria = categoria;
-        this.endereco = endereco;
-        this.taxaEntrega = taxaEntrega;
-        this.tempoEntregaMinutos = tempoEntregaMinutos;
-        this.telefone = telefone;
-        this.email = email;
-        this.avaliacao = avaliacao;
-    }
-
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
-
-    public String getEndereco() { return endereco; }
-    public void setEndereco(String endereco) { this.endereco = endereco; }
-
-    public BigDecimal getTaxaEntrega() { return taxaEntrega; }
-    public void setTaxaEntrega(BigDecimal taxaEntrega) { this.taxaEntrega = taxaEntrega; }
-
-    public Integer getTempoEntregaMinutos() { return tempoEntregaMinutos; }
-    public void setTempoEntregaMinutos(Integer tempoEntregaMinutos) { this.tempoEntregaMinutos = tempoEntregaMinutos; }
-
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public BigDecimal getAvaliacao() { return avaliacao; }
-    public void setAvaliacao(BigDecimal avaliacao) { this.avaliacao = avaliacao; }
 }
