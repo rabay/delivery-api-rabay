@@ -2,6 +2,9 @@ package com.deliverytech.delivery_api.controller;
 
 // import com.deliverytech.delivery_api.dto.request.PedidoRequest;
 // import com.deliverytech.delivery_api.dto.request.ItemPedidoRequest;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +24,46 @@ public class PedidoControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+    
+    private String jwtToken;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeEach
+    void setUp() {
+        // Get JWT token by logging in with admin user
+        jwtToken = loginAndGetToken("admin@deliveryapi.com", "admin123");
+    }
+    
+    private String loginAndGetToken(String email, String password) {
+        String loginJson = "{\"username\": \"" + email + "\", \"password\": \"" + password + "\"}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> loginRequest = new HttpEntity<>(loginJson, headers);
+        
+        ResponseEntity<String> loginResponse = restTemplate.postForEntity(
+            "http://localhost:" + port + "/api/auth/login", 
+            loginRequest, 
+            String.class
+        );
+        
+        if (loginResponse.getStatusCode() == HttpStatus.OK) {
+            try {
+                JsonNode responseNode = objectMapper.readTree(loginResponse.getBody());
+                return responseNode.get("token").asText();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to extract token from login response", e);
+            }
+        } else {
+            throw new RuntimeException("Login failed with status: " + loginResponse.getStatusCode());
+        }
+    }
+    
+    private HttpHeaders createAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(jwtToken);
+        return headers;
+    }
 
     private String baseUrl() {
         return "http://localhost:" + port + "/api/pedidos";
@@ -30,8 +73,16 @@ public class PedidoControllerIntegrationTest {
     void buscarPorCliente_semPedidos_retornaListaVazia() {
         // Garante um cliente isolado (assumimos id alto improvável de existir)
         Long clienteId = 99999L;
+        
+        HttpHeaders headers = createAuthHeaders();
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.getForEntity(baseUrl() + "/cliente/" + clienteId, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(
+            baseUrl() + "/cliente/" + clienteId, 
+            HttpMethod.GET, 
+            requestEntity, 
+            String.class
+        );
 
         assertThat(response.getStatusCode()).isIn(HttpStatus.OK, HttpStatus.NOT_FOUND, HttpStatus.BAD_REQUEST);
         // Se a API seguir a nova regra, deve retornar 200 com array vazio
@@ -45,11 +96,11 @@ public class PedidoControllerIntegrationTest {
     void criarPedido_e_buscarPorCliente_retornaListaComPedido() {
         // Cria cliente, restaurante e produto via endpoints existentes da API através da collection precondição já usada
         // Para simplicidade, tentamos criar um cliente e produto e usar seus ids retornados
+        
+        HttpHeaders headers = createAuthHeaders();
 
         // Criar cliente
         String clienteJson = "{\"nome\": \"Integration Cliente\", \"email\": \"int_cliente_" + System.currentTimeMillis() + "@test.com\", \"telefone\": \"11900000000\", \"endereco\": \"Endereco\" }";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> clienteReq = new HttpEntity<>(clienteJson, headers);
         ResponseEntity<String> clienteResp = restTemplate.postForEntity("http://localhost:" + port + "/clientes", clienteReq, String.class);
         assertThat(clienteResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -78,7 +129,13 @@ public class PedidoControllerIntegrationTest {
         assertThat(pedidoResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         // Buscar pedidos pelo cliente
-        ResponseEntity<String> buscarResp = restTemplate.getForEntity(baseUrl() + "/cliente/" + clienteId, String.class);
+        HttpEntity<String> buscarReq = new HttpEntity<>(headers);
+        ResponseEntity<String> buscarResp = restTemplate.exchange(
+            baseUrl() + "/cliente/" + clienteId, 
+            HttpMethod.GET, 
+            buscarReq, 
+            String.class
+        );
         assertThat(buscarResp.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(buscarResp.getBody()).isNotNull();
         assertThat(buscarResp.getBody()).contains("id");

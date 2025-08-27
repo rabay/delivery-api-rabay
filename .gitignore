@@ -55,4 +55,5 @@ config.json
 
 tasks/**
 
-entregaveis/newman-report.json
+entregaveis/newman-*.json
+docs/**

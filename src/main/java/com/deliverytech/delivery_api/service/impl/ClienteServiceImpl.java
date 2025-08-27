@@ -29,8 +29,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Deprecated
     public Cliente cadastrar(Cliente cliente) {
         if (clienteRepository.findByEmailAndExcluidoFalse(cliente.getEmail()).isPresent()) {
-            log.warn("Tentativa de cadastro de cliente com e-mail já existente: {}", cliente.getEmail());
-            throw new RuntimeException("E-mail já cadastrado: " + cliente.getEmail());
+            throw new com.deliverytech.delivery_api.exception.EmailDuplicadoException(cliente.getEmail());
         }
         return clienteRepository.save(cliente);
     }
@@ -39,7 +38,6 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteResponse cadastrar(ClienteRequest clienteRequest) {
         Cliente cliente = clienteMapper.toEntity(clienteRequest);
         if (clienteRepository.findByEmailAndExcluidoFalse(cliente.getEmail()).isPresent()) {
-            log.warn("Tentativa de cadastro de cliente com e-mail já existente: {}", cliente.getEmail());
             throw new com.deliverytech.delivery_api.exception.EmailDuplicadoException(cliente.getEmail());
         }
         Cliente salvo = clienteRepository.save(cliente);

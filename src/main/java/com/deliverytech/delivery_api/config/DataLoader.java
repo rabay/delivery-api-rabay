@@ -1,15 +1,19 @@
 package com.deliverytech.delivery_api.config;
 
-import com.deliverytech.delivery_api.model.*;
-import com.deliverytech.delivery_api.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.deliverytech.delivery_api.model.Role;
+import com.deliverytech.delivery_api.model.Usuario;
+import com.deliverytech.delivery_api.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-// import java.math.BigDecimal;
 
-import java.util.Arrays;
+import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class DataLoader implements CommandLineRunner {
 
     @Autowired
@@ -24,24 +28,75 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private PedidoRepository pedidoRepository;
 
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("=== INICIANDO CARGA DE DADOS DE TESTE ===");
-
-        // Inserir dados de teste (sem limpar dados existentes)
-        inserirClientes();
-        inserirRestaurantes();
-        inserirPedidos();
-
-    // Validação das consultas derivadas
-    validarConsultas();
-
-        System.out.println("=== CARGA DE DADOS CONCLUÍDA ===");
-        System.out.println("\n✅ Spring Boot Application iniciada com sucesso!");
-        System.out.println("\n🎯 SISTEMA DE CAPTURA AUTOMÁTICA ATIVO!");
-        System.out.println("📁 Respostas serão salvas em: ./entregaveis/");
-        System.out.println("🔄 Faça requisições para /api/* e veja os arquivos sendo gerados!\n");
+        loadDefaultUsers();
     }
+
+    private void loadDefaultUsers() {
+        // Check if users already exist
+        if (usuarioRepository.count() > 0) {
+            log.info("Usuários já existem no banco de dados, pulando inicialização");
+            return;
+        }
+
+        log.info("Criando usuários padrão para testes...");
+
+        // Create Admin user
+        Usuario admin = Usuario.builder()
+            .nome("Administrator")
+            .email("admin@deliveryapi.com")
+            .senha(passwordEncoder.encode("admin123"))
+            .role(Role.ADMIN)
+            .ativo(true)
+            .dataCriacao(LocalDateTime.now())
+            .build();
+        usuarioRepository.save(admin);
+
+        // Create Cliente user
+        Usuario cliente = Usuario.builder()
+            .nome("Cliente Teste")
+            .email("cliente@test.com")
+            .senha(passwordEncoder.encode("cliente123"))
+            .role(Role.CLIENTE)
+            .ativo(true)
+            .dataCriacao(LocalDateTime.now())
+            .build();
+        usuarioRepository.save(cliente);
+
+        // Create Restaurante user
+        Usuario restaurante = Usuario.builder()
+            .nome("Restaurante Teste")
+            .email("restaurante@test.com")
+            .senha(passwordEncoder.encode("restaurante123"))
+            .role(Role.RESTAURANTE)
+            .ativo(true)
+            .dataCriacao(LocalDateTime.now())
+            .restauranteId(1L) // Associate with first restaurant
+            .build();
+        usuarioRepository.save(restaurante);
+
+        // Create Entregador user
+        Usuario entregador = Usuario.builder()
+            .nome("Entregador Teste")
+            .email("entregador@test.com")
+            .senha(passwordEncoder.encode("entregador123"))
+            .role(Role.ENTREGADOR)
+            .ativo(true)
+            .dataCriacao(LocalDateTime.now())
+            .build();
+        usuarioRepository.save(entregador);
+
+        log.info("✅ Usuários padrão criados com sucesso!");
+        log.info("👤 Admin: admin@deliveryapi.com / admin123");
+        log.info("👤 Cliente: cliente@test.com / cliente123");
+        log.info("👤 Restaurante: restaurante@test.com / restaurante123");
+        log.info("👤 Entregador: entregador@test.com / entregador123");
+    }
+
     private void validarConsultas() {
         System.out.println("\n=== Validação das Consultas Derivadas ===");
 

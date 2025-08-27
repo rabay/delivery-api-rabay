@@ -48,6 +48,25 @@ public class ClienteController {
     }
 
 
+    @Operation(summary = "Buscar cliente por ID", description = "Consulta um cliente pelo seu identificador único.")
+    @GetMapping("/{id}")
+    public ResponseEntity<ClienteResponse> buscarPorId(@PathVariable Long id) {
+        return clienteService.buscarPorId(id)
+            .map(cliente -> {
+                // Convert Cliente to ClienteResponse
+                ClienteResponse response = new ClienteResponse();
+                response.setId(cliente.getId());
+                response.setNome(cliente.getNome());
+                response.setEmail(cliente.getEmail());
+                response.setTelefone(cliente.getTelefone());
+                response.setEndereco(cliente.getEndereco());
+                response.setAtivo(cliente.isAtivo());
+                return ResponseEntity.ok(response);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+
     @Operation(summary = "Atualizar cliente", description = "Atualiza os dados de um cliente existente.")
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ClienteRequest clienteRequest) {
