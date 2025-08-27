@@ -140,6 +140,107 @@ delivery-api-rabay/
 
 ---
 
+## 📊 Estratégia de Inicialização de Dados
+
+A aplicação utiliza uma estratégia dupla para inicialização de dados, separando responsabilidades entre autenticação JWT e dados de exemplo:
+
+### 1. UserDataLoader.java - Usuários JWT
+
+**Localização:** `src/main/java/com/deliverytech/delivery_api/config/UserDataLoader.java`
+
+**Responsabilidade:** Criação automática de usuários para sistema de autenticação JWT.
+
+**Dados criados:**
+- **Admin:** `admin@deliveryapi.com` / `admin123` (Role: ADMIN)
+- **Cliente:** `cliente@test.com` / `cliente123` (Role: CLIENTE) 
+- **Restaurante:** `restaurante@test.com` / `restaurante123` (Role: RESTAURANTE)
+- **Entregador:** `entregador@test.com` / `entregador123` (Role: ENTREGADOR)
+
+**Características:**
+- Executa apenas se não existirem usuários no banco (`usuarioRepository.count() == 0`)
+- Utiliza `@Order(100)` para executar após outros data loaders
+- Configurado com `@Profile({"!test", "dev", "default"})` - não executa em testes
+- Senhas são automaticamente criptografadas com `PasswordEncoder`
+- Execução transacional para garantir integridade
+
+### 2. data.sql - Dados de Exemplo
+
+**Localização:** `src/main/resources/data.sql`
+
+**Responsabilidade:** Criação de dados de exemplo para clientes, restaurantes, produtos e pedidos.
+
+**Dados criados:**
+- **5 Clientes:** João Silva, Maria Santos, Pedro Oliveira, Ana Costa, Carlos Ferreira
+- **5 Restaurantes:** Pizza Express, Burger King, Sushi House, Gyros Athenas, Chiparia do Porto
+- **10 Produtos:** Variados por categoria e restaurante
+- **3 Pedidos:** Com diferentes status (CRIADO, ENTREGUE, CANCELADO)
+- **Itens de pedido:** Relacionamentos entre pedidos e produtos
+
+**Características:**
+- Utiliza `MERGE INTO` para operações idempotentes
+- Dados preservam integridade referencial
+- Configurado para executar após criação do schema (`spring.jpa.defer-datasource-initialization=true`)
+- Atualmente desabilitado via `spring.sql.init.mode=never` para evitar conflitos
+
+### 3. Configuração Atual
+
+```properties
+# application.properties
+spring.jpa.defer-datasource-initialization=true
+spring.sql.init.mode=never  # data.sql desabilitado
+```
+
+**Status:** UserDataLoader ativo, data.sql desabilitado para evitar duplicação.
+
+### 4. Como Adicionar Novos Dados
+
+#### Para Usuários JWT:
+1. **Modifique UserDataLoader.java** para adicionar novos usuários padrão
+2. Adicione no método `loadDefaultUsers()` utilizando o builder pattern:
+```java
+Usuario.builder()
+    .nome("Novo Usuario")
+    .email("novo@example.com")
+    .senha(passwordEncoder.encode("senha123"))
+    .role(Role.CLIENTE)
+    .ativo(true)
+    .dataCriacao(LocalDateTime.now())
+    .build()
+```
+
+#### Para Dados de Exemplo:
+1. **Opção A - Via data.sql:**
+   - Modifique `src/main/resources/data.sql`
+   - Habilite execução: `spring.sql.init.mode=always`
+   - Use sempre `MERGE INTO` para idempotência
+
+2. **Opção B - Via DataLoader dedicado:**
+   - Crie novo `@Component` implementando `CommandLineRunner`
+   - Configure `@Order(200)` para executar após UserDataLoader
+   - Use `@Profile("dev")` para controlar ambiente
+
+#### Para Dados de Produção:
+1. **Utilize migrations:** Flyway ou Liquibase para versionamento
+2. **Scripts de deploy:** Separados por ambiente
+3. **APIs administrativas:** Para criação controlada via endpoints
+
+### 5. Evolução Histórica
+
+- **Versão anterior:** DataLoader.java único com múltiplas responsabilidades
+- **Problema:** Misturava criação de usuários JWT com dados de exemplo
+- **Refatoração:** Separação de responsabilidades em componentes específicos
+- **Benefício:** Maior controle, testabilidade e flexibilidade por ambiente
+
+### 6. Recomendações
+
+✅ **Mantenha separação:** Usuários JWT vs. dados de negócio  
+✅ **Use profiles:** Controle execução por ambiente  
+✅ **Operações idempotentes:** MERGE INTO ou verificações de existência  
+✅ **Versionamento:** Para mudanças em dados críticos  
+✅ **Transações:** Para operações que requerem integridade  
+
+---
+
 
 ## 🏃‍♂️ Como Executar, Testar e Usar CI/CD
 
