@@ -55,5 +55,7 @@ config.json
 
 tasks/**
 
-entregaveis/newman-*.json
+**/newman-*.json
 docs/**
+
+.qoder/**
