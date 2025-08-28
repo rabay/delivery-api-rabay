@@ -1,6 +1,8 @@
 package com.deliverytech.delivery_api.service;
 
 import com.deliverytech.delivery_api.dto.request.ItemPedidoRequest;
+import com.deliverytech.delivery_api.dto.request.PedidoRequest;
+import com.deliverytech.delivery_api.dto.response.PedidoResponse;
 import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.model.StatusPedido;
 import java.math.BigDecimal;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PedidoService {
+    // Métodos existentes com Entity
     Pedido criar(Pedido pedido);
     Pedido buscarPorId(Long id);
     List<Pedido> buscarPorCliente(Long clienteId);
@@ -27,4 +30,7 @@ public interface PedidoService {
     List<Pedido> buscarPorClienteComItens(Long clienteId);
     List<Pedido> listarTodos();
     void deletar(Long id);
+
+    // Novos métodos com DTOs
+    PedidoResponse criarPedido(PedidoRequest pedidoRequest);
 }

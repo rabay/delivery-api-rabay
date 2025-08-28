@@ -1,13 +1,14 @@
 package com.deliverytech.delivery_api.service;
 
 import com.deliverytech.delivery_api.model.Restaurante;
+import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
+import com.deliverytech.delivery_api.dto.response.RestauranteResponse;
 import java.util.Optional;
 import java.util.List;
-
-import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import java.math.BigDecimal;
 
 public interface RestauranteService {
+    // Métodos existentes com Entity
     Restaurante cadastrar(RestauranteRequest restauranteRequest);
     Optional<Restaurante> buscarPorId(Long id);
     List<Restaurante> listarTodos();
@@ -21,4 +22,11 @@ public interface RestauranteService {
     Restaurante alterarStatus(Long id, Boolean ativo);
     List<Restaurante> buscarProximos(String cep);
     List<Restaurante> listarComFiltros(String categoria, Boolean ativo);
+
+    // Novos métodos com DTOs
+    RestauranteResponse cadastrarRestaurante(RestauranteRequest restauranteRequest);
+    RestauranteResponse buscarRestaurantePorId(Long id);
+    List<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria);
+    List<RestauranteResponse> buscarRestaurantesDisponiveis();
+    RestauranteResponse atualizarRestaurante(Long id, RestauranteRequest restauranteRequest);
 }

@@ -10,14 +10,13 @@ public interface ClienteService {
     @Deprecated
     com.deliverytech.delivery_api.model.Cliente cadastrar(com.deliverytech.delivery_api.model.Cliente cliente);
     @Deprecated
-    Optional<com.deliverytech.delivery_api.model.Cliente> buscarPorId(Long id);
-    @Deprecated
     List<com.deliverytech.delivery_api.model.Cliente> buscarAtivos();
     @Deprecated
     com.deliverytech.delivery_api.model.Cliente atualizar(com.deliverytech.delivery_api.model.Cliente cliente);
 
     // Métodos novos com DTOs
     ClienteResponse cadastrar(ClienteRequest clienteRequest);
+    ClienteResponse buscarPorId(Long id);
     Optional<ClienteResponse> buscarPorEmail(String email);
     List<ClienteResponse> listarAtivos();
     List<ClienteResponse> buscarPorNome(String nome);

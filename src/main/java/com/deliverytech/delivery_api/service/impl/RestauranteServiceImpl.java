@@ -2,21 +2,26 @@ package com.deliverytech.delivery_api.service.impl;
 
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
+import com.deliverytech.delivery_api.dto.response.RestauranteResponse;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
 import com.deliverytech.delivery_api.service.RestauranteService;
+import com.deliverytech.delivery_api.mapper.RestauranteMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.math.BigDecimal;
 
 @Service
 @Transactional
 public class RestauranteServiceImpl implements RestauranteService {
     private final RestauranteRepository restauranteRepository;
+    private final RestauranteMapper restauranteMapper;
 
-    public RestauranteServiceImpl(RestauranteRepository restauranteRepository) {
+    public RestauranteServiceImpl(RestauranteRepository restauranteRepository, RestauranteMapper restauranteMapper) {
         this.restauranteRepository = restauranteRepository;
+        this.restauranteMapper = restauranteMapper;
     }
 
     @Override
@@ -171,5 +176,70 @@ public class RestauranteServiceImpl implements RestauranteService {
             return ativo ? restauranteRepository.findByAtivoTrueAndExcluidoFalse() : restauranteRepository.findByAtivoFalseAndExcluidoFalse();
         }
         return restauranteRepository.findByCategoriaAndAtivoAndExcluidoFalse(categoria, ativo);
+    }
+
+    // ===== NOVOS MÉTODOS COM DTOs =====
+    
+    @Override
+    public RestauranteResponse cadastrarRestaurante(RestauranteRequest restauranteRequest) {
+        Restaurante restaurante = restauranteMapper.toEntity(restauranteRequest);
+        Restaurante salvo = restauranteRepository.save(restaurante);
+        return restauranteMapper.toResponse(salvo);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RestauranteResponse buscarRestaurantePorId(Long id) {
+        Restaurante restaurante = restauranteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+        
+        // Validate not soft deleted
+        if (Boolean.TRUE.equals(restaurante.getExcluido())) {
+            throw new RuntimeException("Restaurante foi excluído do sistema");
+        }
+        
+        return restauranteMapper.toResponse(restaurante);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria) {
+        List<Restaurante> restaurantes = restauranteRepository.findByCategoriaAndExcluidoFalse(categoria);
+        return restaurantes.stream()
+                .map(restauranteMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RestauranteResponse> buscarRestaurantesDisponiveis() {
+        List<Restaurante> restaurantes = restauranteRepository.findByAtivoTrueAndExcluidoFalse();
+        return restaurantes.stream()
+                .map(restauranteMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public RestauranteResponse atualizarRestaurante(Long id, RestauranteRequest restauranteRequest) {
+        Restaurante existente = restauranteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+        
+        // Validate not soft deleted
+        if (Boolean.TRUE.equals(existente.getExcluido())) {
+            throw new RuntimeException("Não é possível atualizar restaurante excluído");
+        }
+        
+        // Update fields
+        existente.setNome(restauranteRequest.getNome());
+        existente.setCategoria(restauranteRequest.getCategoria());
+        existente.setEndereco(restauranteRequest.getEndereco());
+        existente.setTaxaEntrega(restauranteRequest.getTaxaEntrega());
+        existente.setTelefone(restauranteRequest.getTelefone());
+        existente.setEmail(restauranteRequest.getEmail());
+        existente.setTempoEntregaMinutos(restauranteRequest.getTempoEntregaMinutos());
+        existente.setAvaliacao(restauranteRequest.getAvaliacao());
+        
+        Restaurante atualizado = restauranteRepository.save(existente);
+        return restauranteMapper.toResponse(atualizado);
     }
 }

@@ -1,9 +1,14 @@
 package com.deliverytech.delivery_api.service.impl;
 
 import com.deliverytech.delivery_api.dto.request.ItemPedidoRequest;
+import com.deliverytech.delivery_api.dto.request.PedidoRequest;
+import com.deliverytech.delivery_api.dto.response.PedidoResponse;
+import com.deliverytech.delivery_api.mapper.PedidoMapper;
 import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
+import com.deliverytech.delivery_api.repository.ClienteRepository;
+import com.deliverytech.delivery_api.repository.RestauranteRepository;
 import com.deliverytech.delivery_api.service.PedidoService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -22,10 +27,18 @@ public class PedidoServiceImpl implements PedidoService {
     private static final Logger log = LoggerFactory.getLogger(PedidoServiceImpl.class);
     private final PedidoRepository pedidoRepository;
     private final ProdutoRepository produtoRepository;
+    private final ClienteRepository clienteRepository;
+    private final RestauranteRepository restauranteRepository;
+    private final PedidoMapper pedidoMapper;
 
-    public PedidoServiceImpl(PedidoRepository pedidoRepository, ProdutoRepository produtoRepository) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository, ProdutoRepository produtoRepository, 
+                           ClienteRepository clienteRepository, RestauranteRepository restauranteRepository,
+                           PedidoMapper pedidoMapper) {
         this.pedidoRepository = pedidoRepository;
         this.produtoRepository = produtoRepository;
+        this.clienteRepository = clienteRepository;
+        this.restauranteRepository = restauranteRepository;
+        this.pedidoMapper = pedidoMapper;
     }
 
     @Override
@@ -253,5 +266,61 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
         pedidoRepository.delete(pedido);
+    }
+
+    // ===== NOVO MÉTODO COM DTO =====
+    
+    @Override
+    public PedidoResponse criarPedido(PedidoRequest pedidoRequest) {
+        try {
+            // Validate cliente exists and not excluded
+            Cliente cliente = clienteRepository.findById(pedidoRequest.getClienteId())
+                    .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+            
+            if (Boolean.TRUE.equals(cliente.getExcluido()) || !cliente.isAtivo()) {
+                throw new RuntimeException("Cliente inativo ou excluído do sistema");
+            }
+            
+            // Validate restaurante exists and not excluded
+            Restaurante restaurante = restauranteRepository.findById(pedidoRequest.getRestauranteId())
+                    .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+            
+            if (Boolean.TRUE.equals(restaurante.getExcluido()) || !restaurante.isAtivo()) {
+                throw new RuntimeException("Restaurante inativo ou excluído do sistema");
+            }
+            
+            // Validate itens
+            if (pedidoRequest.getItens() == null || pedidoRequest.getItens().isEmpty()) {
+                throw new RuntimeException("Pedido deve conter ao menos um item");
+            }
+            
+            // Validate all produtos are available and not excluded
+            for (ItemPedidoRequest itemRequest : pedidoRequest.getItens()) {
+                Produto produto = produtoRepository.findById(itemRequest.getProdutoId())
+                        .orElseThrow(() -> new RuntimeException("Produto não encontrado: ID " + itemRequest.getProdutoId()));
+                
+                if (Boolean.TRUE.equals(produto.getExcluido()) || !Boolean.TRUE.equals(produto.getDisponivel())) {
+                    throw new RuntimeException("Produto indisponível ou excluído: " + produto.getNome());
+                }
+                
+                // Validate produto belongs to the same restaurant
+                if (!produto.getRestaurante().getId().equals(pedidoRequest.getRestauranteId())) {
+                    throw new RuntimeException("Produto não pertence ao restaurante selecionado: " + produto.getNome());
+                }
+            }
+            
+            // Convert DTO to Entity
+            Pedido pedido = pedidoMapper.toEntity(pedidoRequest);
+            
+            // Create the pedido using existing business logic
+            Pedido pedidoCriado = criar(pedido);
+            
+            // Convert back to DTO response
+            return pedidoMapper.toResponse(pedidoCriado);
+            
+        } catch (Exception e) {
+            log.error("Erro ao criar pedido via DTO: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 }

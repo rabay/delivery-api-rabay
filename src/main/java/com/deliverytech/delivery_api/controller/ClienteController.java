@@ -51,19 +51,12 @@ public class ClienteController {
     @Operation(summary = "Buscar cliente por ID", description = "Consulta um cliente pelo seu identificador único.")
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponse> buscarPorId(@PathVariable Long id) {
-        return clienteService.buscarPorId(id)
-            .map(cliente -> {
-                // Convert Cliente to ClienteResponse
-                ClienteResponse response = new ClienteResponse();
-                response.setId(cliente.getId());
-                response.setNome(cliente.getNome());
-                response.setEmail(cliente.getEmail());
-                response.setTelefone(cliente.getTelefone());
-                response.setEndereco(cliente.getEndereco());
-                response.setAtivo(cliente.isAtivo());
-                return ResponseEntity.ok().body(response);
-            })
-            .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            ClienteResponse cliente = clienteService.buscarPorId(id);
+            return ResponseEntity.ok(cliente);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 

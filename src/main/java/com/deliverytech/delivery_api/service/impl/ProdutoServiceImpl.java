@@ -4,18 +4,24 @@ import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.service.ProdutoService;
+import com.deliverytech.delivery_api.dto.request.ProdutoRequest;
+import com.deliverytech.delivery_api.dto.response.ProdutoResponse;
+import com.deliverytech.delivery_api.mapper.ProdutoMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class ProdutoServiceImpl implements ProdutoService {
     private final ProdutoRepository produtoRepository;
+    private final ProdutoMapper produtoMapper;
 
-    public ProdutoServiceImpl(ProdutoRepository produtoRepository) {
+    public ProdutoServiceImpl(ProdutoRepository produtoRepository, ProdutoMapper produtoMapper) {
         this.produtoRepository = produtoRepository;
+        this.produtoMapper = produtoMapper;
     }
 
     @Override
@@ -50,6 +56,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     @Override
     @Transactional(readOnly = true)
+    @Deprecated
     public Optional<Produto> buscarPorId(Long id) {
         return produtoRepository.findById(id);
     }
@@ -119,5 +126,73 @@ public class ProdutoServiceImpl implements ProdutoService {
         if (preco == null || preco.compareTo(java.math.BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("Preço inválido");
         }
+    }
+
+    // ===== NOVOS MÉTODOS COM DTOs =====
+    
+    @Override
+    public ProdutoResponse cadastrar(ProdutoRequest produtoRequest) {
+        Produto produto = produtoMapper.toEntity(produtoRequest);
+        Produto salvo = produtoRepository.save(produto);
+        return produtoMapper.toResponse(salvo);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProdutoResponse buscarProdutoPorId(Long id) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        
+        // Validate not soft deleted
+        if (Boolean.TRUE.equals(produto.getExcluido())) {
+            throw new RuntimeException("Produto foi excluído do sistema");
+        }
+        
+        return produtoMapper.toResponse(produto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProdutoResponse> buscarProdutosPorRestaurante(Long restauranteId) {
+        List<Produto> produtos = produtoRepository.findByRestauranteIdAndExcluidoFalse(restauranteId);
+        return produtos.stream()
+                .map(produtoMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ProdutoResponse atualizar(Long id, ProdutoRequest produtoRequest) {
+        Produto existente = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        
+        // Validate not soft deleted
+        if (Boolean.TRUE.equals(existente.getExcluido())) {
+            throw new RuntimeException("Não é possível atualizar produto excluído");
+        }
+        
+        // Update fields
+        existente.setNome(produtoRequest.getNome());
+        existente.setCategoria(produtoRequest.getCategoria());
+        existente.setDescricao(produtoRequest.getDescricao());
+        existente.setPreco(produtoRequest.getPreco());
+        existente.setDisponivel(produtoRequest.getDisponivel());
+        
+        // Update restaurant if changed
+        if (!existente.getRestaurante().getId().equals(produtoRequest.getRestauranteId())) {
+            Produto temp = produtoMapper.toEntity(produtoRequest);
+            existente.setRestaurante(temp.getRestaurante());
+        }
+        
+        Produto atualizado = produtoRepository.save(existente);
+        return produtoMapper.toResponse(atualizado);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProdutoResponse> buscarProdutosPorCategoria(String categoria) {
+        List<Produto> produtos = produtoRepository.findByCategoriaAndExcluidoFalse(categoria);
+        return produtos.stream()
+                .map(produtoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

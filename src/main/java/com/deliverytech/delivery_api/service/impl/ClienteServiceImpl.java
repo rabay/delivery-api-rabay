@@ -44,10 +44,18 @@ public class ClienteServiceImpl implements ClienteService {
         return clienteMapper.toResponse(salvo);
     }
 
+    @Override
     @Transactional(readOnly = true)
-    @Deprecated
-    public Optional<Cliente> buscarPorId(Long id) {
-        return clienteRepository.findById(id);
+    public ClienteResponse buscarPorId(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        
+        // Validate not soft deleted
+        if (Boolean.TRUE.equals(cliente.getExcluido())) {
+            throw new RuntimeException("Cliente foi excluído do sistema");
+        }
+        
+        return clienteMapper.toResponse(cliente);
     }
 
     @Override
