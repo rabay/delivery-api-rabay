@@ -6,8 +6,10 @@ services:
       - "8080:8080"
     depends_on:
       - db
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
     # A aplicação poderá acessar o banco pelo hostname 'db'
-    # Não altere variáveis de ambiente da aplicação neste momento
+    # Profile dev ativado para usar configurações MySQL
 
   db:
     image: mysql:8.0
@@ -22,7 +24,32 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./config/mysql:/docker-entrypoint-initdb.d
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=128M
+      --max-connections=100
     # O banco estará acessível na rede interna como 'db:3306'
+    # Scripts de inicialização executados automaticamente
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: delivery-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: deliveryuser
+      PMA_PASSWORD: deliverypass
+      PMA_ARBITRARY: 1
+      MYSQL_ROOT_PASSWORD: rootpass
+    depends_on:
+      - db
+    # Painel de controle MySQL acessível em http://localhost:8081
+    # Login automático configurado com credenciais do MySQL
 
 volumes:
   mysql_data:

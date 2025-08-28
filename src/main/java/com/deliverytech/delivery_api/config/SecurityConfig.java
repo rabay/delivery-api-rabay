@@ -34,7 +34,7 @@ public class SecurityConfig {
                     "/health",
                     "/info",
                     "/actuator/**",
-                    "/h2-console/**"
+                    "/db/**"
                 ).permitAll()
                 // Swagger/OpenAPI endpoints - Documentation access
                 .requestMatchers(
@@ -52,7 +52,7 @@ public class SecurityConfig {
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())) // For H2 console
+            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())) // For database admin interfaces
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

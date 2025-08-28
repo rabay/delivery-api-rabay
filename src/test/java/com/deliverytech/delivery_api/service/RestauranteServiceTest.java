@@ -4,12 +4,14 @@ import com.deliverytech.delivery_api.model.Restaurante;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import java.util.List;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class RestauranteServiceTest {
 
     @Test

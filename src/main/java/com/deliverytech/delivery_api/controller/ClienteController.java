@@ -61,9 +61,9 @@ public class ClienteController {
                 response.setTelefone(cliente.getTelefone());
                 response.setEndereco(cliente.getEndereco());
                 response.setAtivo(cliente.isAtivo());
-                return ResponseEntity.ok(response);
+                return ResponseEntity.ok().body(response);
             })
-            .orElse(ResponseEntity.notFound().build());
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 

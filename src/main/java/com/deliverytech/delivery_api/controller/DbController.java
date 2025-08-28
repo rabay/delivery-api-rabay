@@ -29,16 +29,17 @@ public class DbController {
     public ResponseEntity<Map<String, Object>> schema(@RequestParam(value = "table", required = false) String tableName) {
         Map<String, Object> result = new HashMap<>();
 
-        // listar tabelas públicas
+        // listar tabelas da base de dados atual (MySQL)
         List<Map<String, Object>> tables = jdbcTemplate.queryForList(
-                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC' ORDER BY TABLE_NAME"
+                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME"
         );
         result.put("tables", tables);
+        
         // listar colunas de uma tabela específica (se solicitada) usando consulta dinâmica
         if (tableName != null && !tableName.isBlank()) {
             try {
                 List<Map<String, Object>> cols = jdbcTemplate.queryForList(
-                        "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='PUBLIC' AND TABLE_NAME=? ORDER BY ORDINAL_POSITION",
+                        "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION",
                         tableName.toUpperCase()
                 );
                 result.put("columns", cols);
@@ -49,13 +50,13 @@ public class DbController {
 
         // constraints
         List<Map<String, Object>> constraints = jdbcTemplate.queryForList(
-                "SELECT TABLE_NAME, CONSTRAINT_NAME, CONSTRAINT_TYPE FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA='PUBLIC' ORDER BY TABLE_NAME, CONSTRAINT_NAME"
+                "SELECT TABLE_NAME, CONSTRAINT_NAME, CONSTRAINT_TYPE FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() ORDER BY TABLE_NAME, CONSTRAINT_NAME"
         );
         result.put("constraints", constraints);
 
-        // key column usage (FK columns) - evitar colunas que podem não existir em todas as versões do H2
+        // key column usage (FK columns) - MySQL INFORMATION_SCHEMA
         List<Map<String, Object>> keys = jdbcTemplate.queryForList(
-                "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA='PUBLIC' ORDER BY TABLE_NAME, CONSTRAINT_NAME"
+                "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA=DATABASE() ORDER BY TABLE_NAME, CONSTRAINT_NAME"
         );
         result.put("keyColumnUsage", keys);
 
