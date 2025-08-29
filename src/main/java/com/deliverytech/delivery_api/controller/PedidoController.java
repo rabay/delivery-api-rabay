@@ -16,6 +16,7 @@ import com.deliverytech.delivery_api.service.PedidoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,24 +71,6 @@ public class PedidoController {
         }
     }
 
-    @Operation(summary = "Listar pedidos de um cliente", description = "Retorna todos os pedidos realizados por um cliente específico.")
-    @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<List<PedidoResponse>> buscarPorCliente(@PathVariable Long clienteId) {
-        try {
-            // Carregar pedidos com itens e produtos para evitar problemas de lazy loading ao mapear para DTOs
-            List<Pedido> pedidos = pedidoService.buscarPorClienteComItens(clienteId);
-            List<PedidoResponse> responses = pedidos == null ? List.of() : pedidos.stream().map(this::mapToResponse).toList();
-            return ResponseEntity.ok(responses);
-        } catch (RuntimeException ex) {
-            // Logar a exceção para diagnóstico e manter contrato da API retornando lista vazia
-            logger.error("Erro ao buscar pedidos para cliente {}: {}", clienteId, ex.getMessage(), ex);
-            return ResponseEntity.ok(List.of());
-        } catch (Exception ex) {
-            logger.error("Erro inesperado ao buscar pedidos para cliente {}: {}", clienteId, ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
     @Operation(summary = "Atualizar status do pedido", description = "Atualiza o status de um pedido existente (ex: CRIADO, ENTREGUE, CANCELADO).")
     @PutMapping("/{id}/status")
     public ResponseEntity<PedidoResponse> atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusUpdateRequest statusUpdateRequest) {
@@ -97,6 +80,42 @@ public class PedidoController {
     return pedidoService.buscarPorIdComItens(atualizado.getId())
         .map(pedidoComItens -> ResponseEntity.ok(mapToResponse(pedidoComItens)))
         .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
+    @Operation(summary = "Cancelar pedido", description = "Cancela um pedido existente.")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<PedidoResponse> cancelarPedido(@PathVariable Long id) {
+        try {
+            Pedido cancelado = pedidoService.cancelar(id);
+            PedidoResponse response = mapToResponse(cancelado);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException ex) {
+            logger.error("Erro ao cancelar pedido {}: {}", id, ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception ex) {
+            logger.error("Erro inesperado ao cancelar pedido {}: {}", id, ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @Operation(summary = "Calcular total do pedido", description = "Calcula o total de um pedido sem persisti-lo no banco de dados.")
+    @PostMapping("/calcular")
+    public ResponseEntity<Map<String, Object>> calcularTotal(@Valid @RequestBody PedidoRequest pedidoRequest) {
+        try {
+            java.math.BigDecimal total = pedidoService.calcularTotalPedido(pedidoRequest.getItens());
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("total", total);
+            response.put("quantidade_itens", pedidoRequest.getItens().size());
+            response.put("clienteId", pedidoRequest.getClienteId());
+            response.put("restauranteId", pedidoRequest.getRestauranteId());
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException ex) {
+            logger.error("Erro ao calcular total do pedido: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception ex) {
+            logger.error("Erro inesperado ao calcular total do pedido: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     // Métodos utilitários de mapeamento

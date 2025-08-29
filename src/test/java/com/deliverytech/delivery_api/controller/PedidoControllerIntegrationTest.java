@@ -76,7 +76,7 @@ public class PedidoControllerIntegrationTest {
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-            baseUrl() + "/cliente/" + clienteId, 
+            "http://localhost:" + port + "/api/clientes/" + clienteId + "/pedidos", 
             HttpMethod.GET, 
             requestEntity, 
             String.class
@@ -100,7 +100,7 @@ public class PedidoControllerIntegrationTest {
         // Criar cliente
         String clienteJson = "{\"nome\": \"Integration Cliente\", \"email\": \"int_cliente_" + System.currentTimeMillis() + "@test.com\", \"telefone\": \"11900000000\", \"endereco\": \"Endereco\" }";
         HttpEntity<String> clienteReq = new HttpEntity<>(clienteJson, headers);
-        ResponseEntity<String> clienteResp = restTemplate.postForEntity("http://localhost:" + port + "/clientes", clienteReq, String.class);
+        ResponseEntity<String> clienteResp = restTemplate.postForEntity("http://localhost:" + port + "/api/clientes", clienteReq, String.class);
         assertThat(clienteResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         // extrair id simples do body (assume JSON com campo id)
         String body = clienteResp.getBody();
@@ -109,14 +109,14 @@ public class PedidoControllerIntegrationTest {
         // Criar restaurante
         String restauranteJson = "{\"nome\": \"Rest Int\", \"categoria\": \"Geral\", \"ativo\": true, \"avaliacao\": 4.0 }";
         HttpEntity<String> restReq = new HttpEntity<>(restauranteJson, headers);
-        ResponseEntity<String> restResp = restTemplate.postForEntity("http://localhost:" + port + "/restaurantes", restReq, String.class);
+        ResponseEntity<String> restResp = restTemplate.postForEntity("http://localhost:" + port + "/api/restaurantes", restReq, String.class);
         assertThat(restResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Long restauranteId = JsonUtils.extractId(restResp.getBody());
 
         // Criar produto
         String produtoJson = "{\"nome\": \"Prod Int\", \"categoria\": \"Geral\", \"preco\": 9.9, \"disponivel\": true, \"restaurante\": { \"id\": " + restauranteId + " } }";
         HttpEntity<String> prodReq = new HttpEntity<>(produtoJson, headers);
-        ResponseEntity<String> prodResp = restTemplate.postForEntity("http://localhost:" + port + "/produtos", prodReq, String.class);
+        ResponseEntity<String> prodResp = restTemplate.postForEntity("http://localhost:" + port + "/api/produtos", prodReq, String.class);
         assertThat(prodResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Long produtoId = JsonUtils.extractId(prodResp.getBody());
 
@@ -129,7 +129,7 @@ public class PedidoControllerIntegrationTest {
         // Buscar pedidos pelo cliente
         HttpEntity<String> buscarReq = new HttpEntity<>(headers);
         ResponseEntity<String> buscarResp = restTemplate.exchange(
-            baseUrl() + "/cliente/" + clienteId, 
+            "http://localhost:" + port + "/api/clientes/" + clienteId + "/pedidos", 
             HttpMethod.GET, 
             buscarReq, 
             String.class

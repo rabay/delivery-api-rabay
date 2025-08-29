@@ -5,23 +5,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.deliverytech.delivery_api.model.Produto;
-import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.service.ProdutoService;
-import com.deliverytech.delivery_api.service.RestauranteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/produtos")
+@RequestMapping("/api/produtos")
 @Tag(name = "Produtos", description = "Cadastro, consulta e gerenciamento de produtos disponíveis nos restaurantes.")
 public class ProdutoController {
     private final ProdutoService produtoService;
-    private final RestauranteService restauranteService;
 
-    public ProdutoController(ProdutoService produtoService, RestauranteService restauranteService) {
+    public ProdutoController(ProdutoService produtoService) {
         this.produtoService = produtoService;
-        this.restauranteService = restauranteService;
     }
 
     @Operation(summary = "Cadastrar novo produto", description = "Cria um novo produto disponível em um restaurante.")
@@ -63,12 +60,28 @@ public class ProdutoController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Listar produtos de um restaurante", description = "Retorna todos os produtos disponíveis de um restaurante específico.")
-    @GetMapping("/restaurante/{restauranteId}")
-    public ResponseEntity<List<Produto>> buscarPorRestaurante(@PathVariable Long restauranteId) {
-        Restaurante restaurante = restauranteService.buscarPorId(restauranteId)
-            .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
-        List<Produto> produtos = produtoService.buscarPorRestaurante(restaurante);
-        return ResponseEntity.ok(produtos);
+    @Operation(summary = "Alterar disponibilidade do produto", description = "Alterna a disponibilidade de um produto (ativar/desativar).")
+    @PatchMapping("/{id}/disponibilidade")
+    public ResponseEntity<Map<String, Object>> alterarDisponibilidade(@PathVariable Long id, @RequestBody Map<String, Boolean> request) {
+        try {
+            Boolean disponivel = request.get("disponivel");
+            if (disponivel == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            produtoService.alterarDisponibilidade(id, disponivel);
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("produtoId", id);
+            response.put("disponivel", disponivel);
+            response.put("message", "Disponibilidade atualizada com sucesso");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Buscar produtos por categoria", description = "Retorna todos os produtos disponíveis de uma categoria específica.")
+    @GetMapping("/categoria/{categoria}")
+    public List<Produto> buscarPorCategoria(@PathVariable String categoria) {
+        return produtoService.buscarPorCategoria(categoria);
     }
 }

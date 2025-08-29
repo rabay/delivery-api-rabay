@@ -72,7 +72,7 @@ class PedidoControllerTest {
         pedido.setId(1L);
         when(pedidoService.buscarPorClienteComItens(1L)).thenReturn(java.util.List.of(pedido));
         
-        mockMvc.perform(get("/api/pedidos/cliente/1"))
+        mockMvc.perform(get("/api/clientes/1/pedidos"))
                 .andExpect(status().isOk());
                 
         verify(pedidoService).buscarPorClienteComItens(1L);

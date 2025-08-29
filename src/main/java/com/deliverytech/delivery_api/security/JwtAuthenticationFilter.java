@@ -17,8 +17,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -32,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "/health",
         "/info",
         "/actuator/",
-        "/h2-console/",
+        "/db/**",
         "/v3/api-docs",
         "/swagger-ui/",
         "/swagger-resources/",
@@ -58,19 +60,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         var token = this.recoverToken(request);
         if (token != null){
-            var login = jwtUtil.getEmailFromToken(token);
-            UserDetails user = usuarioRepository.findByEmail(login);
-
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                var login = jwtUtil.getEmailFromToken(token);
+                log.debug("Trying to authenticate user with email: {}", login);
+                
+                UserDetails user = usuarioRepository.findByEmail(login);
+                
+                if (user != null) {
+                    log.debug("User found: {}", user.getUsername());
+                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    log.warn("User not found for email: {}", login);
+                }
+            } catch (Exception e) {
+                log.error("Error during JWT authentication", e);
+            }
         }
         filterChain.doFilter(request, response);
     }
 
     private boolean isPublicEndpoint(String requestPath) {
-        return publicEndpoints.stream().anyMatch(endpoint -> 
-            requestPath.startsWith(endpoint) || requestPath.equals(endpoint.substring(0, endpoint.length() - 1))
-        );
+        return publicEndpoints.stream().anyMatch(endpoint -> {
+            if (endpoint.endsWith("/**")) {
+                String prefix = endpoint.substring(0, endpoint.length() - 3);
+                return requestPath.startsWith(prefix);
+            }
+            return requestPath.startsWith(endpoint) || 
+                   (endpoint.endsWith("/") && requestPath.equals(endpoint.substring(0, endpoint.length() - 1)));
+        });
     }
 
     private String recoverToken(HttpServletRequest request){
