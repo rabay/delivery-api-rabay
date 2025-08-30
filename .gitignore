@@ -61,3 +61,6 @@ docs/**/*
 
 .qoder/
 .qoder/**/*
+
+dependency-check-report/
+dependency-check-report/**
