@@ -76,26 +76,6 @@ sequenceDiagram
     SMSS-->>NotifS: SMS enviado
     NotifS-->>PedS: Notificações enviadas
 ```
-    
-    %% Order Persistence
-    PedS->>PedS: calcularValorTotal()
-    PedS->>PedS: gerarNumeroPedido()
-    PedS->>PedR: save(pedido)
-    PedR->>DB: INSERT pedido
-    DB-->>PedR: Pedido salvo
-    PedR-->>PedS: Pedido entity
-    PedS-->>PedC: PedidoResponse
-    PedC-->>Client: 201 Created with PedidoResponse
-    
-    %% Notifications
-    Note over NotifS, SMSS: Notificações Automáticas
-    PedS->>NotifS: notificarNovoPedido(pedido)
-    NotifS->>EmailS: enviarEmailRestaurante(pedido)
-    NotifS->>SMSS: enviarSMSCliente(confirmacao)
-    EmailS-->>NotifS: Email enviado
-    SMSS-->>NotifS: SMS enviado
-    NotifS-->>PedS: Notificações enviadas
-```
 
 ## Fluxo de Consulta de Relatórios
 
@@ -216,21 +196,25 @@ sequenceDiagram
 ## Descrição dos Fluxos
 
 ### 1. Fluxo de Autenticação e Criação de Pedido
+
 - Demonstra o processo completo desde login até criação de pedido
 - Inclui validação JWT e regras de negócio
 - Mostra as validações em cascata (cliente, restaurante, produtos)
 
 ### 2. Fluxo de Consulta de Relatórios
+
 - Mostra como funciona a autorização por role (ADMIN)
 - Demonstra consultas paralelas para performance
 - Inclui agregação de dados de múltiplas fontes
 
 ### 3. Fluxo de Registro de Usuário
+
 - Processo de criação de nova conta
 - Validação de email duplicado
 - Criptografia de senha e geração de token
 
 ### 4. Fluxo de Atualização de Status do Pedido
+
 - Demonstra autorização por role específica
 - Validação de transições de status
 - Tratamento de erros e exceções
