@@ -1,5 +1,20 @@
-
 # Dockerfile multi-stage otimizado para aplicação Spring Boot
+
+# ----------- TEST STAGE -----------
+# This stage runs unit tests that don't require Testcontainers
+FROM maven:3.9.6-eclipse-temurin-21 AS tester
+WORKDIR /app
+
+# Copia arquivos essenciais para dependências (melhor cache)
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copia o restante do código
+COPY src src
+COPY config config
+
+# Run only unit tests that don't require Testcontainers
+RUN mvn clean test -Dtest="*ServiceImplTest,*MapperTest,*ModelTest" -DfailIfNoTests=false
 
 # ----------- BUILDER STAGE -----------
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
@@ -11,14 +26,14 @@ RUN mvn dependency:go-offline -B
 
 # Copia o restante do código
 COPY src src
+COPY config config
 
-# Compila o projeto (gera o jar na pasta target)
+# Compila o projeto (gera o jar na pasta target) incluindo testes
 RUN mvn clean package -DskipTests
 
 # ----------- RUNTIME STAGE -----------
 FROM eclipse-temurin:21-jre-jammy AS runtime
 WORKDIR /app
-
 
 # Cria usuário não-root para rodar a aplicação
 RUN useradd -m spring && mkdir /app/logs && chown -R spring:spring /app
@@ -35,7 +50,7 @@ USER spring
 # Variáveis de ambiente recomendadas
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 
-# Expondo porta padrão Spring Boot
+# Exponindo porta padrão Spring Boot
 EXPOSE 8080
 
 # Healthcheck para endpoint /health da aplicação

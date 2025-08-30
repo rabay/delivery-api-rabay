@@ -1,14 +1,19 @@
 package com.deliverytech.delivery_api.repository;
 
+import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.deliverytech.delivery_api.model.Restaurante;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-class RestauranteRepositoryTest {
+// Remove @DataJpaTest since we're using @SpringBootTest in BaseIntegrationTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers
+class RestauranteRepositoryTest extends BaseIntegrationTest {
     @Autowired
     private RestauranteRepository restauranteRepository;
 

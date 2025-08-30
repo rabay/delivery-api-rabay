@@ -1,10 +1,12 @@
 package com.deliverytech.delivery_api.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,18 +31,17 @@ public class Pedido {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valorTotal;
-    
+
     @Column(unique = true, length = 50)
     private String numeroPedido;
-    
+
     @Column(precision = 10, scale = 2)
     private BigDecimal subtotal;
-    
+
     @Column(length = 500)
     private String observacoes;
 
-    @Embedded
-    private Endereco enderecoEntrega;
+    @Embedded private Endereco enderecoEntrega;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,7 +50,7 @@ public class Pedido {
     @Column(nullable = false)
     @Builder.Default
     private LocalDateTime dataPedido = LocalDateTime.now();
-    
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean excluido = false;
@@ -57,7 +58,7 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     @Builder.Default
     private List<ItemPedido> itens = new java.util.ArrayList<>();
-    
+
     // Helper methods for bidirectional relationship management
     public void addItem(ItemPedido item) {
         if (itens == null) {
@@ -66,7 +67,7 @@ public class Pedido {
         itens.add(item);
         item.setPedido(this);
     }
-    
+
     public void removeItem(ItemPedido item) {
         if (itens != null) {
             itens.remove(item);

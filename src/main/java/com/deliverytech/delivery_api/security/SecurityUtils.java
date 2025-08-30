@@ -1,6 +1,7 @@
 package com.deliverytech.delivery_api.security;
 
 import com.deliverytech.delivery_api.model.Usuario;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -23,9 +24,7 @@ public class SecurityUtils {
     }
 
     public static boolean hasRole(String role) {
-        return getCurrentUser()
-                .map(u -> u.getRole().name().equals(role))
-                .orElse(false);
+        return getCurrentUser().map(u -> u.getRole().name().equals(role)).orElse(false);
     }
 
     public static boolean isRestaurante() {

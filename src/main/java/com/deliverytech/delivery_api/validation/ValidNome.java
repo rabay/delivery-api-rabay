@@ -11,46 +11,31 @@ import java.lang.annotation.Target;
 
 /**
  * Anotação personalizada para validar nomes próprios.
- * 
- * Verifica:
- * - Não pode conter números
- * - Não pode conter caracteres especiais (exceto acentos, hífens e apostrofes)
- * - Não pode ter espaços consecutivos
- * - Não pode começar ou terminar com espaço
- * - Comprimento entre 2 e 100 caracteres
- * 
- * Exemplo de uso:
- * @ValidNome
- * private String nome;
+ *
+ * <p>Verifica: - Não pode conter números - Não pode conter caracteres especiais (exceto acentos,
+ * hífens e apostrofes) - Não pode ter espaços consecutivos - Não pode começar ou terminar com
+ * espaço - Comprimento entre 2 e 100 caracteres
+ *
+ * <p>Exemplo de uso: @ValidNome private String nome;
  */
 @Documented
 @Constraint(validatedBy = NomeValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidNome {
-    
-    /**
-     * Mensagem de erro padrão exibida quando a validação falha
-     */
+
+    /** Mensagem de erro padrão exibida quando a validação falha */
     String message() default "Nome deve conter apenas letras, acentos, hífens e apostrofes";
-    
-    /**
-     * Comprimento mínimo do nome
-     */
+
+    /** Comprimento mínimo do nome */
     int min() default 2;
-    
-    /**
-     * Comprimento máximo do nome
-     */
+
+    /** Comprimento máximo do nome */
     int max() default 100;
-    
-    /**
-     * Grupos de validação - permite agrupar validações
-     */
+
+    /** Grupos de validação - permite agrupar validações */
     Class<?>[] groups() default {};
-    
-    /**
-     * Payload - permite anexar metadados à validação
-     */
+
+    /** Payload - permite anexar metadados à validação */
     Class<? extends Payload>[] payload() default {};
 }

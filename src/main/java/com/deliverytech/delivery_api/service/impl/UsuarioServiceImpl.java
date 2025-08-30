@@ -1,10 +1,14 @@
 package com.deliverytech.delivery_api.service.impl;
 
 import com.deliverytech.delivery_api.dto.request.RegisterRequest;
+import com.deliverytech.delivery_api.exception.EmailJaCadastradoException;
+import com.deliverytech.delivery_api.exception.UsuarioNaoEncontradoException;
 import com.deliverytech.delivery_api.model.Usuario;
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
 import com.deliverytech.delivery_api.service.UsuarioService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,18 +40,19 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario salvar(RegisterRequest request) {
         // Check if email already exists
         if (usuarioRepository.findUsuarioByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email já cadastrado: " + request.getEmail());
+            throw new EmailJaCadastradoException(request.getEmail());
         }
 
-        Usuario usuario = Usuario.builder()
-            .nome(request.getNome())
-            .email(request.getEmail())
-            .senha(passwordEncoder.encode(request.getSenha()))
-            .role(request.getRole())
-            .ativo(true)
-            .dataCriacao(LocalDateTime.now())
-            .restauranteId(request.getRestauranteId())
-            .build();
+        Usuario usuario =
+                Usuario.builder()
+                        .nome(request.getNome())
+                        .email(request.getEmail())
+                        .senha(passwordEncoder.encode(request.getSenha()))
+                        .role(request.getRole())
+                        .ativo(true)
+                        .dataCriacao(LocalDateTime.now())
+                        .restauranteId(request.getRestauranteId())
+                        .build();
 
         return usuarioRepository.save(usuario);
     }
@@ -72,13 +77,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario atualizar(Long id, RegisterRequest request) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + id));
+        Usuario usuario =
+                usuarioRepository
+                        .findById(id)
+                        .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
 
         // Check if email is being changed and if it already exists
         if (!usuario.getEmail().equals(request.getEmail())) {
             if (usuarioRepository.findUsuarioByEmail(request.getEmail()).isPresent()) {
-                throw new RuntimeException("Email já cadastrado: " + request.getEmail());
+                throw new EmailJaCadastradoException(request.getEmail());
             }
             usuario.setEmail(request.getEmail());
         }
@@ -86,7 +93,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setNome(request.getNome());
         usuario.setRole(request.getRole());
         usuario.setRestauranteId(request.getRestauranteId());
-        
+
         // Only encode password if it's being changed
         if (request.getSenha() != null && !request.getSenha().trim().isEmpty()) {
             usuario.setSenha(passwordEncoder.encode(request.getSenha()));
@@ -97,9 +104,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public void deletar(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + id));
-        
+        Usuario usuario =
+                usuarioRepository
+                        .findById(id)
+                        .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+
         usuario.setAtivo(false); // Soft delete
         usuarioRepository.save(usuario);
     }

@@ -17,16 +17,16 @@ public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secret;
-    
+
     @Value("${jwt.expiration}")
     private Long expiration;
-    
+
     // Gera um token JWT para o usuário
     public String gerarToken(String email) {
         Date agora = new Date();
         Date dataExpiracao = new Date(agora.getTime() + expiration);
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secret));
-        
+
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(agora)
@@ -34,22 +34,18 @@ public class JwtUtil {
                 .signWith(key)
                 .compact();
     }
-    
+
     // Valida um token JWT e retorna as claims
     public Claims validarToken(String token) {
         try {
             SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secret));
 
-            return Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
         } catch (Exception e) {
             return null; // Token inválido
         }
     }
-    
+
     // Extrai o email (subject) do token
     public String getEmailFromToken(String token) {
         Claims claims = validarToken(token);

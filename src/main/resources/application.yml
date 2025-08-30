@@ -1,0 +1,81 @@
+spring:
+  application:
+    name: delivery-api
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:mysql://db:3306/deliverydb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: deliveryuser
+    password: deliverypass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+jwt:
+  secret: my-secret-keyQWERTYUIOPASDFGHJKLZXCVBNMQWERTY1
+  expiration: 86400000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:mysql://db:3306/deliverydb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: deliveryuser
+    password: deliverypass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+jwt:
+  secret: my-secret-keyQWERTYUIOPASDFGHJKLZXCVBNMQWERTY1
+  expiration: 86400000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://db:3306/deliverydb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: deliveryuser
+    password: deliverypass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+jwt:
+  secret: my-secret-keyQWERTYUIOPASDFGHJKLZXCVBNMQWERTY1
+  expiration: 86400000
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.deliverytech.delivery_api.security: DEBUG

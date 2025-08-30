@@ -1,6 +1,8 @@
 package com.deliverytech.delivery_api.service;
 
 import com.deliverytech.delivery_api.dto.request.RegisterRequest;
+import com.deliverytech.delivery_api.exception.EmailJaCadastradoException;
+import com.deliverytech.delivery_api.exception.UsuarioNaoEncontradoException;
 import com.deliverytech.delivery_api.model.Role;
 import com.deliverytech.delivery_api.model.Usuario;
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
@@ -104,9 +106,8 @@ class UsuarioServiceImplTest {
                 .thenReturn(Optional.of(testUser));
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class,
+        assertThrows(EmailJaCadastradoException.class,
                 () -> usuarioService.salvar(registerRequest));
-        assertThat(exception.getMessage()).contains("Email já cadastrado");
         verify(usuarioRepository).findUsuarioByEmail(registerRequest.getEmail());
         verify(usuarioRepository, never()).save(any());
     }
@@ -175,9 +176,8 @@ class UsuarioServiceImplTest {
         when(usuarioRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class,
+        assertThrows(UsuarioNaoEncontradoException.class,
                 () -> usuarioService.deletar(userId));
-        assertThat(exception.getMessage()).contains("Usuário não encontrado");
         verify(usuarioRepository).findById(userId);
         verify(usuarioRepository, never()).save(any());
     }

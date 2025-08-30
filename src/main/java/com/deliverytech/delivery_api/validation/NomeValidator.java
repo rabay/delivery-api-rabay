@@ -6,33 +6,27 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 /**
- * Implementa a interface para validar a anotação @ValidNome
- * Valida strings que representam nomes próprios
+ * Implementa a interface para validar a anotação @ValidNome Valida strings que representam nomes
+ * próprios
  */
 public class NomeValidator implements ConstraintValidator<ValidNome, String> {
 
     // Padrão regex que permite letras (incluindo acentuadas), espaços, hífens e apostrofes
-    private static final String NOME_PATTERN = 
-        "^[\\p{L}][\\p{L}\\s'-]*[\\p{L}]$|^[\\p{L}]$";
-    
+    private static final String NOME_PATTERN = "^[\\p{L}][\\p{L}\\s'-]*[\\p{L}]$|^[\\p{L}]$";
+
     private static final Pattern pattern = Pattern.compile(NOME_PATTERN);
-    
+
     private int minLength;
     private int maxLength;
 
-    /**
-     * Inicializa o validador com os parâmetros da anotação
-     */
+    /** Inicializa o validador com os parâmetros da anotação */
     @Override
     public void initialize(ValidNome constraintAnnotation) {
         this.minLength = constraintAnnotation.min();
         this.maxLength = constraintAnnotation.max();
     }
 
-    /**
-     * Método que contém a regra de validação
-     * 'value' é o valor do campo anotado com @ValidNome
-     */
+    /** Método que contém a regra de validação 'value' é o valor do campo anotado com @ValidNome */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
@@ -66,8 +60,10 @@ public class NomeValidator implements ConstraintValidator<ValidNome, String> {
         }
 
         // Verifica se não começa ou termina com hífen ou apostrofe
-        if (trimmedValue.startsWith("-") || trimmedValue.endsWith("-") ||
-            trimmedValue.startsWith("'") || trimmedValue.endsWith("'")) {
+        if (trimmedValue.startsWith("-")
+                || trimmedValue.endsWith("-")
+                || trimmedValue.startsWith("'")
+                || trimmedValue.endsWith("'")) {
             return false;
         }
 
@@ -81,7 +77,8 @@ public class NomeValidator implements ConstraintValidator<ValidNome, String> {
             return false;
         }
 
-        // Verifica se todas as palavras têm pelo menos 1 caractere (não há espaços seguidos de hífen/apostrofe)
+        // Verifica se todas as palavras têm pelo menos 1 caractere (não há espaços seguidos de
+        // hífen/apostrofe)
         String[] words = trimmedValue.split("\\s+");
         for (String word : words) {
             if (word.isEmpty() || word.matches("^[-']+$")) {

@@ -1,99 +1,95 @@
 package com.deliverytech.delivery_api.security;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
 
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final JwtUtil jwtUtil;
+    private final UsuarioRepository usuarioRepository;
 
-    // Lista de endpoints públicos que não precisam de autenticação
-    private final List<String> publicEndpoints = Arrays.asList(
-        "/api/auth/",
-        "/health",
-        "/info",
-        "/actuator/",
-        "/db/**",
-        "/v3/api-docs",
-        "/swagger-ui/",
-        "/swagger-resources/",
-        "/webjars/",
-        "/api-docs/",
-        "/configuration/"
-    );
+    // All authorization decisions are handled by SecurityConfig
+    // This filter only handles JWT authentication
+
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UsuarioRepository usuarioRepository) {
+        this.jwtUtil = jwtUtil;
+        this.usuarioRepository = usuarioRepository;
+    }
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request, 
-        HttpServletResponse response, 
-        FilterChain filterChain
-    ) throws ServletException, IOException {
-        
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
         String requestPath = request.getRequestURI();
-        
-        // Pular autenticação para endpoints públicos
-        if (isPublicEndpoint(requestPath)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        
+        String method = request.getMethod();
+
+        log.debug("Processing request: {} {}", method, requestPath);
+
+        // Let Spring Security handle authorization decisions entirely
+        // This filter only processes authentication for requests that require it
+
         var token = this.recoverToken(request);
-        if (token != null){
+        if (token != null) {
             try {
                 var login = jwtUtil.getEmailFromToken(token);
                 log.debug("Trying to authenticate user with email: {}", login);
-                
+
                 UserDetails user = usuarioRepository.findByEmail(login);
-                
+
                 if (user != null) {
-                    log.debug("User found: {}", user.getUsername());
-                    var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    log.debug(
+                            "User found: {}, authorities: {}",
+                            user.getUsername(),
+                            user.getAuthorities());
+                    var authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    user, null, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.debug("Authentication set in SecurityContext");
                 } else {
                     log.warn("User not found for email: {}", login);
                 }
             } catch (Exception e) {
                 log.error("Error during JWT authentication", e);
             }
+        } else {
+            log.debug("No JWT token found in request");
         }
+
+        // Log the current authentication status
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            log.debug(
+                    "Current authentication: {} with authorities: {}",
+                    authentication.getPrincipal(),
+                    authentication.getAuthorities());
+        } else {
+            log.debug("No authentication found in SecurityContext");
+        }
+
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPublicEndpoint(String requestPath) {
-        return publicEndpoints.stream().anyMatch(endpoint -> {
-            if (endpoint.endsWith("/**")) {
-                String prefix = endpoint.substring(0, endpoint.length() - 3);
-                return requestPath.startsWith(prefix);
-            }
-            return requestPath.startsWith(endpoint) || 
-                   (endpoint.endsWith("/") && requestPath.equals(endpoint.substring(0, endpoint.length() - 1)));
-        });
-    }
-
-    private String recoverToken(HttpServletRequest request){
+    private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-        if(authHeader == null) return null;
+        if (authHeader == null) return null;
         return authHeader.replace("Bearer ", "");
     }
 }

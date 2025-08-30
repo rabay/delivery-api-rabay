@@ -22,7 +22,7 @@ API backend desenvolvida em Java 21 com Spring Boot 3.2.x, servindo como base ro
 - **Spring Boot 3.2.x**
 - **Maven**
 - **Spring MVC, Spring Data JPA, Spring Security**
-- **H2 Database** (dev/test)
+- **MySQL Database** (dev/test/production)
 - **Thymeleaf** (templates)
 - **Docker** (multi-stage)
 
@@ -59,7 +59,6 @@ API backend desenvolvida em Java 21 com Spring Boot 3.2.x, servindo como base ro
 4. **Acesso:**
    - API: [http://localhost:8080/](http://localhost:8080/)
    - Health: [http://localhost:8080/health](http://localhost:8080/health)
-   - H2 Console: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
    - Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ## Estrutura de Pastas
@@ -98,7 +97,7 @@ API backend desenvolvida em Java 21 com Spring Boot 3.2.x, servindo como base ro
 - Testes unitários com JUnit 5 e Mockito
 - Estrutura de testes espelhando pacotes de produção
 - Cobertura mínima recomendada: 80%
-- Testes de integração com banco real (opcional)
+- Testes de integração com banco real (MySQL via Testcontainers)
 - Execução: `mvn test`
 
 ## Contribuindo

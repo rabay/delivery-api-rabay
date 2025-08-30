@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.service;
 
+import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.dto.request.ClienteRequest;
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
@@ -7,8 +8,10 @@ import com.deliverytech.delivery_api.dto.response.ClienteResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
@@ -16,9 +19,11 @@ import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class PedidoServiceTest {
+// Remove @DataJpaTest since we're using @SpringBootTest in BaseIntegrationTest
+@Import({com.deliverytech.delivery_api.service.impl.PedidoServiceImpl.class, com.deliverytech.delivery_api.service.impl.ClienteServiceImpl.class, com.deliverytech.delivery_api.service.impl.RestauranteServiceImpl.class, com.deliverytech.delivery_api.service.impl.ProdutoServiceImpl.class, com.deliverytech.delivery_api.mapper.PedidoMapper.class, com.deliverytech.delivery_api.mapper.ClienteMapper.class, com.deliverytech.delivery_api.mapper.RestauranteMapper.class, com.deliverytech.delivery_api.mapper.ProdutoMapper.class})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers
+class PedidoServiceTest extends BaseIntegrationTest {
     @Autowired
     private PedidoService pedidoService;
     

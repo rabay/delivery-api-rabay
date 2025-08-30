@@ -1,10 +1,13 @@
 package com.deliverytech.delivery_api.repository;
 
+import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.model.Cliente;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.LocalDateTime;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,8 +17,13 @@ import com.deliverytech.delivery_api.projection.RelatorioVendas;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-@DataJpaTest
-class PedidoRepositoryTest {
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
+// Remove @DataJpaTest since we're using @SpringBootTest in BaseIntegrationTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers
+class PedidoRepositoryTest extends BaseIntegrationTest {
     @Autowired
     private PedidoRepository pedidoRepository;
     @Autowired
@@ -23,6 +31,9 @@ class PedidoRepositoryTest {
 
     @Autowired
     private RestauranteRepository restauranteRepository;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     void testCalcularTotalVendasPorRestaurante() {

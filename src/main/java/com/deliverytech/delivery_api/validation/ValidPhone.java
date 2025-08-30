@@ -11,36 +11,25 @@ import java.lang.annotation.Target;
 
 /**
  * Anotação personalizada para validar números de telefone brasileiros.
- * 
- * Aceita formatos:
- * - (11) 99999-9999 (celular com DDD)
- * - (11) 9999-9999 (fixo com DDD)
- * - 11999999999 (celular sem formatação)
- * - 1199999999 (fixo sem formatação)
- * - +5511999999999 (com código do país)
- * 
- * Exemplo de uso:
- * @ValidPhone
- * private String telefone;
+ *
+ * <p>Aceita formatos: - (11) 99999-9999 (celular com DDD) - (11) 9999-9999 (fixo com DDD) -
+ * 11999999999 (celular sem formatação) - 1199999999 (fixo sem formatação) - +5511999999999 (com
+ * código do país)
+ *
+ * <p>Exemplo de uso: @ValidPhone private String telefone;
  */
 @Documented
 @Constraint(validatedBy = PhoneValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidPhone {
-    
-    /**
-     * Mensagem de erro padrão exibida quando a validação falha
-     */
+
+    /** Mensagem de erro padrão exibida quando a validação falha */
     String message() default "Telefone deve ter um formato válido brasileiro";
-    
-    /**
-     * Grupos de validação - permite agrupar validações
-     */
+
+    /** Grupos de validação - permite agrupar validações */
     Class<?>[] groups() default {};
-    
-    /**
-     * Payload - permite anexar metadados à validação
-     */
+
+    /** Payload - permite anexar metadados à validação */
     Class<? extends Payload>[] payload() default {};
 }

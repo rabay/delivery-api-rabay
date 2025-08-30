@@ -1,7 +1,9 @@
 package com.deliverytech.delivery_api.model;
 
 import jakarta.persistence.*;
+
 import lombok.*;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

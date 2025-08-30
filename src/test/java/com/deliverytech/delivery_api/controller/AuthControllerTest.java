@@ -1,7 +1,9 @@
 package com.deliverytech.delivery_api.controller;
 
+import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.deliverytech.delivery_api.dto.request.LoginRequest;
 import com.deliverytech.delivery_api.dto.request.RegisterRequest;
+import com.deliverytech.delivery_api.exception.EmailJaCadastradoException;
 import com.deliverytech.delivery_api.model.Role;
 import com.deliverytech.delivery_api.model.Usuario;
 import com.deliverytech.delivery_api.security.JwtUtil;
@@ -12,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -29,11 +30,11 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+// Remove @SpringBootTest since we're extending BaseIntegrationTest which already has it
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(JwtTestUtils.class)
-class AuthControllerTest {
+class AuthControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -149,16 +150,16 @@ class AuthControllerTest {
     }
 
     @Test
-    void register_WithDuplicateEmail_ShouldReturnBadRequest() throws Exception {
+    void register_WithDuplicateEmail_ShouldReturnConflict() throws Exception {
         // Given
         when(usuarioService.salvar(any(RegisterRequest.class)))
-                .thenThrow(new RuntimeException("Email já cadastrado"));
+                .thenThrow(new EmailJaCadastradoException("Email já cadastrado"));
 
         // When & Then
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
 
         verify(usuarioService).salvar(any(RegisterRequest.class));
     }

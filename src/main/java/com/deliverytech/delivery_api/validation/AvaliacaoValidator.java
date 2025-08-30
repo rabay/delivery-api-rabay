@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Implementa a interface para validar a anotação @ValidAvaliacao
- * Valida valores BigDecimal que representam avaliações/ratings
+ * Implementa a interface para validar a anotação @ValidAvaliacao Valida valores BigDecimal que
+ * representam avaliações/ratings
  */
 public class AvaliacaoValidator implements ConstraintValidator<ValidAvaliacao, BigDecimal> {
 
@@ -16,9 +16,7 @@ public class AvaliacaoValidator implements ConstraintValidator<ValidAvaliacao, B
     private BigDecimal maxValue;
     private BigDecimal increment;
 
-    /**
-     * Inicializa o validador com os parâmetros da anotação
-     */
+    /** Inicializa o validador com os parâmetros da anotação */
     @Override
     public void initialize(ValidAvaliacao constraintAnnotation) {
         this.minValue = BigDecimal.valueOf(constraintAnnotation.min());
@@ -27,8 +25,7 @@ public class AvaliacaoValidator implements ConstraintValidator<ValidAvaliacao, B
     }
 
     /**
-     * Método que contém a regra de validação
-     * 'value' é o valor do campo anotado com @ValidAvaliacao
+     * Método que contém a regra de validação 'value' é o valor do campo anotado com @ValidAvaliacao
      */
     @Override
     public boolean isValid(BigDecimal value, ConstraintValidatorContext context) {
@@ -51,7 +48,7 @@ public class AvaliacaoValidator implements ConstraintValidator<ValidAvaliacao, B
 
         // Arredonda para 1 casa decimal para comparação
         BigDecimal rounded = value.setScale(1, RoundingMode.HALF_UP);
-        
+
         // Verifica se o valor é exatamente igual ao arredondado
         if (value.compareTo(rounded) != 0) {
             return false;
@@ -61,7 +58,7 @@ public class AvaliacaoValidator implements ConstraintValidator<ValidAvaliacao, B
         // Ex: se increment = 0.5, valores válidos são 1.0, 1.5, 2.0, 2.5, etc.
         BigDecimal difference = rounded.subtract(minValue);
         BigDecimal remainder = difference.remainder(increment);
-        
+
         // O resto da divisão deve ser zero (múltiplo exato)
         if (remainder.compareTo(BigDecimal.ZERO) != 0) {
             return false;
@@ -71,9 +68,7 @@ public class AvaliacaoValidator implements ConstraintValidator<ValidAvaliacao, B
         return isValidRatingValue(rounded);
     }
 
-    /**
-     * Verifica se o valor é uma avaliação válida no contexto de sistema de rating
-     */
+    /** Verifica se o valor é uma avaliação válida no contexto de sistema de rating */
     private boolean isValidRatingValue(BigDecimal rating) {
         // Para flexibilidade, aceita qualquer valor que passed as outras validações
         // As regras de negócio específicas podem ser implementadas nas anotações

@@ -1,9 +1,11 @@
 package com.deliverytech.delivery_api.dto.request;
 
 import jakarta.validation.constraints.*;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
 import java.math.BigDecimal;
 
 @Data
@@ -33,7 +35,7 @@ public class RestauranteRequest {
 
     @Pattern(regexp = "\\d{10,11}", message = "Telefone deve ter 10 ou 11 dígitos")
     private String telefone;
-    
+
     @Email(message = "Email deve ter formato válido")
     @Size(max = 100, message = "Email não pode ter mais de 100 caracteres")
     private String email;

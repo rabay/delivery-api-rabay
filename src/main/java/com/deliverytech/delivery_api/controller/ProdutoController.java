@@ -1,19 +1,24 @@
-
 package com.deliverytech.delivery_api.controller;
+
+import com.deliverytech.delivery_api.dto.request.ProdutoRequest;
+import com.deliverytech.delivery_api.dto.response.ProdutoResponse;
+import com.deliverytech.delivery_api.service.ProdutoService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import com.deliverytech.delivery_api.model.Produto;
-import com.deliverytech.delivery_api.service.ProdutoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/produtos")
-@Tag(name = "Produtos", description = "Cadastro, consulta e gerenciamento de produtos disponíveis nos restaurantes.")
+@Tag(
+        name = "Produtos",
+        description =
+                "Cadastro, consulta e gerenciamento de produtos disponíveis nos restaurantes.")
 public class ProdutoController {
     private final ProdutoService produtoService;
 
@@ -21,48 +26,70 @@ public class ProdutoController {
         this.produtoService = produtoService;
     }
 
-    @Operation(summary = "Cadastrar novo produto", description = "Cria um novo produto disponível em um restaurante.")
+    @Operation(
+            summary = "Cadastrar novo produto",
+            description = "Cria um novo produto disponível em um restaurante.")
     @PostMapping
-    public ResponseEntity<Produto> criar(@RequestBody Produto produto) {
-        Produto novo = produtoService.cadastrar(produto);
+    public ResponseEntity<ProdutoResponse> criar(@RequestBody ProdutoRequest produto) {
+        ProdutoResponse novo = produtoService.cadastrar(produto);
         return ResponseEntity.status(201).body(novo);
     }
 
-    @Operation(summary = "Listar produtos disponíveis", description = "Retorna todos os produtos disponíveis cadastrados.")
+    @Operation(
+            summary = "Listar produtos disponíveis",
+            description = "Retorna todos os produtos disponíveis cadastrados.")
     @GetMapping
-    public List<Produto> listar() {
-        return produtoService.buscarDisponiveis();
+    public ResponseEntity<List<ProdutoResponse>> listar() {
+        List<ProdutoResponse> produtos = produtoService.buscarDisponiveis();
+        return ResponseEntity.ok(produtos);
     }
 
-    @Operation(summary = "Buscar produto por ID", description = "Consulta um produto pelo seu identificador único.")
+    @Operation(
+            summary = "Buscar produto por ID",
+            description = "Consulta um produto pelo seu identificador único.")
     @GetMapping("/{id}")
-    public ResponseEntity<Produto> buscarPorId(@PathVariable Long id) {
-        // Supondo que exista método buscarPorId no service
-        return produtoService.buscarPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-    }
-
-    @Operation(summary = "Atualizar produto", description = "Atualiza os dados de um produto existente.")
-    @PutMapping("/{id}")
-    public ResponseEntity<Produto> atualizar(@PathVariable Long id, @RequestBody Produto produto) {
-        if (!id.equals(produto.getId())) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Long id) {
+        try {
+            ProdutoResponse produto = produtoService.buscarProdutoPorId(id);
+            return ResponseEntity.ok(produto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
-        Produto atualizado = produtoService.cadastrar(produto);
-        return ResponseEntity.ok(atualizado);
     }
 
-    @Operation(summary = "Deletar produto", description = "Remove (soft delete) um produto pelo seu ID.")
+    @Operation(
+            summary = "Atualizar produto",
+            description = "Atualiza os dados de um produto existente.")
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoResponse> atualizar(
+            @PathVariable Long id, @RequestBody ProdutoRequest produto) {
+        try {
+            ProdutoResponse atualizado = produtoService.atualizar(id, produto);
+            return ResponseEntity.ok(atualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(
+            summary = "Deletar produto",
+            description = "Remove (soft delete) um produto pelo seu ID.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        produtoService.deletar(id);
-        return ResponseEntity.noContent().build();
+        try {
+            produtoService.deletar(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @Operation(summary = "Alterar disponibilidade do produto", description = "Alterna a disponibilidade de um produto (ativar/desativar).")
+    @Operation(
+            summary = "Alterar disponibilidade do produto",
+            description = "Alterna a disponibilidade de um produto (ativar/desativar).")
     @PatchMapping("/{id}/disponibilidade")
-    public ResponseEntity<Map<String, Object>> alterarDisponibilidade(@PathVariable Long id, @RequestBody Map<String, Boolean> request) {
+    public ResponseEntity<Map<String, Object>> alterarDisponibilidade(
+            @PathVariable Long id, @RequestBody Map<String, Boolean> request) {
         try {
             Boolean disponivel = request.get("disponivel");
             if (disponivel == null) {
@@ -79,9 +106,13 @@ public class ProdutoController {
         }
     }
 
-    @Operation(summary = "Buscar produtos por categoria", description = "Retorna todos os produtos disponíveis de uma categoria específica.")
+    @Operation(
+            summary = "Buscar produtos por categoria",
+            description = "Retorna todos os produtos disponíveis de uma categoria específica.")
     @GetMapping("/categoria/{categoria}")
-    public List<Produto> buscarPorCategoria(@PathVariable String categoria) {
-        return produtoService.buscarPorCategoria(categoria);
+    public ResponseEntity<List<ProdutoResponse>> buscarPorCategoria(
+            @PathVariable String categoria) {
+        List<ProdutoResponse> produtos = produtoService.buscarProdutosPorCategoria(categoria);
+        return ResponseEntity.ok(produtos);
     }
 }

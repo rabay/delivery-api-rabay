@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.controller;
 
+import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,13 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
-import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import static com.deliverytech.delivery_api.controller.JsonUtils.extractId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-public class PedidoControllerIntegrationTest {
+@Testcontainers
+class PedidoControllerIntegrationTest extends BaseIntegrationTest {
 
     @LocalServerPort
     private int port;
@@ -104,21 +107,21 @@ public class PedidoControllerIntegrationTest {
         assertThat(clienteResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         // extrair id simples do body (assume JSON com campo id)
         String body = clienteResp.getBody();
-        Long clienteId = JsonUtils.extractId(body);
+        Long clienteId = extractId(body);
 
         // Criar restaurante
         String restauranteJson = "{\"nome\": \"Rest Int\", \"categoria\": \"Geral\", \"ativo\": true, \"avaliacao\": 4.0 }";
         HttpEntity<String> restReq = new HttpEntity<>(restauranteJson, headers);
         ResponseEntity<String> restResp = restTemplate.postForEntity("http://localhost:" + port + "/api/restaurantes", restReq, String.class);
         assertThat(restResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        Long restauranteId = JsonUtils.extractId(restResp.getBody());
+        Long restauranteId = extractId(restResp.getBody());
 
         // Criar produto
-        String produtoJson = "{\"nome\": \"Prod Int\", \"categoria\": \"Geral\", \"preco\": 9.9, \"disponivel\": true, \"restaurante\": { \"id\": " + restauranteId + " } }";
+        String produtoJson = "{\"nome\": \"Prod Int\", \"categoria\": \"Geral\", \"preco\": 9.9, \"disponivel\": true, \"restauranteId\": " + restauranteId + " }";
         HttpEntity<String> prodReq = new HttpEntity<>(produtoJson, headers);
         ResponseEntity<String> prodResp = restTemplate.postForEntity("http://localhost:" + port + "/api/produtos", prodReq, String.class);
         assertThat(prodResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        Long produtoId = JsonUtils.extractId(prodResp.getBody());
+        Long produtoId = extractId(prodResp.getBody());
 
         // Criar pedido
         String pedidoJson = "{\"clienteId\": " + clienteId + ", \"restauranteId\": " + restauranteId + ", \"enderecoEntrega\": { \"rua\": \"R\", \"numero\": \"1\", \"bairro\": \"B\", \"cidade\": \"C\", \"estado\": \"S\", \"cep\": \"01000-000\" }, \"itens\": [{ \"produtoId\": " + produtoId + ", \"quantidade\": 1 }] }";

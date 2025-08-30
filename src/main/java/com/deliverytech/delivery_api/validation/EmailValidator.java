@@ -6,24 +6,20 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 /**
- * Implementa a interface para validar a anotação @ValidEmail
- * Valida strings que representam endereços de email
+ * Implementa a interface para validar a anotação @ValidEmail Valida strings que representam
+ * endereços de email
  */
 public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
 
     // Padrão regex para validação de email mais rigorosa
-    private static final String EMAIL_PATTERN = 
-        "^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-    
+    private static final String EMAIL_PATTERN = "^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+
     private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-    
+
     // Comprimento máximo permitido para emails (RFC 5321)
     private static final int MAX_EMAIL_LENGTH = 255;
 
-    /**
-     * Método que contém a regra de validação
-     * 'value' é o valor do campo anotado com @ValidEmail
-     */
+    /** Método que contém a regra de validação 'value' é o valor do campo anotado com @ValidEmail */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
@@ -63,8 +59,10 @@ public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
         }
 
         // Não pode começar ou terminar com ponto
-        if (localPart.startsWith(".") || localPart.endsWith(".") ||
-            domainPart.startsWith(".") || domainPart.endsWith(".")) {
+        if (localPart.startsWith(".")
+                || localPart.endsWith(".")
+                || domainPart.startsWith(".")
+                || domainPart.endsWith(".")) {
             return false;
         }
 

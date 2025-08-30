@@ -4,5 +4,6 @@ import java.math.BigDecimal;
 
 public interface FaturamentoPorCategoriaProjection {
     String getCategoria();
+
     BigDecimal getTotalFaturado();
 }

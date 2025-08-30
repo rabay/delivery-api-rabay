@@ -1,12 +1,14 @@
 package com.deliverytech.delivery_api.controller;
 
-import com.deliverytech.delivery_api.service.RelatorioService;
 import com.deliverytech.delivery_api.projection.RelatorioVendas;
 import com.deliverytech.delivery_api.projection.RelatorioVendasClientes;
 import com.deliverytech.delivery_api.projection.RelatorioVendasProdutos;
+import com.deliverytech.delivery_api.service.RelatorioService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/relatorios")
 public class RelatorioController {
-    @Autowired
-    private RelatorioService relatorioService;
+    @Autowired private RelatorioService relatorioService;
 
     @GetMapping("/vendas-por-restaurante")
     public List<RelatorioVendas> vendasPorRestaurante(

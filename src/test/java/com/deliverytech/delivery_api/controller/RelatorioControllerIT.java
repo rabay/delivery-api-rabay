@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.controller;
 
+import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.model.Pedido;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,8 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-class RelatorioControllerIT {
+class RelatorioControllerIT extends BaseIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired

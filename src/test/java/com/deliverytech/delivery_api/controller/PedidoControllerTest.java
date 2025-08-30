@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.controller;
 
+import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.model.Role;
 import com.deliverytech.delivery_api.service.PedidoService;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class PedidoControllerTest {
+class PedidoControllerTest extends BaseIntegrationTest {
     
     @Autowired
     private MockMvc mockMvc;

@@ -1,17 +1,19 @@
 package com.deliverytech.delivery_api.service.impl;
 
-import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.dto.response.RestauranteResponse;
+import com.deliverytech.delivery_api.mapper.RestauranteMapper;
+import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
 import com.deliverytech.delivery_api.service.RestauranteService;
-import com.deliverytech.delivery_api.mapper.RestauranteMapper;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -19,7 +21,8 @@ public class RestauranteServiceImpl implements RestauranteService {
     private final RestauranteRepository restauranteRepository;
     private final RestauranteMapper restauranteMapper;
 
-    public RestauranteServiceImpl(RestauranteRepository restauranteRepository, RestauranteMapper restauranteMapper) {
+    public RestauranteServiceImpl(
+            RestauranteRepository restauranteRepository, RestauranteMapper restauranteMapper) {
         this.restauranteRepository = restauranteRepository;
         this.restauranteMapper = restauranteMapper;
     }
@@ -80,43 +83,56 @@ public class RestauranteServiceImpl implements RestauranteService {
 
     @Override
     public Restaurante atualizar(Long id, RestauranteRequest atualizado) {
-        return restauranteRepository.findById(id)
-            .map(r -> {
-                r.setNome(atualizado.getNome());
-                r.setCategoria(atualizado.getCategoria());
-                r.setEndereco(atualizado.getEndereco());
-                r.setTaxaEntrega(atualizado.getTaxaEntrega());
-                r.setTelefone(atualizado.getTelefone());
-                r.setEmail(atualizado.getEmail());
-                r.setTempoEntregaMinutos(atualizado.getTempoEntregaMinutos());
-                r.setAvaliacao(atualizado.getAvaliacao());
-                return restauranteRepository.save(r);
-            }).orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+        return restauranteRepository
+                .findById(id)
+                .map(
+                        r -> {
+                            r.setNome(atualizado.getNome());
+                            r.setCategoria(atualizado.getCategoria());
+                            r.setEndereco(atualizado.getEndereco());
+                            r.setTaxaEntrega(atualizado.getTaxaEntrega());
+                            r.setTelefone(atualizado.getTelefone());
+                            r.setEmail(atualizado.getEmail());
+                            r.setTempoEntregaMinutos(atualizado.getTempoEntregaMinutos());
+                            r.setAvaliacao(atualizado.getAvaliacao());
+                            return restauranteRepository.save(r);
+                        })
+                .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
     }
 
     @Override
     public void inativar(Long id) {
-        restauranteRepository.findById(id)
-            .ifPresentOrElse(
-                restaurante -> {
-                    restaurante.setAtivo(false);
-                    restaurante.setExcluido(true);
-                    restauranteRepository.save(restaurante);
-                },
-                () -> {
-                    throw new RuntimeException("Restaurante não encontrado - ID: " + id);
-                }
-            );
+        restauranteRepository
+                .findById(id)
+                .ifPresentOrElse(
+                        restaurante -> {
+                            restaurante.setAtivo(false);
+                            restaurante.setExcluido(true);
+                            restauranteRepository.save(restaurante);
+                        },
+                        () -> {
+                            throw new RuntimeException("Restaurante não encontrado - ID: " + id);
+                        });
     }
 
     @Override
     public BigDecimal calcularTaxaEntrega(Long restauranteId, String cep) {
-        Restaurante restaurante = restauranteRepository.findById(restauranteId)
-            .orElseThrow(() -> new RuntimeException("Restaurante não encontrado - ID: " + restauranteId));
+        Restaurante restaurante =
+                restauranteRepository
+                        .findById(restauranteId)
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "Restaurante não encontrado - ID: "
+                                                        + restauranteId));
         if (!restaurante.isAtivo()) {
             throw new RuntimeException("Restaurante não está disponível para entrega");
         }
         BigDecimal taxaBase = restaurante.getTaxaEntrega();
+        // Handle null taxaEntrega by using a default value
+        if (taxaBase == null) {
+            taxaBase = BigDecimal.ZERO;
+        }
         String primeirosDigitos = cep.substring(0, Math.min(2, cep.length()));
         try {
             int codigoRegiao = Integer.parseInt(primeirosDigitos);
@@ -138,8 +154,13 @@ public class RestauranteServiceImpl implements RestauranteService {
 
     @Override
     public Restaurante alterarStatus(Long id, Boolean ativo) {
-        Restaurante restaurante = restauranteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Restaurante não encontrado - ID: " + id));
+        Restaurante restaurante =
+                restauranteRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "Restaurante não encontrado - ID: " + id));
         restaurante.setAtivo(ativo);
         return restauranteRepository.save(restaurante);
     }
@@ -147,7 +168,8 @@ public class RestauranteServiceImpl implements RestauranteService {
     @Override
     @Transactional(readOnly = true)
     public List<Restaurante> buscarProximos(String cep) {
-    List<Restaurante> restaurantesAtivos = restauranteRepository.findByAtivoTrueAndExcluidoFalse();
+        List<Restaurante> restaurantesAtivos =
+                restauranteRepository.findByAtivoTrueAndExcluidoFalse();
         String primeirosDigitos = cep.substring(0, Math.min(2, cep.length()));
         try {
             int codigoRegiao = Integer.parseInt(primeirosDigitos);
@@ -155,8 +177,8 @@ public class RestauranteServiceImpl implements RestauranteService {
                 return restaurantesAtivos;
             } else {
                 return restaurantesAtivos.stream()
-                    .filter(r -> r.getTaxaEntrega().compareTo(new BigDecimal("10.00")) <= 0)
-                    .toList();
+                        .filter(r -> r.getTaxaEntrega().compareTo(new BigDecimal("10.00")) <= 0)
+                        .toList();
             }
         } catch (NumberFormatException e) {
             return restaurantesAtivos;
@@ -173,13 +195,15 @@ public class RestauranteServiceImpl implements RestauranteService {
             return restauranteRepository.findByCategoriaAndExcluidoFalse(categoria);
         }
         if (categoria == null && ativo != null) {
-            return ativo ? restauranteRepository.findByAtivoTrueAndExcluidoFalse() : restauranteRepository.findByAtivoFalseAndExcluidoFalse();
+            return ativo
+                    ? restauranteRepository.findByAtivoTrueAndExcluidoFalse()
+                    : restauranteRepository.findByAtivoFalseAndExcluidoFalse();
         }
         return restauranteRepository.findByCategoriaAndAtivoAndExcluidoFalse(categoria, ativo);
     }
 
     // ===== NOVOS MÉTODOS COM DTOs =====
-    
+
     @Override
     public RestauranteResponse cadastrarRestaurante(RestauranteRequest restauranteRequest) {
         Restaurante restaurante = restauranteMapper.toEntity(restauranteRequest);
@@ -190,21 +214,24 @@ public class RestauranteServiceImpl implements RestauranteService {
     @Override
     @Transactional(readOnly = true)
     public RestauranteResponse buscarRestaurantePorId(Long id) {
-        Restaurante restaurante = restauranteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
-        
+        Restaurante restaurante =
+                restauranteRepository
+                        .findById(id)
+                        .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+
         // Validate not soft deleted
         if (Boolean.TRUE.equals(restaurante.getExcluido())) {
             throw new RuntimeException("Restaurante foi excluído do sistema");
         }
-        
+
         return restauranteMapper.toResponse(restaurante);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria) {
-        List<Restaurante> restaurantes = restauranteRepository.findByCategoriaAndExcluidoFalse(categoria);
+        List<Restaurante> restaurantes =
+                restauranteRepository.findByCategoriaAndExcluidoFalse(categoria);
         return restaurantes.stream()
                 .map(restauranteMapper::toResponse)
                 .collect(Collectors.toList());
@@ -220,15 +247,18 @@ public class RestauranteServiceImpl implements RestauranteService {
     }
 
     @Override
-    public RestauranteResponse atualizarRestaurante(Long id, RestauranteRequest restauranteRequest) {
-        Restaurante existente = restauranteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
-        
+    public RestauranteResponse atualizarRestaurante(
+            Long id, RestauranteRequest restauranteRequest) {
+        Restaurante existente =
+                restauranteRepository
+                        .findById(id)
+                        .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+
         // Validate not soft deleted
         if (Boolean.TRUE.equals(existente.getExcluido())) {
             throw new RuntimeException("Não é possível atualizar restaurante excluído");
         }
-        
+
         // Update fields
         existente.setNome(restauranteRequest.getNome());
         existente.setCategoria(restauranteRequest.getCategoria());
@@ -238,7 +268,7 @@ public class RestauranteServiceImpl implements RestauranteService {
         existente.setEmail(restauranteRequest.getEmail());
         existente.setTempoEntregaMinutos(restauranteRequest.getTempoEntregaMinutos());
         existente.setAvaliacao(restauranteRequest.getAvaliacao());
-        
+
         Restaurante atualizado = restauranteRepository.save(existente);
         return restauranteMapper.toResponse(atualizado);
     }

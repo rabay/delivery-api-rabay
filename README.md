@@ -14,7 +14,7 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 - Cadastro e gerenciamento de clientes e restaurantes
 - Catálogo de produtos
 - Gestão de pedidos
-- Integração com banco H2 para testes
+- Integração com banco MySQL para testes e produção
 - Monitoramento via endpoints health/info
 
 ---
@@ -25,7 +25,7 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 - Spring Boot 3.2.x
 - Spring Web
 - Spring Data JPA
-- H2 Database (memória)
+- MySQL Database
 - Maven Wrapper
 - Docker
 - Docker Compose
@@ -38,7 +38,7 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 
 ## 📈 Status do Projeto
 
-✅ Aplicação funcional, endpoints REST testados via Postman/Newman, DataLoader populando H2 e testes automatizados presentes. Estrutura de código alinhada a padrões modernos de arquitetura Java/Spring Boot, facilitando manutenção, testes e evolução.
+✅ Aplicação funcional, endpoints REST testados via Postman/Newman, DataLoader populando MySQL e testes automatizados presentes. Estrutura de código alinhada a padrões modernos de arquitetura Java/Spring Boot, facilitando manutenção, testes e evolução.
 
 ---
 
@@ -110,7 +110,7 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 
 ## 🏗️ Estrutura do Projeto
 
-```text
+``text
 delivery-api-rabay/
 ├── src/
 │   ├── main/
@@ -322,12 +322,10 @@ O summary traz:
 
 - Health: [http://localhost:8080/health](http://localhost:8080/health)
 - Info: [http://localhost:8080/info](http://localhost:8080/info)
-- H2 Console: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
-	- JDBC URL: `jdbc:h2:mem:testdb` | User: `sa` | Senha: (em branco)
 
 #### Endpoints de inspeção do banco (desenvolvimento)
 
-Adicionalmente, a aplicação expõe endpoints de inspeção do banco para uso em ambiente de desenvolvimento. Eles consultam o H2 em memória a partir da própria JVM da aplicação e são úteis quando o console externo não consegue acessar a mesma instância "in-memory".
+Adicionalmente, a aplicação expõe endpoints de inspeção do banco para uso em ambiente de desenvolvimento. Eles consultam o MySQL a partir da própria JVM da aplicação.
 
 - GET `/db/schema` — lista tabelas, constraints, contagens e metadados opcionais
 - GET `/db/schema?table=NAME` — retorna colunas/metadados da tabela informada
@@ -601,14 +599,14 @@ Todos os endpoints agora utilizam DTOs para entrada e saída, garantindo desacop
 - `GET /pedidos/cliente/{clienteId}`: Lista pedidos de um cliente (retorna lista de PedidoResponse)
 - `POST /pedidos`: Cria pedido (recebe PedidoRequest, retorna PedidoResponse)
 - `PUT /pedidos/{id}/status`: Atualiza status do pedido (recebe StatusUpdateRequest, retorna PedidoResponse)
-- `GET /health`, `GET /info`, `GET /h2-console`
+- `GET /health`, `GET /info`
  - `GET /clientes`, `POST /clientes`, `PUT /clientes/{id}`, `DELETE /clientes/{id}`
  - `GET /restaurantes`, `POST /restaurantes`, ...
  - `GET /produtos`, `POST /produtos`, ...
  - `GET /pedidos/cliente/{clienteId}`: Lista pedidos de um cliente (retorna lista de PedidoResponse)
  - `POST /pedidos`: Cria pedido (recebe PedidoRequest, retorna PedidoResponse)
  - `PUT /pedidos/{id}/status`: Atualiza status do pedido (recebe StatusUpdateRequest, retorna PedidoResponse)
- - `GET /health`, `GET /info`, `GET /h2-console`
+ - `GET /health`, `GET /info`
  - `GET /db/schema`, `GET /db/schema?table={name}`, `GET /db/integrity`, `POST /db/query` (endpoints de inspeção - ambiente dev)
 
 ---
@@ -701,7 +699,7 @@ Base URL: `/api/relatorios`
 ## 🔧 Configuração
 
 - Porta: 8080
-- Banco: H2 em memória
+- Banco: MySQL
 - Profile: development
 
 ---

@@ -1,22 +1,24 @@
 package com.deliverytech.delivery_api.dto.request;
 
 import com.deliverytech.delivery_api.model.Endereco;
+
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
 public class PedidoRequest {
-    @NotNull
-    private Long clienteId;
-    @NotNull
-    private Long restauranteId;
-    @NotNull
-    private Endereco enderecoEntrega;
-    @NotNull
-    private List<ItemPedidoRequest> itens;
+    @NotNull private Long clienteId;
+    @NotNull private Long restauranteId;
+    @NotNull private Endereco enderecoEntrega;
+    @NotNull private List<ItemPedidoRequest> itens;
 
     public PedidoRequest() {}
 
-    public PedidoRequest(Long clienteId, Long restauranteId, Endereco enderecoEntrega, List<ItemPedidoRequest> itens) {
+    public PedidoRequest(
+            Long clienteId,
+            Long restauranteId,
+            Endereco enderecoEntrega,
+            List<ItemPedidoRequest> itens) {
         this.clienteId = clienteId;
         this.restauranteId = restauranteId;
         this.enderecoEntrega = enderecoEntrega;
