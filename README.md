@@ -1,5 +1,7 @@
 # 🚀 Delivery API Rabay
 
+[![Build, Testes e Coverage Java Maven](https://github.com/rabay/delivery-api-rabay/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/rabay/delivery-api-rabay/actions/workflows/build.yml)
+
 > **ATENÇÃO:** Este projeto utiliza CI/CD completo com GitHub Actions, build/teste automatizado, cobertura Jacoco e build de imagem Docker. Apenas o relatório de cobertura é salvo como artefato. Nenhum binário (JAR/WAR) ou imagem Docker é publicado pelo pipeline.
 
 API backend desenvolvida em **Java 21** com **Spring Boot 3.2.x**, como base para um sistema de delivery moderno, escalável e de fácil manutenção.
@@ -45,30 +47,29 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 
 
 ## ✅ Funcionalidades e Refatorações Recentes
+
 ---
-
-
 
 ## 🆕 Implementações e Correções Recentes (Agosto/2025)
 
 - [x] **Validação de E-mail Único e Erro 409:**
-	- Cadastro de cliente agora retorna HTTP 409 (Conflict) e mensagem clara ao tentar cadastrar e-mail já existente.
-	- Exceção customizada (`EmailDuplicadoException`) e tratamento global via `GlobalExceptionHandler`.
-	- Teste automatizado específico na collection Postman para garantir o comportamento correto.
+  - Cadastro de cliente agora retorna HTTP 409 (Conflict) e mensagem clara ao tentar cadastrar e-mail já existente.
+  - Exceção customizada (`EmailDuplicadoException`) e tratamento global via `GlobalExceptionHandler`.
+  - Teste automatizado específico na collection Postman para garantir o comportamento correto.
 
 - [x] **Refatoração completa do módulo Cliente:**
-	- Implementação do padrão DTO para requisições e respostas (`ClienteRequest`, `ClienteResponse`).
-	- Criação da camada de mapeamento (`ClienteMapper`) para conversão entre entidade e DTO.
-	- Refatoração do serviço (`ClienteService`, `ClienteServiceImpl`) e controller para uso exclusivo de DTOs, eliminando exposição direta da entidade.
-	- Métodos legados marcados como `@Deprecated` para facilitar transição e manter compatibilidade temporária.
-	- Testes unitários e collection Postman atualizados para refletir o novo contrato de API (payloads e respostas).
-	- Validação e tratamento de erros padronizados para cadastro, atualização, busca e inativação de clientes.
-	- Documentação e exemplos de payloads revisados neste README.
+  - Implementação do padrão DTO para requisições e respostas (`ClienteRequest`, `ClienteResponse`).
+  - Criação da camada de mapeamento (`ClienteMapper`) para conversão entre entidade e DTO.
+  - Refatoração do serviço (`ClienteService`, `ClienteServiceImpl`) e controller para uso exclusivo de DTOs, eliminando exposição direta da entidade.
+  - Métodos legados marcados como `@Deprecated` para facilitar transição e manter compatibilidade temporária.
+  - Testes unitários e collection Postman atualizados para refletir o novo contrato de API (payloads e respostas).
+  - Validação e tratamento de erros padronizados para cadastro, atualização, busca e inativação de clientes.
+  - Documentação e exemplos de payloads revisados neste README.
 
 - [x] **Testes Postman idempotentes e robustos:**
-	- Os testes automatizados agora utilizam e-mails dinâmicos e únicos a cada execução, evitando falhas por dados duplicados.
-	- Adicionado teste específico para tentativa de cadastro com e-mail duplicado, validando o retorno do erro 409.
-	- Scripts de teste revisados para aceitar múltiplos status onde aplicável (ex: 200 ou 405), tornando a suite mais resiliente.
+  - Os testes automatizados agora utilizam e-mails dinâmicos e únicos a cada execução, evitando falhas por dados duplicados.
+  - Adicionado teste específico para tentativa de cadastro com e-mail duplicado, validando o retorno do erro 409.
+  - Scripts de teste revisados para aceitar múltiplos status onde aplicável (ex: 200 ou 405), tornando a suite mais resiliente.
 
 - [x] **Soft Delete (Exclusão Lógica) implementado para Cliente, Restaurante e Produto:**
 	- Todas as entidades principais agora possuem o campo `excluido` (Boolean).
@@ -110,7 +111,7 @@ Este projeto fornece uma estrutura robusta para aplicações de delivery, inclui
 
 ## 🏗️ Estrutura do Projeto
 
-``text
+```text
 delivery-api-rabay/
 ├── src/
 │   ├── main/
@@ -151,12 +152,14 @@ A aplicação utiliza uma estratégia dupla para inicialização de dados, separ
 **Responsabilidade:** Criação automática de usuários para sistema de autenticação JWT.
 
 **Dados criados:**
+
 - **Admin:** `admin@deliveryapi.com` / `admin123` (Role: ADMIN)
 - **Cliente:** `cliente@test.com` / `cliente123` (Role: CLIENTE) 
 - **Restaurante:** `restaurante@test.com` / `restaurante123` (Role: RESTAURANTE)
 - **Entregador:** `entregador@test.com` / `entregador123` (Role: ENTREGADOR)
 
 **Características:**
+
 - Executa apenas se não existirem usuários no banco (`usuarioRepository.count() == 0`)
 - Utiliza `@Order(100)` para executar após outros data loaders
 - Configurado com `@Profile({"!test", "dev", "default"})` - não executa em testes
@@ -170,6 +173,7 @@ A aplicação utiliza uma estratégia dupla para inicialização de dados, separ
 **Responsabilidade:** Criação de dados de exemplo para clientes, restaurantes, produtos e pedidos.
 
 **Dados criados:**
+
 - **5 Clientes:** João Silva, Maria Santos, Pedro Oliveira, Ana Costa, Carlos Ferreira
 - **5 Restaurantes:** Pizza Express, Burger King, Sushi House, Gyros Athenas, Chiparia do Porto
 - **10 Produtos:** Variados por categoria e restaurante
@@ -177,6 +181,7 @@ A aplicação utiliza uma estratégia dupla para inicialização de dados, separ
 - **Itens de pedido:** Relacionamentos entre pedidos e produtos
 
 **Características:**
+
 - Utiliza `MERGE INTO` para operações idempotentes
 - Dados preservam integridade referencial
 - Configurado para executar após criação do schema (`spring.jpa.defer-datasource-initialization=true`)
@@ -195,7 +200,9 @@ spring.sql.init.mode=never  # data.sql desabilitado
 ### 4. Como Adicionar Novos Dados
 
 #### Para Usuários JWT:
+
 1. **Modifique UserDataLoader.java** para adicionar novos usuários padrão
+
 2. Adicione no método `loadDefaultUsers()` utilizando o builder pattern:
 ```java
 Usuario.builder()
@@ -209,6 +216,7 @@ Usuario.builder()
 ```
 
 #### Para Dados de Exemplo:
+
 1. **Opção A - Via data.sql:**
    - Modifique `src/main/resources/data.sql`
    - Habilite execução: `spring.sql.init.mode=always`
@@ -220,6 +228,7 @@ Usuario.builder()
    - Use `@Profile("dev")` para controlar ambiente
 
 #### Para Dados de Produção:
+
 1. **Utilize migrations:** Flyway ou Liquibase para versionamento
 2. **Scripts de deploy:** Separados por ambiente
 3. **APIs administrativas:** Para criação controlada via endpoints
@@ -241,9 +250,7 @@ Usuario.builder()
 
 ---
 
-
 ## 🏃‍♂️ Como Executar, Testar e Usar CI/CD
-
 
 ### 1. Pré-requisitos
 
@@ -293,30 +300,6 @@ act push
 
 > O workflow executa build, testes, cobertura Jacoco, Dependency-Check e build da imagem Docker, mas **não publica binários nem imagens**.
 
-### 8. Verificação de Dependências (OWASP Dependency-Check)
-
-#### a) Execução Local (CLI)
-
-```bash
-# Defina sua NVD API Key (obrigatório):
-export NVD_API_KEY=seu_token_nvd
-
-# Execute o script Python (recomendado: com Central Analyzer desabilitado para evitar erros de rede):
-python scripts/run_dependency_check.py
-# Por padrão, o script já executa com --disableCentral, evitando timeouts ao acessar o Maven Central.
-# Relatórios HTML e XML gerados em: dependency-check-report/
-```
-
-#### b) Execução no CI/CD (GitHub Actions)
-
-
-O workflow já executa o Dependency-Check automaticamente, publica o relatório como artefato (`dependency-check-report`) **e gera um summary em Markdown** (exibido no painel do GitHub Actions, igual ao Jacoco).
-
-O summary traz:
-- Total de dependências analisadas
-- Quantidade de dependências vulneráveis
-- Tabela de vulnerabilidades por severidade
-- Link para o relatório HTML completo
 
 ### 9. Acesse endpoints básicos
 
@@ -337,7 +320,6 @@ Segurança: esses endpoints são destinados ao ambiente de desenvolvimento; prot
 ### 10. Relatórios
 
 - **Cobertura Jacoco:** `target/site/jacoco/index.html`
-- **Dependency-Check:** `dependency-check-report/index.html` (local ou artefato do CI)
 
 
 
@@ -357,16 +339,6 @@ Com a aplicação rodando, execute:
 ```bash
 newman run entregaveis/delivery-api-rabay.postman_collection.json --reporters cli --insecure
 ```
-
-**Validação automatizada:**
-- Todos os requests principais possuem scripts de teste (assertions) para status code, campos obrigatórios e estrutura do corpo.
-- Os fluxos de pedidos validam que o campo `cliente` está presente no retorno, além de `id`, `status` e demais campos.
-- O resultado esperado é: todos os requests com status 2xx/201/204, sem falhas de assertions.
-
-**Cobertura dos testes automatizados:**
-- Criação, atualização, exclusão lógica e consulta de clientes, restaurantes, produtos e pedidos.
-- Validação de soft delete e isolamento de dados de teste.
-- Testes de fluxo completo de pedidos, incluindo assertions detalhados no retorno.
 
 ---
 
@@ -711,41 +683,6 @@ Base URL: `/api/relatorios`
 - Nenhum JAR/WAR ou imagem Docker é publicado pelo workflow.
 - O build Docker é feito apenas para validação.
 - Para publicar imagens, configure um job/passo extra conforme sua necessidade.
-
----
-
-## 🚦 Padrão para consultas com relacionamentos LAZY (fetch join)
-
-- Para evitar erros de LazyInitializationException ao acessar coleções LAZY (ex: Pedido.itens) fora do contexto de sessão do Hibernate, foi implementado o método customizado no PedidoRepository usando @Query com fetch join:
-
-```java
-@Query("SELECT DISTINCT p FROM Pedido p LEFT JOIN FETCH p.itens i LEFT JOIN FETCH i.produto")
-List<Pedido> findAllWithItens();
-```
-
-- O DataLoader utiliza esse método para validar os relacionamentos e garantir que os itens dos pedidos estejam carregados corretamente, mesmo em contexto de inicialização ou testes.
-- Sempre que for necessário acessar coleções LAZY fora do controller/service, recomenda-se criar métodos com fetch join no repositório correspondente.
-
----
-
-## �️ Troubleshooting
-
-- **Erro de espaço em disco:** Limpe caches Maven (`rm -rf ~/.m2/repository`), imagens/containers Docker não utilizados (`docker system prune -af`), arquivos temporários e extensões antigas do VSCode.
-- **Docker não encontrado:** Certifique-se de que o Docker está instalado e o serviço está ativo.
-- **Problemas com dependências Maven:** Rode `./mvnw dependency:purge-local-repository` e depois `./mvnw clean verify`.
-- **Relatório Jacoco não gerado:** Verifique se os testes estão passando e se a pasta `target/site/jacoco` existe após o build.
-- **act não encontrado:** Instale o act conforme a [documentação oficial](https://github.com/nektos/act).
-
-- README.md atualizado
-- Collection Postman (`entregaveis/delivery-api-rabay.postman_collection.json`)
-- Aplicação pronta para demonstração
-- Documentação completa
-
----
-
-## 📝 Organização dos Commits
-
-Commits organizados por feature, correção e entregáveis. Veja histórico no repositório GitHub.
 
 ---
 
