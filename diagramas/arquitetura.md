@@ -1,8 +1,8 @@
 # Diagrama de Arquitetura - Delivery API
 
-Este diagrama representa a arquitetura geral do sistema de delivery API, mostrando as camadas e componentes principais.
+Este diagrama representa a arquitetura moderna do sistema de delivery API, incluindo padrões cloud-native e componentes de resiliência.
 
-## Arquitetura Geral do Sistema
+## Arquitetura Geral do Sistema (Cloud-Native)
 
 ```mermaid
 graph TB
@@ -10,97 +10,120 @@ graph TB
         Web[Web Client]
         Mobile[Mobile App]
         Postman[API Testing]
+        ThirdParty[Third Party APIs]
     end
     
-    subgraph "API Gateway"
-        Gateway[Spring Boot API Gateway]
+    subgraph "Edge Services"
+        Gateway[API Gateway<br/>Spring Cloud Gateway]
+        LoadBalancer[Load Balancer<br/>NGINX/HAProxy]
+        WAF[WAF<br/>Web Application Firewall]
     end
     
-    subgraph "Controller Layer"
-        AuthC[AuthController]
-        ClienteC[ClienteController]
-        RestC[RestauranteController]
-        ProdC[ProdutoController]
-        PedC[PedidoController]
-        RelC[RelatorioController]
-        HealthC[HealthController]
-        DbC[DbController]
+    subgraph "Service Mesh"
+        ServiceRegistry[Eureka Service Registry]
+        ConfigServer[Spring Cloud Config]
+        CircuitBreaker[Circuit Breaker<br/>Resilience4j]
     end
     
-    subgraph "Security Layer"
-        JWT[JwtAuthenticationFilter]
-        SecConfig[SecurityConfig]
-        JwtUtil[JwtUtil]
+    subgraph "Application Layer"
+        AuthService[Auth Service<br/>JWT/OAuth2]
+        OrderService[Order Service<br/>Pedido Management]
+        RestaurantService[Restaurant Service<br/>Restaurante Management]
+        ProductService[Product Service<br/>Produto Management]
+        CustomerService[Customer Service<br/>Cliente Management]
+        NotificationService[Notification Service<br/>Push Notifications]
     end
     
-    subgraph "Service Layer"
-        UsuarioS[UsuarioService]
-        ClienteS[ClienteService]
-        RestS[RestauranteService]
-        ProdS[ProdutoService]
-        PedS[PedidoService]
-        RelS[RelatorioService]
-    end
-    
-    subgraph "Repository Layer"
-        UsuarioR[UsuarioRepository]
-        ClienteR[ClienteRepository]
-        RestR[RestauranteRepository]
-        ProdR[ProdutoRepository]
-        PedR[PedidoRepository]
+    subgraph "Integration Layer"
+        PaymentGateway[Payment Gateway<br/>Stripe/PagSeguro]
+        DeliveryProvider[Delivery Provider<br/>Logistics API]
+        EmailService[Email Service<br/>SMTP/SendGrid]
+        SMSService[SMS Service<br/>Twilio]
     end
     
     subgraph "Data Layer"
-        H2[(H2 Database)]
-        DataSQL[data.sql]
+        PrimaryDB[(Primary DB<br/>MySQL/PostgreSQL)]
+        CacheDB[(Redis Cache<br/>Session & Data Cache)]
+        SearchDB[(Elasticsearch<br/>Search & Analytics)]
+        MessageQueue[(RabbitMQ/Kafka<br/>Event Streaming)]
     end
     
-    subgraph "Configuration"
-        AppProps[application.properties]
-        SecurityConf[Security Configuration]
-        OpenAPI[OpenAPI Configuration]
+    subgraph "Infrastructure"
+        Monitoring[Monitoring Stack<br/>Prometheus + Grafana]
+        Logging[Centralized Logging<br/>ELK Stack]
+        Backup[Backup & Recovery<br/>Automated Backups]
+        CDN[CDN<br/>CloudFront/CloudFlare]
     end
     
-    Web --> Gateway
-    Mobile --> Gateway
-    Postman --> Gateway
+    Web --> LoadBalancer
+    Mobile --> LoadBalancer
+    Postman --> LoadBalancer
+    ThirdParty --> LoadBalancer
     
-    Gateway --> JWT
-    JWT --> AuthC
-    JWT --> ClienteC
-    JWT --> RestC
-    JWT --> ProdC
-    JWT --> PedC
-    JWT --> RelC
-    JWT --> HealthC
-    JWT --> DbC
+    LoadBalancer --> WAF
+    WAF --> Gateway
     
-    AuthC --> UsuarioS
-    ClienteC --> ClienteS
-    RestC --> RestS
-    ProdC --> ProdS
-    PedC --> PedS
-    RelC --> RelS
+    Gateway --> ServiceRegistry
+    ServiceRegistry --> AuthService
+    ServiceRegistry --> OrderService
+    ServiceRegistry --> RestaurantService
+    ServiceRegistry --> ProductService
+    ServiceRegistry --> CustomerService
+    ServiceRegistry --> NotificationService
     
-    UsuarioS --> UsuarioR
-    ClienteS --> ClienteR
-    RestS --> RestR
-    ProdS --> ProdR
-    PedS --> PedR
+    AuthService --> ConfigServer
+    OrderService --> ConfigServer
+    RestaurantService --> ConfigServer
+    ProductService --> ConfigServer
+    CustomerService --> ConfigServer
+    NotificationService --> ConfigServer
     
-    UsuarioR --> H2
-    ClienteR --> H2
-    RestR --> H2
-    ProdR --> H2
-    PedR --> H2
+    OrderService --> CircuitBreaker
+    CircuitBreaker --> PaymentGateway
+    CircuitBreaker --> DeliveryProvider
     
-    H2 --> DataSQL
+    NotificationService --> EmailService
+    NotificationService --> SMSService
     
-    JWT -.-> JwtUtil
-    JWT -.-> SecConfig
+    AuthService --> PrimaryDB
+    OrderService --> PrimaryDB
+    RestaurantService --> PrimaryDB
+    ProductService --> PrimaryDB
+    CustomerService --> PrimaryDB
     
-    SecConfig -.-> AppProps
-    OpenAPI -.-> AppProps
+    AuthService --> CacheDB
+    OrderService --> CacheDB
+    RestaurantService --> CacheDB
+    ProductService --> CacheDB
+    CustomerService --> CacheDB
+    
+    OrderService --> SearchDB
+    RestaurantService --> SearchDB
+    ProductService --> SearchDB
+    
+    OrderService --> MessageQueue
+    NotificationService --> MessageQueue
+    
+    Monitoring -.-> AuthService
+    Monitoring -.-> OrderService
+    Monitoring -.-> RestaurantService
+    Monitoring -.-> ProductService
+    Monitoring -.-> CustomerService
+    Monitoring -.-> NotificationService
+    
+    Logging -.-> AuthService
+    Logging -.-> OrderService
+    Logging -.-> RestaurantService
+    Logging -.-> ProductService
+    Logging -.-> CustomerService
+    Logging -.-> NotificationService
+    
+    PrimaryDB --> Backup
+    CacheDB --> Backup
+    SearchDB --> Backup
+    
+    CDN -.-> Web
+    CDN -.-> Mobile
 ```
 
 ## Arquitetura de Segurança JWT
@@ -142,32 +165,39 @@ graph LR
 - **Web Client**: Interface web para usuários finais
 - **Mobile App**: Aplicação móvel para clientes e entregadores
 - **API Testing**: Ferramentas como Postman para testes
+- **Third Party APIs**: Integrações com sistemas externos
 
-### Controller Layer
-- **AuthController**: Gerencia autenticação e registro
-- **ClienteController**: CRUD de clientes
-- **RestauranteController**: CRUD de restaurantes
-- **ProdutoController**: CRUD de produtos
-- **PedidoController**: Gerenciamento de pedidos
-- **RelatorioController**: Relatórios e analytics
-- **HealthController**: Health checks
-- **DbController**: Acesso direto ao banco (desenvolvimento)
+### Edge Services
+- **API Gateway**: Ponto único de entrada, roteamento e segurança
+- **Load Balancer**: Distribuição de carga entre instâncias
+- **WAF**: Proteção contra ataques web comuns
 
-### Security Layer
-- **JwtAuthenticationFilter**: Filtro de autenticação JWT
-- **SecurityConfig**: Configuração de segurança
-- **JwtUtil**: Utilitários para manipulação de tokens JWT
+### Service Mesh
+- **Service Registry**: Descoberta dinâmica de serviços
+- **Config Server**: Gerenciamento centralizado de configurações
+- **Circuit Breaker**: Proteção contra falhas em cascata
 
-### Service Layer
-- Camada de lógica de negócio
-- Implementação das regras de negócio
-- Coordenação entre repositories
+### Application Layer
+- **Auth Service**: Autenticação e autorização JWT/OAuth2
+- **Order Service**: Gerenciamento completo do ciclo de pedidos
+- **Restaurant Service**: CRUD e gestão de restaurantes
+- **Product Service**: Catálogo de produtos e disponibilidade
+- **Customer Service**: Perfil e histórico de clientes
+- **Notification Service**: Notificações push, email e SMS
 
-### Repository Layer
-- Acesso a dados via Spring Data JPA
-- Consultas customizadas
-- Mapeamento objeto-relacional
+### Integration Layer
+- **Payment Gateway**: Processamento de pagamentos (Stripe, PagSeguro)
+- **Delivery Provider**: Integração com provedores de entrega
+- **Email/SMS Services**: Comunicação com usuários
 
 ### Data Layer
-- **H2 Database**: Banco de dados em memória
-- **data.sql**: Scripts de inicialização de dados
+- **Primary DB**: Banco principal (MySQL/PostgreSQL)
+- **Redis Cache**: Cache de sessão e dados frequentes
+- **Elasticsearch**: Busca e analytics avançados
+- **Message Queue**: Streaming de eventos assíncrono
+
+### Infrastructure
+- **Monitoring**: Observabilidade com métricas e alertas
+- **Logging**: Logs centralizados para troubleshooting
+- **Backup**: Estratégia de backup e recuperação
+- **CDN**: Distribuição de conteúdo estático

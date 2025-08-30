@@ -2,7 +2,7 @@
 
 Este diagrama mostra os principais fluxos de interação no sistema de delivery API.
 
-## Fluxo de Autenticação e Criação de Pedido
+## Fluxo Completo de Pedido com Pagamento e Notificações
 
 ```mermaid
 sequenceDiagram
@@ -15,6 +15,10 @@ sequenceDiagram
     participant ClienteS as ClienteService
     participant RestS as RestauranteService
     participant ProdS as ProdutoService
+    participant PaymentGW as Payment Gateway
+    participant NotifS as NotificationService
+    participant EmailS as Email Service
+    participant SMSS as SMS Service
     participant PedR as PedidoRepository
     participant DB as H2 Database
     
@@ -36,7 +40,7 @@ sequenceDiagram
     PedC->>PedC: validateJWT()
     PedC->>PedS: criarPedido(pedidoRequest)
     
-    %% Validations
+    %% Business Validations
     PedS->>ClienteS: validarCliente(clienteId)
     ClienteS-->>PedS: Cliente válido
     PedS->>RestS: validarRestaurante(restauranteId)
@@ -48,7 +52,12 @@ sequenceDiagram
         ProdS-->>PedS: Produto válido e disponível
     end
     
-    %% Order processing
+    %% Payment Processing
+    Note over Client, PaymentGW: Processamento de Pagamento
+    PedS->>PaymentGW: processarPagamento(valorTotal, dadosPagamento)
+    PaymentGW-->>PedS: Pagamento aprovado
+    
+    %% Order Persistence
     PedS->>PedS: calcularValorTotal()
     PedS->>PedS: gerarNumeroPedido()
     PedS->>PedR: save(pedido)
@@ -57,6 +66,35 @@ sequenceDiagram
     PedR-->>PedS: Pedido entity
     PedS-->>PedC: PedidoResponse
     PedC-->>Client: 201 Created with PedidoResponse
+    
+    %% Notifications
+    Note over NotifS, SMSS: Notificações Automáticas
+    PedS->>NotifS: notificarNovoPedido(pedido)
+    NotifS->>EmailS: enviarEmailRestaurante(pedido)
+    NotifS->>SMSS: enviarSMSCliente(confirmacao)
+    EmailS-->>NotifS: Email enviado
+    SMSS-->>NotifS: SMS enviado
+    NotifS-->>PedS: Notificações enviadas
+```
+    
+    %% Order Persistence
+    PedS->>PedS: calcularValorTotal()
+    PedS->>PedS: gerarNumeroPedido()
+    PedS->>PedR: save(pedido)
+    PedR->>DB: INSERT pedido
+    DB-->>PedR: Pedido salvo
+    PedR-->>PedS: Pedido entity
+    PedS-->>PedC: PedidoResponse
+    PedC-->>Client: 201 Created with PedidoResponse
+    
+    %% Notifications
+    Note over NotifS, SMSS: Notificações Automáticas
+    PedS->>NotifS: notificarNovoPedido(pedido)
+    NotifS->>EmailS: enviarEmailRestaurante(pedido)
+    NotifS->>SMSS: enviarSMSCliente(confirmacao)
+    EmailS-->>NotifS: Email enviado
+    SMSS-->>NotifS: SMS enviado
+    NotifS-->>PedS: Notificações enviadas
 ```
 
 ## Fluxo de Consulta de Relatórios
