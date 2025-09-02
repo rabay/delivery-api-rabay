@@ -117,6 +117,28 @@ public class PedidoController {
     }
 
     @Operation(
+            summary = "Criar novo pedido (DTO)",
+            description = "Cria um novo pedido para um cliente em um restaurante usando DTO.")
+    @PostMapping("/dto")
+    public ResponseEntity<PedidoResponse> criarPedido(@Valid @RequestBody PedidoRequest pedidoRequest) {
+        try {
+            logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
+            PedidoResponse response = pedidoService.criarPedido(pedidoRequest);
+            logger.info(
+                    "Pedido criado com sucesso: id={} status={}",
+                    response.getId(),
+                    response.getStatus());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException ex) {
+            logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception ex) {
+            logger.error("Erro inesperado ao criar pedido: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @Operation(
             summary = "Atualizar status do pedido",
             description =
                     "Atualiza o status de um pedido existente (ex: CRIADO, ENTREGUE, CANCELADO).")
@@ -203,6 +225,14 @@ public class PedidoController {
                                             new com.deliverytech.delivery_api.model.Produto());
                                     item.getProduto().setId(itemDto.getProdutoId());
                                     item.setQuantidade(itemDto.getQuantidade());
+                                    // Use precoUnitario from DTO if available, otherwise set default
+                                    if (itemDto.getPrecoUnitario() != null) {
+                                        item.setPrecoUnitario(itemDto.getPrecoUnitario());
+                                    } else {
+                                        // Set a default precoUnitario to avoid validation error
+                                        // The service will update this with the actual product price
+                                        item.setPrecoUnitario(java.math.BigDecimal.ONE);
+                                    }
                                     return item;
                                 })
                         .toList());

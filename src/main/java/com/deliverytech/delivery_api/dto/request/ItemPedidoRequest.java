@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Schema(description = "DTO para item de pedido.")
 public class ItemPedidoRequest {
     @NotNull(message = "ID do produto é obrigatório")
@@ -15,6 +17,9 @@ public class ItemPedidoRequest {
     @Positive(message = "Quantidade deve ser maior que zero")
     @Schema(description = "Quantidade do produto no pedido.", example = "2")
     private Integer quantidade;
+    
+    @JsonIgnore
+    private java.math.BigDecimal precoUnitario;
 
     public ItemPedidoRequest() {}
 
@@ -37,5 +42,13 @@ public class ItemPedidoRequest {
 
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
+    }
+    
+    public java.math.BigDecimal getPrecoUnitario() {
+        return precoUnitario;
+    }
+    
+    public void setPrecoUnitario(java.math.BigDecimal precoUnitario) {
+        this.precoUnitario = precoUnitario;
     }
 }

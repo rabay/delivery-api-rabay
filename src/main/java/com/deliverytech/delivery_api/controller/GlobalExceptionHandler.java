@@ -1,6 +1,8 @@
 package com.deliverytech.delivery_api.controller;
 
 import com.deliverytech.delivery_api.exception.EmailDuplicadoException;
+import com.deliverytech.delivery_api.exception.EstoqueInsuficienteException;
+import com.deliverytech.delivery_api.exception.ProdutoIndisponivelException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,16 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ExceptionHandler(EmailDuplicadoException.class)
     public ResponseEntity<String> handleEmailDuplicado(EmailDuplicadoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+    
+    @ExceptionHandler(EstoqueInsuficienteException.class)
+    public ResponseEntity<String> handleEstoqueInsuficiente(EstoqueInsuficienteException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+    
+    @ExceptionHandler(ProdutoIndisponivelException.class)
+    public ResponseEntity<String> handleProdutoIndisponivel(ProdutoIndisponivelException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
     

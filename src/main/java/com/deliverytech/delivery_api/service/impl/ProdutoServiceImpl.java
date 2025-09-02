@@ -2,7 +2,10 @@ package com.deliverytech.delivery_api.service.impl;
 
 import com.deliverytech.delivery_api.dto.request.ProdutoRequest;
 import com.deliverytech.delivery_api.dto.response.ProdutoResponse;
+import com.deliverytech.delivery_api.exception.EstoqueInsuficienteException;
+import com.deliverytech.delivery_api.exception.ProdutoIndisponivelException;
 import com.deliverytech.delivery_api.mapper.ProdutoMapper;
+import com.deliverytech.delivery_api.model.ItemPedido;
 import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
@@ -37,10 +40,10 @@ public class ProdutoServiceImpl implements ProdutoService {
         if (produto.getNome() == null || produto.getNome().isEmpty()) {
             throw new RuntimeException("Nome obrigatório");
         }
-        // Exemplo de validação de preço (supondo campo futuro)
-        // if (produto.getPreco() == null || produto.getPreco().compareTo(BigDecimal.ZERO) <= 0) {
-        //     throw new RuntimeException("Preço inválido");
-        // }
+        // Validate stock quantity is provided
+        if (produto.getQuantidadeEstoque() == null) {
+            throw new RuntimeException("Quantidade em estoque é obrigatória");
+        }
         return produtoRepository.save(produto);
     }
 
@@ -78,6 +81,10 @@ public class ProdutoServiceImpl implements ProdutoService {
         existente.setCategoria(produtoAtualizado.getCategoria());
         existente.setDisponivel(produtoAtualizado.getDisponivel());
         existente.setRestaurante(produtoAtualizado.getRestaurante());
+        // Update stock quantity if provided
+        if (produtoAtualizado.getQuantidadeEstoque() != null) {
+            existente.setQuantidadeEstoque(produtoAtualizado.getQuantidadeEstoque());
+        }
         // Adicione outros campos conforme necessário
         return produtoRepository.save(existente);
     }
@@ -191,6 +198,8 @@ public class ProdutoServiceImpl implements ProdutoService {
         existente.setDescricao(produtoRequest.getDescricao());
         existente.setPreco(produtoRequest.getPreco());
         existente.setDisponivel(produtoRequest.getDisponivel());
+        // Update stock quantity
+        existente.setQuantidadeEstoque(produtoRequest.getQuantidadeEstoque());
 
         // Update restaurant if changed
         if (!existente.getRestaurante().getId().equals(produtoRequest.getRestauranteId())) {
@@ -214,5 +223,97 @@ public class ProdutoServiceImpl implements ProdutoService {
     public List<ProdutoResponse> buscarDisponiveis() {
         List<Produto> produtos = produtoRepository.findByDisponivelTrueAndExcluidoFalse();
         return produtos.stream().map(produtoMapper::toResponse).collect(Collectors.toList());
+    }
+
+    // ===== MÉTODOS PARA CONTROLE DE ESTOQUE =====
+
+    @Override
+    public void validarEstoque(Produto produto, Integer quantidadeSolicitada) {
+        // If product is not available, throw exception
+        if (!produto.isDisponivel()) {
+            throw new ProdutoIndisponivelException("Produto não está disponível: " + produto.getNome());
+        }
+        
+        // If product has infinite stock, no validation needed
+        if (produto.isInfiniteStock()) {
+            return;
+        }
+        
+        // If product has zero stock, throw exception
+        if (produto.getQuantidadeEstoque() == 0) {
+            throw new ProdutoIndisponivelException("Produto fora de estoque: " + produto.getNome());
+        }
+        
+        // If requested quantity exceeds available stock, throw exception
+        if (quantidadeSolicitada > produto.getQuantidadeEstoque()) {
+            throw new EstoqueInsuficienteException(
+                String.format("Estoque insuficiente para o produto %s. Disponível: %d, Solicitado: %d", 
+                             produto.getNome(), produto.getQuantidadeEstoque(), quantidadeSolicitada));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void atualizarEstoque(Long produtoId, Integer novaQuantidade) {
+        Produto produto = produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        
+        produto.setQuantidadeEstoque(novaQuantidade);
+        produtoRepository.save(produto);
+    }
+
+    @Override
+    @Transactional
+    public void ajustarEstoque(Long produtoId, Integer quantidade) {
+        Produto produto = produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        
+        // Only adjust stock for non-infinite stock products
+        if (!produto.isInfiniteStock()) {
+            produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() + quantidade);
+            produtoRepository.save(produto);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void reservarEstoque(com.deliverytech.delivery_api.model.Pedido pedido) {
+        // Reserve stock for all items in the order
+        for (ItemPedido item : pedido.getItens()) {
+            Produto produto = item.getProduto();
+            
+            // Validate stock availability
+            validarEstoque(produto, item.getQuantidade());
+            
+            // Reserve stock (reduce available quantity)
+            // Only for non-infinite stock products
+            if (!produto.isInfiniteStock()) {
+                produto.reduzirEstoque(item.getQuantidade());
+                produtoRepository.save(produto);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void confirmarEstoque(com.deliverytech.delivery_api.model.Pedido pedido) {
+        // Confirm stock reduction for all items in the order
+        // In this implementation, stock is already reduced during reservation
+        // This method is kept for future extensions or different stock management patterns
+    }
+
+    @Override
+    @Transactional
+    public void cancelarReservaEstoque(com.deliverytech.delivery_api.model.Pedido pedido) {
+        // Release reserved stock back to available stock
+        for (ItemPedido item : pedido.getItens()) {
+            Produto produto = item.getProduto();
+            
+            // Only restore stock for non-infinite stock products
+            if (!produto.isInfiniteStock()) {
+                produto.aumentarEstoque(item.getQuantidade());
+                produtoRepository.save(produto);
+            }
+        }
     }
 }

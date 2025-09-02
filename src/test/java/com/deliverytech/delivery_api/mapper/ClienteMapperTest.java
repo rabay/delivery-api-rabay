@@ -13,7 +13,11 @@ class ClienteMapperTest {
     @Test
     @DisplayName("Deve mapear ClienteRequest para Cliente corretamente")
     void deveMapearClienteRequestParaCliente() {
-        ClienteRequest request = new ClienteRequest("João da Silva", "11999999999", "joao@email.com", "Rua A, 123");
+        ClienteRequest request = new ClienteRequest();
+        request.setNome("João da Silva");
+        request.setTelefone("11999999999");
+        request.setEmail("joao@email.com");
+        request.setEndereco("Rua A, 123");
         Cliente cliente = mapper.toEntity(request);
         assertThat(cliente.getNome()).isEqualTo(request.getNome());
         assertThat(cliente.getEmail()).isEqualTo(request.getEmail());

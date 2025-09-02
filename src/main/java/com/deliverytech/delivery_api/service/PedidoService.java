@@ -50,4 +50,7 @@ public interface PedidoService {
 
     // Novos métodos com DTOs
     PedidoResponse criarPedido(PedidoRequest pedidoRequest);
+    
+    // Métodos para controle de estoque
+    void validarEstoqueItens(Pedido pedido);
 }

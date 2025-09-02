@@ -19,4 +19,5 @@ public class ProdutoResponse {
     private BigDecimal preco;
     private RestauranteResumoResponse restaurante;
     private Boolean disponivel;
+    private Integer quantidadeEstoque;
 }

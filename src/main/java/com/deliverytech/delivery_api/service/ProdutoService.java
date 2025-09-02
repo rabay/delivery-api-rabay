@@ -45,4 +45,17 @@ public interface ProdutoService {
     List<ProdutoResponse> buscarProdutosPorCategoria(String categoria);
 
     List<ProdutoResponse> buscarDisponiveis();
+
+    // Métodos para controle de estoque
+    void validarEstoque(Produto produto, Integer quantidadeSolicitada);
+    
+    void atualizarEstoque(Long produtoId, Integer novaQuantidade);
+    
+    void ajustarEstoque(Long produtoId, Integer quantidade);
+    
+    void reservarEstoque(com.deliverytech.delivery_api.model.Pedido pedido);
+    
+    void confirmarEstoque(com.deliverytech.delivery_api.model.Pedido pedido);
+    
+    void cancelarReservaEstoque(com.deliverytech.delivery_api.model.Pedido pedido);
 }

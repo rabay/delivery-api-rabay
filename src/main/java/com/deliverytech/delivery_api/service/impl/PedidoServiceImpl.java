@@ -3,6 +3,8 @@ package com.deliverytech.delivery_api.service.impl;
 import com.deliverytech.delivery_api.dto.request.ItemPedidoRequest;
 import com.deliverytech.delivery_api.dto.request.PedidoRequest;
 import com.deliverytech.delivery_api.dto.response.PedidoResponse;
+import com.deliverytech.delivery_api.exception.EstoqueInsuficienteException;
+import com.deliverytech.delivery_api.exception.ProdutoIndisponivelException;
 import com.deliverytech.delivery_api.mapper.PedidoMapper;
 import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
@@ -10,6 +12,7 @@ import com.deliverytech.delivery_api.repository.PedidoRepository;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
 import com.deliverytech.delivery_api.service.PedidoService;
+import com.deliverytech.delivery_api.service.ProdutoService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,18 +35,21 @@ public class PedidoServiceImpl implements PedidoService {
     private final ClienteRepository clienteRepository;
     private final RestauranteRepository restauranteRepository;
     private final PedidoMapper pedidoMapper;
+    private final ProdutoService produtoService;
 
     public PedidoServiceImpl(
             PedidoRepository pedidoRepository,
             ProdutoRepository produtoRepository,
             ClienteRepository clienteRepository,
             RestauranteRepository restauranteRepository,
-            PedidoMapper pedidoMapper) {
+            PedidoMapper pedidoMapper,
+            ProdutoService produtoService) {
         this.pedidoRepository = pedidoRepository;
         this.produtoRepository = produtoRepository;
         this.clienteRepository = clienteRepository;
         this.restauranteRepository = restauranteRepository;
         this.pedidoMapper = pedidoMapper;
+        this.produtoService = produtoService;
     }
 
     @Override
@@ -58,6 +64,10 @@ public class PedidoServiceImpl implements PedidoService {
                         pedido.getRestaurante() != null ? pedido.getRestaurante().getId() : null);
                 throw new RuntimeException("Pedido deve conter ao menos um item.");
             }
+            
+            // Validate stock for all items before processing
+            validarEstoqueItens(pedido);
+            
             BigDecimal total = BigDecimal.ZERO;
             for (ItemPedido item : pedido.getItens()) {
                 Long produtoId = item.getProduto() != null ? item.getProduto().getId() : null;
@@ -102,6 +112,10 @@ public class PedidoServiceImpl implements PedidoService {
                 item.setPedido(pedido);
             }
             pedido.setValorTotal(total);
+            
+            // Reserve stock for all items
+            produtoService.reservarEstoque(pedido);
+            
             return pedidoRepository.save(pedido);
         } catch (Exception e) {
             log.error("Erro ao criar pedido: {}", e.getMessage(), e);
@@ -161,6 +175,12 @@ public class PedidoServiceImpl implements PedidoService {
             log.warn("Tentativa de atualizar status de pedido já entregue: pedidoId={}", id);
             throw new RuntimeException("Não é possível atualizar um pedido já entregue");
         }
+        
+        // If canceling a confirmed order, restore stock
+        if (status == StatusPedido.CANCELADO && pedido.getStatus() == StatusPedido.CONFIRMADO) {
+            produtoService.cancelarReservaEstoque(pedido);
+        }
+        
         pedido.setStatus(status);
         return pedidoRepository.save(pedido);
     }
@@ -172,6 +192,10 @@ public class PedidoServiceImpl implements PedidoService {
                         .findById(id)
                         .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
         pedido.setStatus(StatusPedido.CONFIRMADO);
+        
+        // Confirm stock reduction (in this implementation, stock is already reduced during reservation)
+        produtoService.confirmarEstoque(pedido);
+        
         return pedidoRepository.save(pedido);
     }
 
@@ -187,6 +211,12 @@ public class PedidoServiceImpl implements PedidoService {
         if (pedido.getStatus() == StatusPedido.CANCELADO) {
             throw new RuntimeException("Pedido já está cancelado");
         }
+        
+        // Restore stock if order was confirmed
+        if (pedido.getStatus() == StatusPedido.CONFIRMADO) {
+            produtoService.cancelarReservaEstoque(pedido);
+        }
+        
         pedido.setStatus(StatusPedido.CANCELADO);
         return pedidoRepository.save(pedido);
     }
@@ -201,6 +231,10 @@ public class PedidoServiceImpl implements PedidoService {
                 produtoRepository
                         .findById(produtoId)
                         .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        
+        // Validate stock for the new item
+        produtoService.validarEstoque(produto, quantidade);
+        
         ItemPedido item = new ItemPedido();
         item.setPedido(pedido);
         item.setProduto(produto);
@@ -212,6 +246,10 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.getItens().add(item);
         BigDecimal novoTotal = calcularTotal(pedido);
         pedido.setValorTotal(novoTotal);
+        
+        // Reserve stock for the new item
+        produtoService.reservarEstoque(pedido);
+        
         return pedidoRepository.save(pedido);
     }
 
@@ -249,6 +287,10 @@ public class PedidoServiceImpl implements PedidoService {
                 throw new RuntimeException(
                         "Produto não está disponível - ID: " + itemRequest.getProdutoId());
             }
+            
+            // Validate stock for the item
+            produtoService.validarEstoque(produto, itemRequest.getQuantidade());
+            
             BigDecimal precoUnitario = produto.getPreco();
             BigDecimal quantidade = BigDecimal.valueOf(itemRequest.getQuantidade());
             BigDecimal subtotal = precoUnitario.multiply(quantidade);
@@ -371,6 +413,9 @@ public class PedidoServiceImpl implements PedidoService {
                             "Produto não pertence ao restaurante selecionado: "
                                     + produto.getNome());
                 }
+                
+                // Validate stock for the item
+                produtoService.validarEstoque(produto, itemRequest.getQuantidade());
             }
 
             // Convert DTO to Entity
@@ -385,6 +430,21 @@ public class PedidoServiceImpl implements PedidoService {
         } catch (Exception e) {
             log.error("Erro ao criar pedido via DTO: {}", e.getMessage(), e);
             throw e;
+        }
+    }
+    
+    // ===== MÉTODO PARA VALIDAÇÃO DE ESTOQUE =====
+    
+    @Override
+    public void validarEstoqueItens(Pedido pedido) {
+        for (ItemPedido item : pedido.getItens()) {
+            Long produtoId = item.getProduto() != null ? item.getProduto().getId() : null;
+            if (produtoId == null) {
+                throw new RuntimeException("ID do produto não pode ser nulo.");
+            }
+            Produto produto = produtoRepository.findById(produtoId)
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado: ID " + produtoId));
+            produtoService.validarEstoque(produto, item.getQuantidade());
         }
     }
 }

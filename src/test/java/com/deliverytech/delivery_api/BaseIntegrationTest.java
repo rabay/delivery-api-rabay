@@ -6,6 +6,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.context.annotation.Import;
 
 @Testcontainers
 @SpringBootTest
@@ -13,6 +14,7 @@ import org.springframework.test.context.TestPropertySource;
     "spring.jpa.hibernate.ddl-auto=none",
     "spring.sql.init.mode=always"
 })
+@Import(TestConfig.class)
 public abstract class BaseIntegrationTest {
 
     @DynamicPropertySource

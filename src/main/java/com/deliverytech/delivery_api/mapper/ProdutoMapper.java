@@ -32,6 +32,7 @@ public class ProdutoMapper {
                 .disponivel(dto.getDisponivel() != null ? dto.getDisponivel() : true)
                 .excluido(false)
                 .restaurante(restaurante)
+                .quantidadeEstoque(dto.getQuantidadeEstoque())
                 .build();
     }
 
@@ -48,6 +49,7 @@ public class ProdutoMapper {
                 .descricao(entity.getDescricao())
                 .preco(entity.getPreco())
                 .disponivel(entity.getDisponivel())
+                .quantidadeEstoque(entity.getQuantidadeEstoque())
                 .restaurante(restauranteResumo)
                 .build();
     }

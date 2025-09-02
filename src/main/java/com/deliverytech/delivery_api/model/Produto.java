@@ -50,4 +50,29 @@ public class Produto {
     @ManyToOne
     @JoinColumn(name = "restaurante_id", nullable = false)
     private Restaurante restaurante;
+
+    @NotNull(message = "Quantidade em estoque é obrigatória")
+    @Column(nullable = false)
+    private Integer quantidadeEstoque;
+
+    // Business methods for stock control
+    public boolean isInfiniteStock() {
+        return quantidadeEstoque != null && quantidadeEstoque < 0;
+    }
+
+    public boolean isDisponivel() {
+        return disponivel && (isInfiniteStock() || (quantidadeEstoque != null && quantidadeEstoque > 0));
+    }
+
+    public void reduzirEstoque(Integer quantidade) {
+        if (!isInfiniteStock() && quantidadeEstoque != null && quantidade != null) {
+            this.quantidadeEstoque -= quantidade;
+        }
+    }
+
+    public void aumentarEstoque(Integer quantidade) {
+        if (!isInfiniteStock() && quantidadeEstoque != null && quantidade != null) {
+            this.quantidadeEstoque += quantidade;
+        }
+    }
 }

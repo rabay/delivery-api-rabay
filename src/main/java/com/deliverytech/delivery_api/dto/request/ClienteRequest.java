@@ -29,4 +29,10 @@ public class ClienteRequest {
     @NotBlank(message = "Endereço é obrigatório")
     @Size(max = 255, message = "Endereço não pode ter mais de 255 caracteres")
     private String endereco;
+    
+    private String senha;
+    
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
 }

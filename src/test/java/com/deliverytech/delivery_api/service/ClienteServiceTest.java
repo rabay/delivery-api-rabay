@@ -6,14 +6,12 @@ import com.deliverytech.delivery_api.dto.response.ClienteResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-// Remove @DataJpaTest since we're using @SpringBootTest in BaseIntegrationTest
 @Import({com.deliverytech.delivery_api.service.impl.ClienteServiceImpl.class, com.deliverytech.delivery_api.mapper.ClienteMapper.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers

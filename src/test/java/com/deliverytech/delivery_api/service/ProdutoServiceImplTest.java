@@ -1,6 +1,7 @@
 package com.deliverytech.delivery_api.service;
 
 import com.deliverytech.delivery_api.model.Produto;
+import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.service.impl.ProdutoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,13 +10,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ProdutoServiceImplTest {
     @Mock
     private ProdutoRepository produtoRepository;
+
     @InjectMocks
     private ProdutoServiceImpl produtoService;
 
@@ -111,13 +115,26 @@ class ProdutoServiceImplTest {
     @Test
     @DisplayName("Deve cadastrar produto com dados válidos")
     void deveCadastrarProdutoQuandoDadosValidos() {
-    Produto produto = new Produto();
-    produto.setNome("Pizza");
-    produto.setCategoria("Pizza");
-    produto.setRestaurante(new com.deliverytech.delivery_api.model.Restaurante());
-    when(produtoRepository.save(produto)).thenReturn(produto);
-    Produto salvo = produtoService.cadastrar(produto);
-    assertNotNull(salvo);
-    assertEquals("Pizza", salvo.getNome());
+        Produto produto = new Produto();
+        produto.setNome("Pizza");
+        produto.setCategoria("Pizza");
+        produto.setQuantidadeEstoque(10); // Add required field
+        produto.setRestaurante(new Restaurante());
+        when(produtoRepository.save(produto)).thenReturn(produto);
+        Produto salvo = produtoService.cadastrar(produto);
+        assertNotNull(salvo);
+        assertEquals("Pizza", salvo.getNome());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando quantidade estoque for nula")
+    void deveLancarExcecaoQuandoQuantidadeEstoqueForNula() {
+        Produto produto = new Produto();
+        produto.setNome("Pizza");
+        produto.setCategoria("Pizza");
+        produto.setQuantidadeEstoque(null); // Null stock quantity
+        produto.setRestaurante(new Restaurante());
+        
+        assertThrows(RuntimeException.class, () -> produtoService.cadastrar(produto));
     }
 }

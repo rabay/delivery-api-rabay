@@ -1,29 +1,26 @@
 package com.deliverytech.delivery_api.service;
 
 import com.deliverytech.delivery_api.BaseIntegrationTest;
-import com.deliverytech.delivery_api.model.*;
-import com.deliverytech.delivery_api.dto.request.ClienteRequest;
-import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
+import com.deliverytech.delivery_api.dto.request.*;
 import com.deliverytech.delivery_api.dto.response.ClienteResponse;
-import org.junit.jupiter.api.Test;
+import com.deliverytech.delivery_api.dto.response.PedidoResponse;
+import com.deliverytech.delivery_api.dto.response.RestauranteResponse;
+import com.deliverytech.delivery_api.model.*;
+import com.deliverytech.delivery_api.repository.PedidoRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-// Remove @DataJpaTest since we're using @SpringBootTest in BaseIntegrationTest
-@Import({com.deliverytech.delivery_api.service.impl.PedidoServiceImpl.class, com.deliverytech.delivery_api.service.impl.ClienteServiceImpl.class, com.deliverytech.delivery_api.service.impl.RestauranteServiceImpl.class, com.deliverytech.delivery_api.service.impl.ProdutoServiceImpl.class, com.deliverytech.delivery_api.mapper.PedidoMapper.class, com.deliverytech.delivery_api.mapper.ClienteMapper.class, com.deliverytech.delivery_api.mapper.RestauranteMapper.class, com.deliverytech.delivery_api.mapper.ProdutoMapper.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
+@Transactional
 class PedidoServiceTest extends BaseIntegrationTest {
+
     @Autowired
     private PedidoService pedidoService;
     
@@ -35,28 +32,25 @@ class PedidoServiceTest extends BaseIntegrationTest {
     
     @Autowired
     private ProdutoService produtoService;
-
-    @Test
-    void contextLoads() {
-        assertThat(pedidoService).isNotNull();
-    }
     
+    @Autowired
+    private PedidoRepository pedidoRepository;
+
     @Test
     @DisplayName("Deve criar pedido com itens válidos")
     void deveCriarPedidoComItensValidos() {
         // Arrange - Criar cliente
         ClienteRequest clienteReq = new ClienteRequest();
-        clienteReq.setNome("Cliente Teste");
+        clienteReq.setNome("Cliente Pedido Teste");
         clienteReq.setEmail("cliente.pedido@test.com");
         clienteReq.setTelefone("11999999999");
-        clienteReq.setEndereco("Endereço Teste");
+        clienteReq.setSenha("senha123");
         ClienteResponse clienteResponse = clienteService.cadastrar(clienteReq);
         
         // Arrange - Criar restaurante
         RestauranteRequest restReq = new RestauranteRequest();
-        restReq.setNome("Restaurante Pedido");
+        restReq.setNome("Restaurante Pedido Teste");
         restReq.setCategoria("Teste");
-        restReq.setEndereco("Endereço Rest");
         restReq.setTaxaEntrega(BigDecimal.valueOf(5.0));
         restReq.setTempoEntregaMinutos(30);
         restReq.setTelefone("11888888888");
@@ -71,6 +65,7 @@ class PedidoServiceTest extends BaseIntegrationTest {
         produto.setDescricao("Descrição");
         produto.setPreco(BigDecimal.valueOf(25.0));
         produto.setRestaurante(restaurante);
+        produto.setQuantidadeEstoque(10); // Add required field
         produto = produtoService.cadastrar(produto);
         
         // Arrange - Criar pedido usando entity diretamente para teste

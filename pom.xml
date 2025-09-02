@@ -145,6 +145,8 @@
 			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Removed H2 Database dependency as we're using Testcontainers -->
 	</dependencies>
 
 	<build>

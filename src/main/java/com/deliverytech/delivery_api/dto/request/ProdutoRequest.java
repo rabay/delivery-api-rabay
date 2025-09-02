@@ -38,4 +38,7 @@ public class ProdutoRequest {
     private Long restauranteId;
 
     @Builder.Default private Boolean disponivel = true;
+
+    @NotNull(message = "Quantidade em estoque é obrigatória")
+    private Integer quantidadeEstoque;
 }

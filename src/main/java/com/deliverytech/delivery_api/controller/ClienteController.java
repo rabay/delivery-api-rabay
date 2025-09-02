@@ -62,12 +62,15 @@ public class ClienteController {
     @Operation(
             summary = "Buscar cliente por ID",
             description = "Consulta um cliente pelo seu identificador único.")
-    @GetMapping("/{id}")
+    @GetMapping("/{id:[0-9]+}")
     public ResponseEntity<ClienteResponse> buscarPorId(@PathVariable Long id) {
         try {
+            System.out.println("ClienteController.buscarPorId called with id: " + id);
             ClienteResponse cliente = clienteService.buscarPorId(id);
             return ResponseEntity.ok(cliente);
         } catch (RuntimeException e) {
+            System.err.println("RuntimeException in buscarPorId: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.notFound().build();
         }
     }
@@ -75,7 +78,7 @@ public class ClienteController {
     @Operation(
             summary = "Atualizar cliente",
             description = "Atualiza os dados de um cliente existente.")
-    @PutMapping("/{id}")
+    @PutMapping("/{id:[0-9]+}")
     public ResponseEntity<ClienteResponse> atualizar(
             @PathVariable Long id, @Valid @RequestBody ClienteRequest clienteRequest) {
         ClienteResponse atualizado = clienteService.atualizar(id, clienteRequest);
@@ -85,7 +88,7 @@ public class ClienteController {
     @Operation(
             summary = "Inativar cliente",
             description = "Inativa um cliente pelo seu ID, tornando-o indisponível para operações.")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:[0-9]+}")
     public ResponseEntity<Void> inativar(@PathVariable Long id) {
         clienteService.inativar(id);
         return ResponseEntity.noContent().build();
@@ -94,7 +97,7 @@ public class ClienteController {
     @Operation(
             summary = "Ativar/Desativar cliente",
             description = "Alterna o status ativo/inativo de um cliente.")
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{id:[0-9]+}/status")
     public ResponseEntity<ClienteResponse> alterarStatus(@PathVariable Long id) {
         ClienteResponse atualizado = clienteService.ativarDesativarCliente(id);
         return ResponseEntity.ok(atualizado);
@@ -103,23 +106,42 @@ public class ClienteController {
     @Operation(
             summary = "Listar pedidos do cliente",
             description = "Retorna todos os pedidos realizados por um cliente específico.")
-    @GetMapping("/{clienteId}/pedidos")
+    @GetMapping("/{clienteId:[0-9]+}/pedidos")
     public ResponseEntity<List<PedidoResponse>> buscarPedidosDoCliente(
             @PathVariable Long clienteId) {
         try {
+            // Log the clienteId to see what's being passed
+            System.out.println("Received request for pedidos of clienteId: " + clienteId);
+            System.out.println("clienteId class: " + clienteId.getClass().getName());
+            System.out.println("clienteId value: " + clienteId);
+            
+            // Validate that clienteId is not null or negative
+            if (clienteId == null || clienteId <= 0) {
+                System.out.println("Invalid clienteId: " + clienteId);
+                return ResponseEntity.badRequest().build();
+            }
+            
             // Carregar pedidos com itens e produtos para evitar problemas de lazy loading ao mapear
             // para DTOs
+            System.out.println("Calling pedidoService.buscarPorClienteComItens with clienteId: " + clienteId);
             List<com.deliverytech.delivery_api.model.Pedido> pedidos =
                     pedidoService.buscarPorClienteComItens(clienteId);
+            System.out.println("pedidoService returned " + (pedidos != null ? pedidos.size() : "null") + " pedidos");
             List<PedidoResponse> responses =
                     pedidos == null
                             ? List.of()
                             : pedidos.stream().map(this::mapToResponse).toList();
+            System.out.println("Mapped to " + responses.size() + " PedidoResponse objects");
             return ResponseEntity.ok(responses);
         } catch (RuntimeException ex) {
             // Logar a exceção para diagnóstico e manter contrato da API retornando lista vazia
+            System.err.println("RuntimeException in buscarPedidosDoCliente: " + ex.getMessage());
+            ex.printStackTrace();
             return ResponseEntity.ok(List.of());
         } catch (Exception ex) {
+            // Log the exception for debugging
+            System.err.println("Exception in buscarPedidosDoCliente: " + ex.getMessage());
+            ex.printStackTrace();
             return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(null);
         }

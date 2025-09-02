@@ -59,6 +59,7 @@ CREATE TABLE produto (
     disponivel BOOLEAN NOT NULL DEFAULT TRUE,
     excluido BOOLEAN NOT NULL DEFAULT FALSE,
     restaurante_id BIGINT NOT NULL,
+    quantidade_estoque INTEGER NOT NULL,
     FOREIGN KEY (restaurante_id) REFERENCES restaurante(id)
 );
 
@@ -97,368 +98,131 @@ CREATE TABLE item_pedido (
     FOREIGN KEY (produto_id) REFERENCES produto(id)
 );
 
--- Insert initial data (idempotent using INSERT ... ON DUPLICATE KEY UPDATE)
+-- Insert initial data using standard SQL that works with both MySQL and H2
+-- For idempotent inserts, we'll use a conditional approach
 
 -- Clientes
-INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
-VALUES (1, 'João Silva', 'joao@email.com', NULL, NULL, 1, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    telefone = VALUES(telefone),
-    endereco = VALUES(endereco),
-    ativo = VALUES(ativo),
-    excluido = VALUES(excluido);
+INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido) 
+SELECT 1, 'João Silva', 'joao@email.com', NULL, NULL, TRUE, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 1);
 
-INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
-VALUES (2, 'Maria Santos', 'maria@email.com', NULL, NULL, 1, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    telefone = VALUES(telefone),
-    endereco = VALUES(endereco),
-    ativo = VALUES(ativo),
-    excluido = VALUES(excluido);
+INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido) 
+SELECT 2, 'Maria Santos', 'maria@email.com', NULL, NULL, TRUE, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 2);
 
-INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
-VALUES (3, 'Pedro Oliveira', 'pedro@email.com', NULL, NULL, 0, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    telefone = VALUES(telefone),
-    endereco = VALUES(endereco),
-    ativo = VALUES(ativo),
-    excluido = VALUES(excluido);
+INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido) 
+SELECT 3, 'Pedro Oliveira', 'pedro@email.com', NULL, NULL, FALSE, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 3);
 
-INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
-VALUES (4, 'Ana Costa', 'ana@email.com', NULL, NULL, 1, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    telefone = VALUES(telefone),
-    endereco = VALUES(endereco),
-    ativo = VALUES(ativo),
-    excluido = VALUES(excluido);
+INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido) 
+SELECT 4, 'Ana Costa', 'ana@email.com', NULL, NULL, TRUE, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 4);
 
-INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
-VALUES (5, 'Carlos Ferreira', 'carlos@email.com', NULL, NULL, 1, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    telefone = VALUES(telefone),
-    endereco = VALUES(endereco),
-    ativo = VALUES(ativo),
-    excluido = VALUES(excluido);
+INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido) 
+SELECT 5, 'Carlos Ferreira', 'carlos@email.com', NULL, NULL, TRUE, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 5);
 
 -- Restaurantes
-INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
-VALUES (1, 'Pizza Express', 'Italiana', NULL, 5.00, NULL, NULL, 30, 1, 4.5, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    endereco = VALUES(endereco),
-    taxa_entrega = VALUES(taxa_entrega),
-    telefone = VALUES(telefone),
-    email = VALUES(email),
-    tempo_entrega_minutos = VALUES(tempo_entrega_minutos),
-    ativo = VALUES(ativo),
-    avaliacao = VALUES(avaliacao),
-    excluido = VALUES(excluido);
+INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido) 
+SELECT 1, 'Pizza Express', 'Italiana', NULL, 5.00, NULL, NULL, 30, TRUE, 4.5, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 1);
 
-INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
-VALUES (2, 'Burger King', 'Fast Food', NULL, 4.00, NULL, NULL, 25, 1, 4.2, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    endereco = VALUES(endereco),
-    taxa_entrega = VALUES(taxa_entrega),
-    telefone = VALUES(telefone),
-    email = VALUES(email),
-    tempo_entrega_minutos = VALUES(tempo_entrega_minutos),
-    ativo = VALUES(ativo),
-    avaliacao = VALUES(avaliacao),
-    excluido = VALUES(excluido);
+INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido) 
+SELECT 2, 'Burger King', 'Fast Food', NULL, 4.00, NULL, NULL, 25, TRUE, 4.2, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 2);
 
-INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
-VALUES (3, 'Sushi House', 'Japonesa', NULL, 6.00, NULL, NULL, 40, 1, 4.8, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    endereco = VALUES(endereco),
-    taxa_entrega = VALUES(taxa_entrega),
-    telefone = VALUES(telefone),
-    email = VALUES(email),
-    tempo_entrega_minutos = VALUES(tempo_entrega_minutos),
-    ativo = VALUES(ativo),
-    avaliacao = VALUES(avaliacao),
-    excluido = VALUES(excluido);
+INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido) 
+SELECT 3, 'Sushi House', 'Japonesa', NULL, 6.00, NULL, NULL, 40, TRUE, 4.8, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 3);
 
-INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
-VALUES (4, 'Gyros Athenas', 'Grega', NULL, 5.00, NULL, NULL, 35, 1, 4.0, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    endereco = VALUES(endereco),
-    taxa_entrega = VALUES(taxa_entrega),
-    telefone = VALUES(telefone),
-    email = VALUES(email),
-    tempo_entrega_minutos = VALUES(tempo_entrega_minutos),
-    ativo = VALUES(ativo),
-    avaliacao = VALUES(avaliacao),
-    excluido = VALUES(excluido);
+INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido) 
+SELECT 4, 'Gyros Athenas', 'Grega', NULL, 5.00, NULL, NULL, 35, TRUE, 4.0, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 4);
 
-INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
-VALUES (5, 'Chiparia do Porto', 'Frutos do Mar', NULL, 7.00, NULL, NULL, 45, 1, 4.3, 0)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    endereco = VALUES(endereco),
-    taxa_entrega = VALUES(taxa_entrega),
-    telefone = VALUES(telefone),
-    email = VALUES(email),
-    tempo_entrega_minutos = VALUES(tempo_entrega_minutos),
-    ativo = VALUES(ativo),
-    avaliacao = VALUES(avaliacao),
-    excluido = VALUES(excluido);
+INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido) 
+SELECT 5, 'Chiparia do Porto', 'Frutos do Mar', NULL, 7.00, NULL, NULL, 45, TRUE, 4.3, FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 5);
 
--- Usuarios (for authentication)
-INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao)
-VALUES (1, 'Administrator', 'admin@deliveryapi.com', '$2a$10$JR5F1bHMJWaItjsch8eLIujaLx.RyaCRP5Oy7K.c0qW7OneVGmHQa', 'ADMIN', 1, NOW())
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    senha = VALUES(senha),
-    role = VALUES(role),
-    ativo = VALUES(ativo),
-    data_criacao = VALUES(data_criacao);
+-- Usuarios
+INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao) 
+SELECT 1, 'Administrator', 'admin@deliveryapi.com', '$2a$10$JR5F1bHMJWaItjsch8eLIujaLx.RyaCRP5Oy7K.c0qW7OneVGmHQa', 'ADMIN', TRUE, NOW() 
+WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE id = 1);
 
-INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao)
-VALUES (2, 'Cliente Teste', 'cliente@test.com', '$2a$10$rOzJmZKz.5d5z.5d5z.5d5uz5z5z5z5z5z5z5z5z5z5z5z5z5z5z', 'CLIENTE', 1, NOW())
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    senha = VALUES(senha),
-    role = VALUES(role),
-    ativo = VALUES(ativo),
-    data_criacao = VALUES(data_criacao);
+INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao) 
+SELECT 2, 'Cliente Teste', 'cliente@test.com', '$2a$10$rOzJmZKz.5d5z.5d5z.5d5uz5z5z5z5z5z5z5z5z5z5z5z5z5z5z', 'CLIENTE', TRUE, NOW() 
+WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE id = 2);
 
-INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao, restaurante_id)
-VALUES (3, 'Restaurante Teste', 'restaurante@test.com', '$2a$10$rOzJmZKz.5d5z.5d5z.5d5uz5z5z5z5z5z5z5z5z5z5z5z5z5z5z', 'RESTAURANTE', 1, NOW(), 1)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    senha = VALUES(senha),
-    role = VALUES(role),
-    ativo = VALUES(ativo),
-    data_criacao = VALUES(data_criacao),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao, restaurante_id) 
+SELECT 3, 'Restaurante Teste', 'restaurante@test.com', '$2a$10$rOzJmZKz.5d5z.5d5z.5d5uz5z5z5z5z5z5z5z5z5z5z5z5z5z5z', 'RESTAURANTE', TRUE, NOW(), 1 
+WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE id = 3);
 
-INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao)
-VALUES (4, 'Entregador Teste', 'entregador@test.com', '$2a$10$rOzJmZKz.5d5z.5d5z.5d5uz5z5z5z5z5z5z5z5z5z5z5z5z5z5z', 'ENTREGADOR', 1, NOW())
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    email = VALUES(email),
-    senha = VALUES(senha),
-    role = VALUES(role),
-    ativo = VALUES(ativo),
-    data_criacao = VALUES(data_criacao);
+INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao) 
+SELECT 4, 'Entregador Teste', 'entregador@test.com', '$2a$10$rOzJmZKz.5d5z.5d5z.5d5uz5z5z5z5z5z5z5z5z5z5z5z5z5z5z', 'ENTREGADOR', TRUE, NOW() 
+WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE id = 4);
 
 -- Produtos
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (1, 'Pizza Margherita', 'Pizza', NULL, 25.00, 1, 0, 1)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 1, 'Pizza Margherita', 'Pizza', NULL, 25.00, TRUE, FALSE, 1, 10 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 1);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (2, 'Pizza Pepperoni', 'Pizza', NULL, 28.00, 1, 0, 1)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 2, 'Pizza Pepperoni', 'Pizza', NULL, 28.00, TRUE, FALSE, 1, 8 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 2);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (3, 'Big Burger', 'Hambúrguer', NULL, 30.00, 1, 0, 2)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 3, 'Big Burger', 'Hambúrguer', NULL, 30.00, TRUE, FALSE, 2, 15 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 3);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (4, 'Batata Frita Grande', 'Acompanhamento', NULL, 10.00, 1, 0, 2)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 4, 'Batata Frita Grande', 'Acompanhamento', NULL, 10.00, TRUE, FALSE, 2, 20 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 4);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (5, 'Sushi Salmão', 'Sushi', NULL, 15.00, 1, 0, 3)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 5, 'Sushi Salmão', 'Sushi', NULL, 15.00, TRUE, FALSE, 3, 12 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 5);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (6, 'Hot Roll', 'Sushi', NULL, 12.00, 1, 0, 3)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 6, 'Hot Roll', 'Sushi', NULL, 12.00, TRUE, FALSE, 3, 15 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 6);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (7, 'Gyros de Cordeiro', 'Espeto', NULL, 22.00, 1, 0, 4)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 7, 'Gyros de Cordeiro', 'Espeto', NULL, 22.00, TRUE, FALSE, 4, 7 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 7);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (8, 'Souvlaki de Frango', 'Espeto', NULL, 20.00, 1, 0, 4)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 8, 'Souvlaki de Frango', 'Espeto', NULL, 20.00, TRUE, FALSE, 4, 9 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 8);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (9, 'Fish & Chips Tradicional', 'Peixe', NULL, 35.00, 1, 0, 5)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 9, 'Fish & Chips Tradicional', 'Peixe', NULL, 35.00, TRUE, FALSE, 5, 5 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 9);
 
-INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id)
-VALUES (10, 'Porção de Camarão Empanado', 'Frutos do Mar', NULL, 28.00, 1, 0, 5)
-ON DUPLICATE KEY UPDATE
-    nome = VALUES(nome),
-    categoria = VALUES(categoria),
-    descricao = VALUES(descricao),
-    preco = VALUES(preco),
-    disponivel = VALUES(disponivel),
-    excluido = VALUES(excluido),
-    restaurante_id = VALUES(restaurante_id);
+INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque) 
+SELECT 10, 'Porção de Camarão Empanado', 'Frutos do Mar', NULL, 28.00, TRUE, FALSE, 5, 6 
+WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 10);
 
 -- Pedidos
-INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
-VALUES (1, 1, 1, 50.00, 'PED-0001', 50.00, 'Sem lactose', 'Rua A', '100', 'Centro', 'Sao Paulo', 'SP', '01000-000', '', 'CRIADO', NOW(), 0)
-ON DUPLICATE KEY UPDATE
-    cliente_id = VALUES(cliente_id),
-    restaurante_id = VALUES(restaurante_id),
-    valor_total = VALUES(valor_total),
-    numero_pedido = VALUES(numero_pedido),
-    subtotal = VALUES(subtotal),
-    observacoes = VALUES(observacoes),
-    logradouro = VALUES(logradouro),
-    numero = VALUES(numero),
-    bairro = VALUES(bairro),
-    cidade = VALUES(cidade),
-    estado = VALUES(estado),
-    cep = VALUES(cep),
-    complemento = VALUES(complemento),
-    status = VALUES(status),
-    data_pedido = VALUES(data_pedido),
-    excluido = VALUES(excluido);
+INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
+SELECT 1, 1, 1, 50.00, 'PED-0001', 50.00, 'Sem lactose', 'Rua A', '100', 'Centro', 'Sao Paulo', 'SP', '01000-000', '', 'CRIADO', NOW(), FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 1);
 
-INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
-VALUES (2, 2, 2, 30.00, 'PED-0002', 30.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', NOW(), 0)
-ON DUPLICATE KEY UPDATE
-    cliente_id = VALUES(cliente_id),
-    restaurante_id = VALUES(restaurante_id),
-    valor_total = VALUES(valor_total),
-    numero_pedido = VALUES(numero_pedido),
-    subtotal = VALUES(subtotal),
-    observacoes = VALUES(observacoes),
-    logradouro = VALUES(logradouro),
-    numero = VALUES(numero),
-    bairro = VALUES(bairro),
-    cidade = VALUES(cidade),
-    estado = VALUES(estado),
-    cep = VALUES(cep),
-    complemento = VALUES(complemento),
-    status = VALUES(status),
-    data_pedido = VALUES(data_pedido),
-    excluido = VALUES(excluido);
+INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
+SELECT 2, 2, 2, 30.00, 'PED-0002', 30.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', NOW(), FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 2);
 
-INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
-VALUES (3, 3, 3, 45.00, 'PED-0003', 45.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CANCELADO', NOW(), 0)
-ON DUPLICATE KEY UPDATE
-    cliente_id = VALUES(cliente_id),
-    restaurante_id = VALUES(restaurante_id),
-    valor_total = VALUES(valor_total),
-    numero_pedido = VALUES(numero_pedido),
-    subtotal = VALUES(subtotal),
-    observacoes = VALUES(observacoes),
-    logradouro = VALUES(logradouro),
-    numero = VALUES(numero),
-    bairro = VALUES(bairro),
-    cidade = VALUES(cidade),
-    estado = VALUES(estado),
-    cep = VALUES(cep),
-    complemento = VALUES(complemento),
-    status = VALUES(status),
-    data_pedido = VALUES(data_pedido),
-    excluido = VALUES(excluido);
+INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
+SELECT 3, 3, 3, 45.00, 'PED-0003', 45.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CANCELADO', NOW(), FALSE 
+WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 3);
 
 -- Itens dos pedidos
-INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
-VALUES (1, 1, 1, 2, 25.00, 50.00)
-ON DUPLICATE KEY UPDATE
-    pedido_id = VALUES(pedido_id),
-    produto_id = VALUES(produto_id),
-    quantidade = VALUES(quantidade),
-    preco_unitario = VALUES(preco_unitario),
-    subtotal = VALUES(subtotal);
+INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal) 
+SELECT 1, 1, 1, 2, 25.00, 50.00 
+WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 1);
 
-INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
-VALUES (2, 2, 3, 1, 30.00, 30.00)
-ON DUPLICATE KEY UPDATE
-    pedido_id = VALUES(pedido_id),
-    produto_id = VALUES(produto_id),
-    quantidade = VALUES(quantidade),
-    preco_unitario = VALUES(preco_unitario),
-    subtotal = VALUES(subtotal);
+INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal) 
+SELECT 2, 2, 3, 1, 30.00, 30.00 
+WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 2);
 
-INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
-VALUES (3, 3, 5, 3, 15.00, 45.00)
-ON DUPLICATE KEY UPDATE
-    pedido_id = VALUES(pedido_id),
-    produto_id = VALUES(produto_id),
-    quantidade = VALUES(quantidade),
-    preco_unitario = VALUES(preco_unitario),
-    subtotal = VALUES(subtotal);
+INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal) 
+SELECT 3, 3, 5, 3, 15.00, 45.00 
+WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 3);

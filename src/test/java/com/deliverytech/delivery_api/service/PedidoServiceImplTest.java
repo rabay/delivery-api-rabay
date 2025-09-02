@@ -17,6 +17,8 @@ class PedidoServiceImplTest {
     private PedidoRepository pedidoRepository;
     @Mock
     private com.deliverytech.delivery_api.repository.ProdutoRepository produtoRepository;
+    @Mock
+    private com.deliverytech.delivery_api.service.ProdutoService produtoService;
     @InjectMocks
     private PedidoServiceImpl pedidoService;
 
@@ -108,6 +110,10 @@ class PedidoServiceImplTest {
         when(produtoRepository.findById(1L)).thenReturn(java.util.Optional.of(produto));
         when(pedidoRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
+        // Mock the produtoService validation
+        doNothing().when(produtoService).validarEstoque(any(), anyInt());
+        doNothing().when(produtoService).reservarEstoque(any());
+
         var result = pedidoService.criar(pedido);
         assertNotNull(result);
         assertEquals(java.math.BigDecimal.valueOf(20), result.getValorTotal());
@@ -135,6 +141,6 @@ class PedidoServiceImplTest {
         pedido.setItens(java.util.List.of(item));
         when(produtoRepository.findById(99L)).thenReturn(java.util.Optional.empty());
         var ex = assertThrows(RuntimeException.class, () -> pedidoService.criar(pedido));
-        assertTrue(ex.getMessage().contains("Produto não encontrado"));
+        assertTrue(ex.getMessage().contains("Produto não encontrado: ID 99") || ex.getMessage().contains("Produto não encontrado"));
     }
 }
