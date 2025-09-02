@@ -7,6 +7,8 @@ import com.deliverytech.delivery_api.service.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +32,7 @@ public class ProdutoController {
             summary = "Cadastrar novo produto",
             description = "Cria um novo produto disponível em um restaurante.")
     @PostMapping
-    public ResponseEntity<ProdutoResponse> criar(@RequestBody ProdutoRequest produto) {
+    public ResponseEntity<ProdutoResponse> criar(@Valid @RequestBody ProdutoRequest produto) {
         ProdutoResponse novo = produtoService.cadastrar(produto);
         return ResponseEntity.status(201).body(novo);
     }
@@ -62,7 +64,7 @@ public class ProdutoController {
             description = "Atualiza os dados de um produto existente.")
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoResponse> atualizar(
-            @PathVariable Long id, @RequestBody ProdutoRequest produto) {
+            @PathVariable Long id, @Valid @RequestBody ProdutoRequest produto) {
         try {
             ProdutoResponse atualizado = produtoService.atualizar(id, produto);
             return ResponseEntity.ok(atualizado);

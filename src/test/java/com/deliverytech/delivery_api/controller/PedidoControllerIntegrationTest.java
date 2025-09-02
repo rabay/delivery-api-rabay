@@ -110,7 +110,7 @@ class PedidoControllerIntegrationTest extends BaseIntegrationTest {
         Long clienteId = extractId(body);
 
         // Criar restaurante
-        String restauranteJson = "{\"nome\": \"Rest Int\", \"categoria\": \"Geral\", \"ativo\": true, \"avaliacao\": 4.0 }";
+        String restauranteJson = "{\"nome\": \"Rest Int\", \"categoria\": \"Geral\", \"endereco\": \"Rua Teste, 123\", \"taxaEntrega\": 5.0, \"tempoEntregaMinutos\": 30, \"telefone\": \"11999999999\", \"email\": \"rest@test.com\", \"avaliacao\": 4.0 }";
         HttpEntity<String> restReq = new HttpEntity<>(restauranteJson, headers);
         ResponseEntity<String> restResp = restTemplate.postForEntity("http://localhost:" + port + "/api/restaurantes", restReq, String.class);
         assertThat(restResp.getStatusCode()).isEqualTo(HttpStatus.CREATED);

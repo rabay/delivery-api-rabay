@@ -64,3 +64,13 @@ docs/**/*
 
 dependency-check-report/
 dependency-check-report/**
+
+.clinerules/
+.clinerules/**/*
+
+.continue/
+.continue/**/*
+
+.azure/
+.azure/**/*
+!.azure/devops

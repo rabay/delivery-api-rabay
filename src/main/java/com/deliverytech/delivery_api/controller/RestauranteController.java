@@ -9,6 +9,8 @@ import com.deliverytech.delivery_api.service.RestauranteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +38,7 @@ public class RestauranteController {
             summary = "Cadastrar novo restaurante",
             description = "Cria um novo restaurante ativo no sistema.")
     @PostMapping
-    public ResponseEntity<Restaurante> criar(@RequestBody RestauranteRequest restauranteRequest) {
+    public ResponseEntity<Restaurante> criar(@Valid @RequestBody RestauranteRequest restauranteRequest) {
         Restaurante novo = restauranteService.cadastrar(restauranteRequest);
         return ResponseEntity.status(201).body(novo);
     }
@@ -65,7 +67,7 @@ public class RestauranteController {
             description = "Atualiza os dados de um restaurante existente.")
     @PutMapping("/{id}")
     public ResponseEntity<Restaurante> atualizar(
-            @PathVariable Long id, @RequestBody RestauranteRequest restauranteRequest) {
+            @PathVariable Long id, @Valid @RequestBody RestauranteRequest restauranteRequest) {
         Restaurante atualizado = restauranteService.atualizar(id, restauranteRequest);
         return ResponseEntity.ok(atualizado);
     }

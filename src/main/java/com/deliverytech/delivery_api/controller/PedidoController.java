@@ -4,6 +4,7 @@ import com.deliverytech.delivery_api.dto.request.PedidoRequest;
 import com.deliverytech.delivery_api.dto.request.StatusUpdateRequest;
 import com.deliverytech.delivery_api.dto.response.ItemPedidoResponse;
 import com.deliverytech.delivery_api.dto.response.PedidoResponse;
+import com.deliverytech.delivery_api.dto.response.PedidoResumoResponse;
 import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.model.StatusPedido;
 import com.deliverytech.delivery_api.service.PedidoService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/pedidos")
@@ -48,6 +50,21 @@ public class PedidoController {
             return ResponseEntity.ok(responses);
         } catch (Exception ex) {
             logger.error("Erro ao listar todos os pedidos: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @Operation(
+            summary = "Listar todos os pedidos (resumo)",
+            description = "Retorna um resumo de todos os pedidos cadastrados no sistema.")
+    @GetMapping("/resumo")
+    public ResponseEntity<List<PedidoResumoResponse>> listarTodosResumo() {
+        try {
+            List<Pedido> pedidos = pedidoService.listarTodos();
+            List<PedidoResumoResponse> responses = pedidos.stream().map(this::mapToResumoResponse).toList();
+            return ResponseEntity.ok(responses);
+        } catch (Exception ex) {
+            logger.error("Erro ao listar todos os pedidos (resumo): {}", ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -162,7 +179,20 @@ public class PedidoController {
         pedido.getCliente().setId(dto.getClienteId());
         pedido.setRestaurante(new com.deliverytech.delivery_api.model.Restaurante());
         pedido.getRestaurante().setId(dto.getRestauranteId());
-        pedido.setEnderecoEntrega(dto.getEnderecoEntrega());
+        
+        // Convert EnderecoRequest to Endereco
+        if (dto.getEnderecoEntrega() != null) {
+            com.deliverytech.delivery_api.model.Endereco endereco = new com.deliverytech.delivery_api.model.Endereco();
+            endereco.setRua(dto.getEnderecoEntrega().getRua());
+            endereco.setNumero(dto.getEnderecoEntrega().getNumero());
+            endereco.setBairro(dto.getEnderecoEntrega().getBairro());
+            endereco.setCidade(dto.getEnderecoEntrega().getCidade());
+            endereco.setEstado(dto.getEnderecoEntrega().getEstado());
+            endereco.setCep(dto.getEnderecoEntrega().getCep());
+            endereco.setComplemento(dto.getEnderecoEntrega().getComplemento());
+            pedido.setEnderecoEntrega(endereco);
+        }
+        
         pedido.setItens(
                 dto.getItens().stream()
                         .map(
@@ -206,5 +236,15 @@ public class PedidoController {
                                                         item.getPrecoUnitario()))
                                 .toList()
                         : List.of());
+    }
+    
+    private PedidoResumoResponse mapToResumoResponse(Pedido pedido) {
+        return new PedidoResumoResponse(
+                pedido.getId(),
+                (pedido.getCliente() != null) ? pedido.getCliente().getNome() : null,
+                (pedido.getRestaurante() != null) ? pedido.getRestaurante().getNome() : null,
+                pedido.getValorTotal(),
+                (pedido.getStatus() != null) ? pedido.getStatus().name() : null,
+                pedido.getDataPedido());
     }
 }

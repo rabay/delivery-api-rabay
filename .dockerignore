@@ -1,5 +1,5 @@
 # Evita arquivos desnecessários no contexto do build Docker
-/target
+# /target
 /.mvn
 *.md
 *.iml

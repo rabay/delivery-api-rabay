@@ -1,61 +1,48 @@
-# Dockerfile multi-stage otimizado para aplicação Spring Boot
-
-# ----------- TEST STAGE -----------
-# This stage runs unit tests that don't require Testcontainers
-FROM maven:3.9.6-eclipse-temurin-21 AS tester
-WORKDIR /app
-
-# Copia arquivos essenciais para dependências (melhor cache)
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-# Copia o restante do código
-COPY src src
-COPY config config
-
-# Run only unit tests that don't require Testcontainers
-RUN mvn clean test -Dtest="*ServiceImplTest,*MapperTest,*ModelTest" -DfailIfNoTests=false
 
 # ----------- BUILDER STAGE -----------
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
 
-# Copia arquivos essenciais para dependências (melhor cache)
+# Copia apenas arquivos essenciais para cache de dependências
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Copia o restante do código
+# Copia código fonte e configs
 COPY src src
 COPY config config
 
-# Compila o projeto (gera o jar na pasta target) incluindo testes
+# Compila o projeto (gera o jar na pasta target) - testes já rodaram fora do docker build
 RUN mvn clean package -DskipTests
 
+
 # ----------- RUNTIME STAGE -----------
+# Para máxima segurança, pode-se usar distroless. Aqui mantemos eclipse-temurin por flexibilidade.
 FROM eclipse-temurin:21-jre-jammy AS runtime
 WORKDIR /app
 
-# Cria usuário não-root para rodar a aplicação
-RUN useradd -m spring && mkdir /app/logs && chown -R spring:spring /app
+# Cria usuário não-root e diretório de logs
+RUN useradd -r -d /app -s /usr/sbin/nologin spring \
+		&& mkdir -p /app/logs \
+		&& chown -R spring:spring /app
 
-# Copia apenas o jar gerado do builder
+# Copia apenas o JAR final
 COPY --from=builder /app/target/delivery-api-0.0.1-SNAPSHOT.jar app.jar
 
-# Permissões restritivas (antes de trocar usuário)
-RUN chown spring:spring /app/app.jar && chmod 500 /app/app.jar
+# Permissões restritivas
+RUN chmod 500 /app/app.jar && chown spring:spring /app/app.jar
 
-# Troca para usuário não-root após permissionamento
+# Troca para usuário não-root
 USER spring
 
 # Variáveis de ambiente recomendadas
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 
-# Exponindo porta padrão Spring Boot
+# Expondo porta padrão Spring Boot
 EXPOSE 8080
 
-# Healthcheck para endpoint /health da aplicação
+# Healthcheck para endpoint /health
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-	CMD curl -f http://localhost:8080/health || exit 1
+	CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 # Entrypoint seguro
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
