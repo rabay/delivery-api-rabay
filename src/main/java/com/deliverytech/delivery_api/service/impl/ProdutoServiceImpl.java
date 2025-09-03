@@ -2,6 +2,8 @@ package com.deliverytech.delivery_api.service.impl;
 
 import com.deliverytech.delivery_api.dto.request.ProdutoRequest;
 import com.deliverytech.delivery_api.dto.response.ProdutoResponse;
+import com.deliverytech.delivery_api.exception.BusinessException;
+import com.deliverytech.delivery_api.exception.EntityNotFoundException;
 import com.deliverytech.delivery_api.exception.EstoqueInsuficienteException;
 import com.deliverytech.delivery_api.exception.ProdutoIndisponivelException;
 import com.deliverytech.delivery_api.mapper.ProdutoMapper;
@@ -32,17 +34,17 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     public Produto cadastrar(Produto produto) {
         if (produto.getCategoria() == null || produto.getCategoria().isEmpty()) {
-            throw new RuntimeException("Categoria obrigatória");
+            throw new BusinessException("Categoria obrigatória");
         }
         if (produto.getRestaurante() == null) {
-            throw new RuntimeException("Restaurante obrigatório");
+            throw new BusinessException("Restaurante obrigatório");
         }
         if (produto.getNome() == null || produto.getNome().isEmpty()) {
-            throw new RuntimeException("Nome obrigatório");
+            throw new BusinessException("Nome obrigatório");
         }
         // Validate stock quantity is provided
         if (produto.getQuantidadeEstoque() == null) {
-            throw new RuntimeException("Quantidade em estoque é obrigatória");
+            throw new BusinessException("Quantidade em estoque é obrigatória");
         }
         return produtoRepository.save(produto);
     }
@@ -76,7 +78,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto existente =
                 produtoRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Produto", id));
         existente.setNome(produtoAtualizado.getNome());
         existente.setCategoria(produtoAtualizado.getCategoria());
         existente.setDisponivel(produtoAtualizado.getDisponivel());
@@ -94,7 +96,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto produto =
                 produtoRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Produto", id));
         produto.setDisponivel(false);
         produtoRepository.save(produto);
     }
@@ -104,7 +106,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto produto =
                 produtoRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Produto", id));
         produto.setDisponivel(false);
         produto.setExcluido(true);
         produtoRepository.save(produto);
@@ -135,7 +137,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto produto =
                 produtoRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Produto", id));
         produto.setDisponivel(disponivel);
         produtoRepository.save(produto);
     }
@@ -143,7 +145,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     public void validarPreco(java.math.BigDecimal preco) {
         if (preco == null || preco.compareTo(java.math.BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Preço inválido");
+            throw new BusinessException("Preço inválido");
         }
     }
 
@@ -162,11 +164,11 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto produto =
                 produtoRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Produto", id));
 
         // Validate not soft deleted
         if (Boolean.TRUE.equals(produto.getExcluido())) {
-            throw new RuntimeException("Produto foi excluído do sistema");
+            throw new BusinessException("Produto foi excluído do sistema");
         }
 
         return produtoMapper.toResponse(produto);
@@ -185,11 +187,11 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto existente =
                 produtoRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Produto", id));
 
         // Validate not soft deleted
         if (Boolean.TRUE.equals(existente.getExcluido())) {
-            throw new RuntimeException("Não é possível atualizar produto excluído");
+            throw new BusinessException("Não é possível atualizar produto excluído");
         }
 
         // Update fields
@@ -256,7 +258,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Transactional
     public void atualizarEstoque(Long produtoId, Integer novaQuantidade) {
         Produto produto = produtoRepository.findById(produtoId)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Produto", produtoId));
         
         produto.setQuantidadeEstoque(novaQuantidade);
         produtoRepository.save(produto);
@@ -266,7 +268,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Transactional
     public void ajustarEstoque(Long produtoId, Integer quantidade) {
         Produto produto = produtoRepository.findById(produtoId)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Produto", produtoId));
         
         // Only adjust stock for non-infinite stock products
         if (!produto.isInfiniteStock()) {

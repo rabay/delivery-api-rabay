@@ -19,6 +19,9 @@ public class PedidoResumoResponse {
     @Schema(description = "Valor total do pedido.", example = "49.90")
     private BigDecimal valorTotal;
     
+    @Schema(description = "Desconto aplicado ao pedido.", example = "10.00")
+    private BigDecimal desconto;
+    
     @Schema(description = "Status do pedido.", example = "ENTREGUE")
     private String status;
     
@@ -27,12 +30,25 @@ public class PedidoResumoResponse {
     
     public PedidoResumoResponse() {}
     
+    // Constructor without discount (for backward compatibility)
     public PedidoResumoResponse(Long id, String clienteNome, String restauranteNome, 
                                BigDecimal valorTotal, String status, LocalDateTime dataPedido) {
         this.id = id;
         this.clienteNome = clienteNome;
         this.restauranteNome = restauranteNome;
         this.valorTotal = valorTotal;
+        this.status = status;
+        this.dataPedido = dataPedido;
+    }
+    
+    // Constructor with discount
+    public PedidoResumoResponse(Long id, String clienteNome, String restauranteNome, 
+                               BigDecimal valorTotal, BigDecimal desconto, String status, LocalDateTime dataPedido) {
+        this.id = id;
+        this.clienteNome = clienteNome;
+        this.restauranteNome = restauranteNome;
+        this.valorTotal = valorTotal;
+        this.desconto = desconto;
         this.status = status;
         this.dataPedido = dataPedido;
     }
@@ -67,6 +83,14 @@ public class PedidoResumoResponse {
     
     public void setValorTotal(BigDecimal valorTotal) {
         this.valorTotal = valorTotal;
+    }
+    
+    public BigDecimal getDesconto() {
+        return desconto;
+    }
+    
+    public void setDesconto(BigDecimal desconto) {
+        this.desconto = desconto;
     }
     
     public String getStatus() {

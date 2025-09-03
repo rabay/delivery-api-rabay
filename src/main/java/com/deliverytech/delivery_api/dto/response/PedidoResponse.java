@@ -25,6 +25,9 @@ public class PedidoResponse {
 
     @Schema(description = "Valor total do pedido.", example = "99.90")
     private BigDecimal valorTotal;
+    
+    @Schema(description = "Desconto aplicado ao pedido.", example = "10.00")
+    private BigDecimal desconto;
 
     @Schema(description = "Status atual do pedido.", example = "CRIADO")
     private StatusPedido status;
@@ -37,6 +40,7 @@ public class PedidoResponse {
 
     public PedidoResponse() {}
 
+    // Constructor without discount (for backward compatibility)
     public PedidoResponse(
             Long id,
             ClienteResumoResponse cliente,
@@ -51,6 +55,28 @@ public class PedidoResponse {
         this.restauranteId = restauranteId;
         this.enderecoEntrega = enderecoEntrega;
         this.valorTotal = valorTotal;
+        this.status = status;
+        this.dataPedido = dataPedido;
+        this.itens = itens;
+    }
+
+    // Constructor with discount
+    public PedidoResponse(
+            Long id,
+            ClienteResumoResponse cliente,
+            Long restauranteId,
+            Endereco enderecoEntrega,
+            BigDecimal valorTotal,
+            BigDecimal desconto,
+            StatusPedido status,
+            LocalDateTime dataPedido,
+            List<ItemPedidoResponse> itens) {
+        this.id = id;
+        this.cliente = cliente;
+        this.restauranteId = restauranteId;
+        this.enderecoEntrega = enderecoEntrega;
+        this.valorTotal = valorTotal;
+        this.desconto = desconto;
         this.status = status;
         this.dataPedido = dataPedido;
         this.itens = itens;
@@ -94,6 +120,14 @@ public class PedidoResponse {
 
     public void setValorTotal(BigDecimal valorTotal) {
         this.valorTotal = valorTotal;
+    }
+    
+    public BigDecimal getDesconto() {
+        return desconto;
+    }
+    
+    public void setDesconto(BigDecimal desconto) {
+        this.desconto = desconto;
     }
 
     public StatusPedido getStatus() {

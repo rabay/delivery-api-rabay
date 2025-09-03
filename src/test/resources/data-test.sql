@@ -69,6 +69,7 @@ CREATE TABLE pedido (
     cliente_id BIGINT NOT NULL,
     restaurante_id BIGINT NOT NULL,
     valor_total DECIMAL(10,2) NOT NULL,
+    desconto DECIMAL(10,2),
     numero_pedido VARCHAR(50) UNIQUE,
     subtotal DECIMAL(10,2),
     observacoes VARCHAR(500),
@@ -146,8 +147,8 @@ SELECT 2, 'Produto Teste 2', 'Teste', 'Descrição do Produto Teste 2', 30.00, T
 WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 2);
 
 -- Pedidos para testes
-INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
-SELECT 1, 1, 1, 50.00, 'PED-TEST-001', 50.00, 'Pedido de teste 1', 'Rua Teste 1', '123', 'Bairro Teste', 'Cidade Teste', 'CT', '01000-000', '', 'CRIADO', NOW(), FALSE 
+INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
+SELECT 1, 1, 1, 50.00, NULL, 'PED-TEST-001', 50.00, 'Pedido de teste 1', 'Rua Teste 1', '123', 'Bairro Teste', 'Cidade Teste', 'CT', '01000-000', '', 'CRIADO', NOW(), FALSE 
 WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 1);
 
 -- Itens dos pedidos

@@ -54,6 +54,7 @@ public class PedidoMapper {
                         .cliente(cliente)
                         .restaurante(restaurante)
                         .enderecoEntrega(endereco)
+                        .desconto(dto.getDesconto()) // Map discount field
                         .build();
 
         // Convert items
@@ -105,6 +106,7 @@ public class PedidoMapper {
                 entity.getRestaurante() != null ? entity.getRestaurante().getId() : null);
         response.setEnderecoEntrega(entity.getEnderecoEntrega());
         response.setValorTotal(entity.getValorTotal());
+        response.setDesconto(entity.getDesconto()); // Map discount field
         response.setStatus(entity.getStatus());
         response.setDataPedido(entity.getDataPedido());
         response.setItens(itensResponse);
@@ -127,6 +129,7 @@ public class PedidoMapper {
         response.setClienteNome(entity.getCliente() != null ? entity.getCliente().getNome() : null);
         response.setRestauranteNome(entity.getRestaurante() != null ? entity.getRestaurante().getNome() : null);
         response.setValorTotal(entity.getValorTotal());
+        response.setDesconto(entity.getDesconto()); // Map discount field
         response.setStatus(entity.getStatus() != null ? entity.getStatus().name() : null);
         response.setDataPedido(entity.getDataPedido());
         return response;

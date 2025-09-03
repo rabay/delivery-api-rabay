@@ -3,6 +3,8 @@ package com.deliverytech.delivery_api.service.impl;
 import com.deliverytech.delivery_api.dto.request.ItemPedidoRequest;
 import com.deliverytech.delivery_api.dto.request.PedidoRequest;
 import com.deliverytech.delivery_api.dto.response.PedidoResponse;
+import com.deliverytech.delivery_api.exception.BusinessException;
+import com.deliverytech.delivery_api.exception.EntityNotFoundException;
 import com.deliverytech.delivery_api.exception.EstoqueInsuficienteException;
 import com.deliverytech.delivery_api.exception.ProdutoIndisponivelException;
 import com.deliverytech.delivery_api.mapper.PedidoMapper;
@@ -62,7 +64,7 @@ public class PedidoServiceImpl implements PedidoService {
                         "Tentativa de criar pedido sem itens. ClienteId={}, RestauranteId= {}",
                         pedido.getCliente() != null ? pedido.getCliente().getId() : null,
                         pedido.getRestaurante() != null ? pedido.getRestaurante().getId() : null);
-                throw new RuntimeException("Pedido deve conter ao menos um item.");
+                throw new BusinessException("Pedido deve conter ao menos um item.");
             }
             
             // Validate stock for all items before processing
@@ -73,7 +75,7 @@ public class PedidoServiceImpl implements PedidoService {
                 Long produtoId = item.getProduto() != null ? item.getProduto().getId() : null;
                 if (produtoId == null) {
                     log.warn("ID do produto é nulo ao criar pedido.");
-                    throw new RuntimeException("ID do produto não pode ser nulo.");
+                    throw new BusinessException("ID do produto não pode ser nulo.");
                 }
                 Produto produto =
                         produtoRepository
@@ -111,6 +113,21 @@ public class PedidoServiceImpl implements PedidoService {
                 total = total.add(itemSubtotal);
                 item.setPedido(pedido);
             }
+            
+            // Add delivery fee to total
+            if (pedido.getRestaurante() != null && pedido.getRestaurante().getTaxaEntrega() != null) {
+                total = total.add(pedido.getRestaurante().getTaxaEntrega());
+            }
+            
+            // Apply discount if available
+            if (pedido.getDesconto() != null) {
+                total = total.subtract(pedido.getDesconto());
+                // Ensure total doesn't go negative
+                if (total.compareTo(BigDecimal.ZERO) < 0) {
+                    total = BigDecimal.ZERO;
+                }
+            }
+            
             pedido.setValorTotal(total);
             
             // Reserve stock for all items
@@ -128,7 +145,7 @@ public class PedidoServiceImpl implements PedidoService {
     public Pedido buscarPorId(Long id) {
         return pedidoRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido", id));
     }
 
     @Override
@@ -165,15 +182,15 @@ public class PedidoServiceImpl implements PedidoService {
                                             "Tentativa de atualizar status de pedido inexistente:"
                                                 + " pedidoId={}",
                                             id);
-                                    return new RuntimeException("Pedido não encontrado");
+                                    return new EntityNotFoundException("Pedido", id);
                                 });
         if (pedido.getStatus() == StatusPedido.CANCELADO) {
             log.warn("Tentativa de atualizar status de pedido já cancelado: pedidoId={}", id);
-            throw new RuntimeException("Pedido já está cancelado");
+            throw new BusinessException("Pedido já está cancelado");
         }
         if (pedido.getStatus() == StatusPedido.ENTREGUE) {
             log.warn("Tentativa de atualizar status de pedido já entregue: pedidoId={}", id);
-            throw new RuntimeException("Não é possível atualizar um pedido já entregue");
+            throw new BusinessException("Não é possível atualizar um pedido já entregue");
         }
         
         // If canceling a confirmed order, restore stock
@@ -204,12 +221,12 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido =
                 pedidoRepository
                         .findById(pedidoId)
-                        .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Pedido", pedidoId));
         if (pedido.getStatus() == StatusPedido.ENTREGUE) {
-            throw new RuntimeException("Não é possível cancelar um pedido já entregue");
+            throw new BusinessException("Não é possível cancelar um pedido já entregue");
         }
         if (pedido.getStatus() == StatusPedido.CANCELADO) {
-            throw new RuntimeException("Pedido já está cancelado");
+            throw new BusinessException("Pedido já está cancelado");
         }
         
         // Restore stock if order was confirmed
@@ -226,7 +243,7 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido =
                 pedidoRepository
                         .findById(pedidoId)
-                        .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Pedido", pedidoId));
         Produto produto =
                 produtoRepository
                         .findById(produtoId)
@@ -280,9 +297,7 @@ public class PedidoServiceImpl implements PedidoService {
                             .findById(itemRequest.getProdutoId())
                             .orElseThrow(
                                     () ->
-                                            new RuntimeException(
-                                                    "Produto não encontrado - ID: "
-                                                            + itemRequest.getProdutoId()));
+                                            new EntityNotFoundException("Produto", itemRequest.getProdutoId()));
             if (!Boolean.TRUE.equals(produto.getDisponivel())) {
                 throw new RuntimeException(
                         "Produto não está disponível - ID: " + itemRequest.getProdutoId());
@@ -356,7 +371,7 @@ public class PedidoServiceImpl implements PedidoService {
         Pedido pedido =
                 pedidoRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Pedido", id));
         pedidoRepository.delete(pedido);
     }
 
@@ -369,25 +384,30 @@ public class PedidoServiceImpl implements PedidoService {
             Cliente cliente =
                     clienteRepository
                             .findById(pedidoRequest.getClienteId())
-                            .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                            .orElseThrow(() -> new EntityNotFoundException("Cliente", pedidoRequest.getClienteId()));
 
             if (Boolean.TRUE.equals(cliente.getExcluido()) || !cliente.isAtivo()) {
-                throw new RuntimeException("Cliente inativo ou excluído do sistema");
+                throw new BusinessException("Cliente inativo ou excluído do sistema");
+            }
+
+            // Validate delivery address is provided
+            if (pedidoRequest.getEnderecoEntrega() == null) {
+                throw new BusinessException("Endereço de entrega é obrigatório");
             }
 
             // Validate restaurante exists and not excluded
             Restaurante restaurante =
                     restauranteRepository
                             .findById(pedidoRequest.getRestauranteId())
-                            .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+                            .orElseThrow(() -> new EntityNotFoundException("Restaurante", pedidoRequest.getRestauranteId()));
 
             if (Boolean.TRUE.equals(restaurante.getExcluido()) || !restaurante.isAtivo()) {
-                throw new RuntimeException("Restaurante inativo ou excluído do sistema");
+                throw new BusinessException("Restaurante inativo ou excluído do sistema");
             }
 
             // Validate itens
             if (pedidoRequest.getItens() == null || pedidoRequest.getItens().isEmpty()) {
-                throw new RuntimeException("Pedido deve conter ao menos um item");
+                throw new BusinessException("Pedido deve conter ao menos um item");
             }
 
             // Validate all produtos are available and not excluded
@@ -397,19 +417,17 @@ public class PedidoServiceImpl implements PedidoService {
                                 .findById(itemRequest.getProdutoId())
                                 .orElseThrow(
                                         () ->
-                                                new RuntimeException(
-                                                        "Produto não encontrado: ID "
-                                                                + itemRequest.getProdutoId()));
+                                                new EntityNotFoundException("Produto", "ID", itemRequest.getProdutoId().toString()));
 
                 if (Boolean.TRUE.equals(produto.getExcluido())
                         || !Boolean.TRUE.equals(produto.getDisponivel())) {
-                    throw new RuntimeException(
+                    throw new BusinessException(
                             "Produto indisponível ou excluído: " + produto.getNome());
                 }
 
                 // Validate produto belongs to the same restaurant
                 if (!produto.getRestaurante().getId().equals(pedidoRequest.getRestauranteId())) {
-                    throw new RuntimeException(
+                    throw new BusinessException(
                             "Produto não pertence ao restaurante selecionado: "
                                     + produto.getNome());
                 }
@@ -440,10 +458,10 @@ public class PedidoServiceImpl implements PedidoService {
         for (ItemPedido item : pedido.getItens()) {
             Long produtoId = item.getProduto() != null ? item.getProduto().getId() : null;
             if (produtoId == null) {
-                throw new RuntimeException("ID do produto não pode ser nulo.");
+                throw new BusinessException("ID do produto não pode ser nulo.");
             }
             Produto produto = produtoRepository.findById(produtoId)
-                    .orElseThrow(() -> new RuntimeException("Produto não encontrado: ID " + produtoId));
+                    .orElseThrow(() -> new EntityNotFoundException("Produto", "ID", produtoId.toString()));
             produtoService.validarEstoque(produto, item.getQuantidade());
         }
     }

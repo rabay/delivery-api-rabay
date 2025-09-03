@@ -2,6 +2,7 @@ package com.deliverytech.delivery_api.service.impl;
 
 import com.deliverytech.delivery_api.dto.request.ClienteRequest;
 import com.deliverytech.delivery_api.dto.response.ClienteResponse;
+import com.deliverytech.delivery_api.exception.EntityNotFoundException;
 import com.deliverytech.delivery_api.mapper.ClienteMapper;
 import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
@@ -54,11 +55,11 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente cliente =
                 clienteRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Cliente", id));
 
         // Validate not soft deleted
         if (Boolean.TRUE.equals(cliente.getExcluido())) {
-            throw new RuntimeException("Cliente foi excluído do sistema");
+            throw new EntityNotFoundException("Cliente foi excluído do sistema");
         }
 
         return clienteMapper.toResponse(cliente);
@@ -99,7 +100,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Deprecated
     public Cliente atualizar(Cliente cliente) {
         if (!clienteRepository.existsById(cliente.getId())) {
-            throw new RuntimeException("Cliente não encontrado");
+            throw new EntityNotFoundException("Cliente", cliente.getId());
         }
         return clienteRepository.save(cliente);
     }
@@ -109,7 +110,7 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente existente =
                 clienteRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Cliente", id));
         existente.setNome(clienteRequest.getNome());
         existente.setEmail(clienteRequest.getEmail());
         existente.setTelefone(clienteRequest.getTelefone());
@@ -123,7 +124,7 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente cliente =
                 clienteRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Cliente", id));
         if (!cliente.isAtivo() || Boolean.TRUE.equals(cliente.getExcluido())) {
             log.info(
                     "Cliente já estava inativo ou excluído: id={}, email={}",
@@ -145,7 +146,7 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente cliente =
                 clienteRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Cliente", id));
         cliente.setAtivo(!cliente.isAtivo());
         Cliente atualizado = clienteRepository.save(cliente);
         return clienteMapper.toResponse(atualizado);

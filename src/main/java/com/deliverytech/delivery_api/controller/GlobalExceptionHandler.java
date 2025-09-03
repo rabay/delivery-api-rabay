@@ -3,6 +3,10 @@ package com.deliverytech.delivery_api.controller;
 import com.deliverytech.delivery_api.exception.EmailDuplicadoException;
 import com.deliverytech.delivery_api.exception.EstoqueInsuficienteException;
 import com.deliverytech.delivery_api.exception.ProdutoIndisponivelException;
+import com.deliverytech.delivery_api.exception.EntityNotFoundException;
+import com.deliverytech.delivery_api.exception.BusinessException;
+import com.deliverytech.delivery_api.exception.ValidationException;
+import com.deliverytech.delivery_api.exception.TransactionException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +39,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProdutoIndisponivelException.class)
     public ResponseEntity<String> handleProdutoIndisponivel(ProdutoIndisponivelException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+    
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<String> handleEntityNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+    
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleBusinessException(BusinessException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.badRequest().body(errors);
+    }
+    
+    @ExceptionHandler(TransactionException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<String> handleTransactionException(TransactionException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro de transação: " + ex.getMessage());
     }
     
     @ExceptionHandler(MethodArgumentNotValidException.class)

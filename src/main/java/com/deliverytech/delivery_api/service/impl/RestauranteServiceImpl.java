@@ -2,6 +2,8 @@ package com.deliverytech.delivery_api.service.impl;
 
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.dto.response.RestauranteResponse;
+import com.deliverytech.delivery_api.exception.BusinessException;
+import com.deliverytech.delivery_api.exception.EntityNotFoundException;
 import com.deliverytech.delivery_api.mapper.RestauranteMapper;
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
@@ -97,7 +99,7 @@ public class RestauranteServiceImpl implements RestauranteService {
                             r.setAvaliacao(atualizado.getAvaliacao());
                             return restauranteRepository.save(r);
                         })
-                .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Restaurante", id));
     }
 
     @Override
@@ -111,7 +113,7 @@ public class RestauranteServiceImpl implements RestauranteService {
                             restauranteRepository.save(restaurante);
                         },
                         () -> {
-                            throw new RuntimeException("Restaurante não encontrado - ID: " + id);
+                            throw new EntityNotFoundException("Restaurante", "ID", String.valueOf(id));
                         });
     }
 
@@ -121,13 +123,11 @@ public class RestauranteServiceImpl implements RestauranteService {
                 restauranteRepository
                         .findById(restauranteId)
                         .orElseThrow(
-                                () ->
-                                        new RuntimeException(
-                                                "Restaurante não encontrado - ID: "
-                                                        + restauranteId));
+                                () -> new EntityNotFoundException("Restaurante", "ID", String.valueOf(restauranteId)));
         if (!restaurante.isAtivo()) {
-            throw new RuntimeException("Restaurante não está disponível para entrega");
+            throw new BusinessException("Restaurante não está disponível para entrega");
         }
+        
         BigDecimal taxaBase = restaurante.getTaxaEntrega();
         // Handle null taxaEntrega by using a default value
         if (taxaBase == null) {
@@ -158,9 +158,7 @@ public class RestauranteServiceImpl implements RestauranteService {
                 restauranteRepository
                         .findById(id)
                         .orElseThrow(
-                                () ->
-                                        new RuntimeException(
-                                                "Restaurante não encontrado - ID: " + id));
+                                () -> new EntityNotFoundException("Restaurante", "ID", String.valueOf(id)));
         restaurante.setAtivo(ativo);
         return restauranteRepository.save(restaurante);
     }
@@ -217,11 +215,11 @@ public class RestauranteServiceImpl implements RestauranteService {
         Restaurante restaurante =
                 restauranteRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Restaurante", id));
 
         // Validate not soft deleted
         if (Boolean.TRUE.equals(restaurante.getExcluido())) {
-            throw new RuntimeException("Restaurante foi excluído do sistema");
+            throw new BusinessException("Restaurante foi excluído do sistema");
         }
 
         return restauranteMapper.toResponse(restaurante);
@@ -252,11 +250,11 @@ public class RestauranteServiceImpl implements RestauranteService {
         Restaurante existente =
                 restauranteRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+                        .orElseThrow(() -> new EntityNotFoundException("Restaurante", id));
 
         // Validate not soft deleted
         if (Boolean.TRUE.equals(existente.getExcluido())) {
-            throw new RuntimeException("Não é possível atualizar restaurante excluído");
+            throw new BusinessException("Não é possível atualizar restaurante excluído");
         }
 
         // Update fields

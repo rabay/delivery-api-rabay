@@ -69,6 +69,7 @@ CREATE TABLE pedido (
     cliente_id BIGINT NOT NULL,
     restaurante_id BIGINT NOT NULL,
     valor_total DECIMAL(10,2) NOT NULL,
+    desconto DECIMAL(10,2),
     numero_pedido VARCHAR(50) UNIQUE,
     subtotal DECIMAL(10,2),
     observacoes VARCHAR(500),
@@ -202,16 +203,16 @@ SELECT 10, 'Porção de Camarão Empanado', 'Frutos do Mar', NULL, 28.00, TRUE, 
 WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 10);
 
 -- Pedidos
-INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
-SELECT 1, 1, 1, 50.00, 'PED-0001', 50.00, 'Sem lactose', 'Rua A', '100', 'Centro', 'Sao Paulo', 'SP', '01000-000', '', 'CRIADO', NOW(), FALSE 
+INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
+SELECT 1, 1, 1, 50.00, NULL, 'PED-0001', 50.00, 'Sem lactose', 'Rua A', '100', 'Centro', 'Sao Paulo', 'SP', '01000-000', '', 'CRIADO', NOW(), FALSE 
 WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 1);
 
-INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
-SELECT 2, 2, 2, 30.00, 'PED-0002', 30.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', NOW(), FALSE 
+INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
+SELECT 2, 2, 2, 30.00, NULL, 'PED-0002', 30.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', NOW(), FALSE 
 WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 2);
 
-INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
-SELECT 3, 3, 3, 45.00, 'PED-0003', 45.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CANCELADO', NOW(), FALSE 
+INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido) 
+SELECT 3, 3, 3, 45.00, NULL, 'PED-0003', 45.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CANCELADO', NOW(), FALSE 
 WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 3);
 
 -- Itens dos pedidos

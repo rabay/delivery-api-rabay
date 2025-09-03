@@ -37,6 +37,9 @@ public class Pedido {
 
     @Column(precision = 10, scale = 2)
     private BigDecimal subtotal;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal desconto;
 
     @Column(length = 500)
     private String observacoes;
