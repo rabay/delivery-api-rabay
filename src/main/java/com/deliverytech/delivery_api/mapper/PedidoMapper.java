@@ -25,6 +25,7 @@ public class PedidoMapper {
     private final ClienteRepository clienteRepository;
     private final RestauranteRepository restauranteRepository;
     private final ProdutoRepository produtoRepository;
+    private final DtoMapper dtoMapper;
 
     public Pedido toEntity(PedidoRequest dto) {
         Cliente cliente =
@@ -49,13 +50,11 @@ public class PedidoMapper {
             endereco.setComplemento(dto.getEnderecoEntrega().getComplemento());
         }
 
-        Pedido pedido =
-                Pedido.builder()
-                        .cliente(cliente)
-                        .restaurante(restaurante)
-                        .enderecoEntrega(endereco)
-                        .desconto(dto.getDesconto()) // Map discount field
-                        .build();
+        Pedido pedido = new Pedido();
+        pedido.setCliente(cliente);
+        pedido.setRestaurante(restaurante);
+        pedido.setEnderecoEntrega(endereco);
+        pedido.setDesconto(dto.getDesconto()); // Map discount field
 
         // Convert items
         if (dto.getItens() != null && !dto.getItens().isEmpty()) {
@@ -75,12 +74,12 @@ public class PedidoMapper {
                         .findById(dto.getProdutoId())
                         .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
-        return ItemPedido.builder()
-                .pedido(pedido)
-                .produto(produto)
-                .quantidade(dto.getQuantidade())
-                .precoUnitario(produto.getPreco()) // Use current product price
-                .build();
+        ItemPedido item = new ItemPedido();
+        item.setPedido(pedido);
+        item.setProduto(produto);
+        item.setQuantidade(dto.getQuantidade());
+        item.setPrecoUnitario(produto.getPreco()); // Use current product price
+        return item;
     }
 
     public PedidoResponse toResponse(Pedido entity) {
@@ -99,18 +98,9 @@ public class PedidoMapper {
                             .collect(Collectors.toList());
         }
 
-        PedidoResponse response = new PedidoResponse();
-        response.setId(entity.getId());
+        PedidoResponse response = dtoMapper.toDto(entity, PedidoResponse.class);
         response.setCliente(clienteResumo);
-        response.setRestauranteId(
-                entity.getRestaurante() != null ? entity.getRestaurante().getId() : null);
-        response.setEnderecoEntrega(entity.getEnderecoEntrega());
-        response.setValorTotal(entity.getValorTotal());
-        response.setDesconto(entity.getDesconto()); // Map discount field
-        response.setStatus(entity.getStatus());
-        response.setDataPedido(entity.getDataPedido());
         response.setItens(itensResponse);
-
         return response;
     }
 
@@ -124,14 +114,6 @@ public class PedidoMapper {
     }
     
     public PedidoResumoResponse toResumoResponse(Pedido entity) {
-        PedidoResumoResponse response = new PedidoResumoResponse();
-        response.setId(entity.getId());
-        response.setClienteNome(entity.getCliente() != null ? entity.getCliente().getNome() : null);
-        response.setRestauranteNome(entity.getRestaurante() != null ? entity.getRestaurante().getNome() : null);
-        response.setValorTotal(entity.getValorTotal());
-        response.setDesconto(entity.getDesconto()); // Map discount field
-        response.setStatus(entity.getStatus() != null ? entity.getStatus().name() : null);
-        response.setDataPedido(entity.getDataPedido());
-        return response;
+        return dtoMapper.toDto(entity, PedidoResumoResponse.class);
     }
 }

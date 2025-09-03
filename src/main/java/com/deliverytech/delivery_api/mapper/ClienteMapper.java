@@ -8,24 +8,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ClienteMapper {
+    
+    private final DtoMapper dtoMapper;
+    
+    public ClienteMapper(DtoMapper dtoMapper) {
+        this.dtoMapper = dtoMapper;
+    }
+    
     public Cliente toEntity(ClienteRequest dto) {
-        Cliente cliente = new Cliente();
-        cliente.setNome(dto.getNome());
-        cliente.setEmail(dto.getEmail());
-        cliente.setAtivo(true);
-        cliente.setTelefone(dto.getTelefone());
-        cliente.setEndereco(dto.getEndereco());
-        return cliente;
+        return dtoMapper.toEntity(dto, Cliente.class);
     }
 
     public ClienteResponse toResponse(Cliente entity) {
-        ClienteResponse dto = new ClienteResponse();
-        dto.setId(entity.getId());
-        dto.setNome(entity.getNome());
-        dto.setEmail(entity.getEmail());
-        dto.setTelefone(entity.getTelefone());
-        dto.setEndereco(entity.getEndereco());
-        dto.setAtivo(entity.isAtivo());
-        return dto;
+        return dtoMapper.toDto(entity, ClienteResponse.class);
     }
 }

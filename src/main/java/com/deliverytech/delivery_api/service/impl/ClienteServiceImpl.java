@@ -111,10 +111,14 @@ public class ClienteServiceImpl implements ClienteService {
                 clienteRepository
                         .findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Cliente", id));
-        existente.setNome(clienteRequest.getNome());
-        existente.setEmail(clienteRequest.getEmail());
-        existente.setTelefone(clienteRequest.getTelefone());
-        existente.setEndereco(clienteRequest.getEndereco());
+        
+        // Use mapper to update the entity
+        Cliente updatedEntity = clienteMapper.toEntity(clienteRequest);
+        existente.setNome(updatedEntity.getNome());
+        existente.setEmail(updatedEntity.getEmail());
+        existente.setTelefone(updatedEntity.getTelefone());
+        existente.setEndereco(updatedEntity.getEndereco());
+        
         Cliente atualizado = clienteRepository.save(existente);
         return clienteMapper.toResponse(atualizado);
     }

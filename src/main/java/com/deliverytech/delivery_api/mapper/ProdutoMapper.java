@@ -17,6 +17,7 @@ public class ProdutoMapper {
 
     private final RestauranteRepository restauranteRepository;
     private final RestauranteMapper restauranteMapper;
+    private final DtoMapper dtoMapper;
 
     public Produto toEntity(ProdutoRequest dto) {
         Restaurante restaurante =
@@ -24,16 +25,13 @@ public class ProdutoMapper {
                         .findById(dto.getRestauranteId())
                         .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
 
-        return Produto.builder()
-                .nome(dto.getNome())
-                .categoria(dto.getCategoria())
-                .descricao(dto.getDescricao())
-                .preco(dto.getPreco())
-                .disponivel(dto.getDisponivel() != null ? dto.getDisponivel() : true)
-                .excluido(false)
-                .restaurante(restaurante)
-                .quantidadeEstoque(dto.getQuantidadeEstoque())
-                .build();
+        Produto produto = dtoMapper.toEntity(dto, Produto.class);
+        produto.setRestaurante(restaurante);
+        produto.setExcluido(false);
+        if (produto.getDisponivel() == null) {
+            produto.setDisponivel(true);
+        }
+        return produto;
     }
 
     public ProdutoResponse toResponse(Produto entity) {
@@ -42,15 +40,8 @@ public class ProdutoMapper {
             restauranteResumo = restauranteMapper.toResumoResponse(entity.getRestaurante());
         }
 
-        return ProdutoResponse.builder()
-                .id(entity.getId())
-                .nome(entity.getNome())
-                .categoria(entity.getCategoria())
-                .descricao(entity.getDescricao())
-                .preco(entity.getPreco())
-                .disponivel(entity.getDisponivel())
-                .quantidadeEstoque(entity.getQuantidadeEstoque())
-                .restaurante(restauranteResumo)
-                .build();
+        ProdutoResponse response = dtoMapper.toDto(entity, ProdutoResponse.class);
+        response.setRestaurante(restauranteResumo);
+        return response;
     }
 }

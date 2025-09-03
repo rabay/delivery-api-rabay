@@ -9,46 +9,25 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RestauranteMapper {
+    
+    private final DtoMapper dtoMapper;
+    
+    public RestauranteMapper(DtoMapper dtoMapper) {
+        this.dtoMapper = dtoMapper;
+    }
 
     public Restaurante toEntity(RestauranteRequest dto) {
-        return Restaurante.builder()
-                .nome(dto.getNome())
-                .categoria(dto.getCategoria())
-                .endereco(dto.getEndereco())
-                .taxaEntrega(dto.getTaxaEntrega())
-                .telefone(dto.getTelefone())
-                .email(dto.getEmail())
-                .tempoEntregaMinutos(dto.getTempoEntregaMinutos())
-                .avaliacao(dto.getAvaliacao())
-                .ativo(true)
-                .excluido(false)
-                .build();
+        Restaurante restaurante = dtoMapper.toEntity(dto, Restaurante.class);
+        restaurante.setAtivo(true);
+        restaurante.setExcluido(false);
+        return restaurante;
     }
 
     public RestauranteResponse toResponse(Restaurante entity) {
-        return RestauranteResponse.builder()
-                .id(entity.getId())
-                .nome(entity.getNome())
-                .categoria(entity.getCategoria())
-                .endereco(entity.getEndereco())
-                .taxaEntrega(entity.getTaxaEntrega())
-                .telefone(entity.getTelefone())
-                .email(entity.getEmail())
-                .tempoEntregaMinutos(entity.getTempoEntregaMinutos())
-                .avaliacao(entity.getAvaliacao())
-                .ativo(entity.isAtivo())
-                .build();
+        return dtoMapper.toDto(entity, RestauranteResponse.class);
     }
 
     public RestauranteResumoResponse toResumoResponse(Restaurante entity) {
-        return RestauranteResumoResponse.builder()
-                .id(entity.getId())
-                .nome(entity.getNome())
-                .categoria(entity.getCategoria())
-                .taxaEntrega(entity.getTaxaEntrega())
-                .tempoEntregaMinutos(entity.getTempoEntregaMinutos())
-                .avaliacao(entity.getAvaliacao())
-                .ativo(entity.isAtivo())
-                .build();
+        return dtoMapper.toDto(entity, RestauranteResumoResponse.class);
     }
 }
