@@ -54,6 +54,14 @@ jwt:
 spring:
   config:
     activate:
+      on-profile: test
+logging:
+  directory: entregaveis/logs_test
+
+---
+spring:
+  config:
+    activate:
       on-profile: dev
   datasource:
     url: jdbc:mysql://db:3306/deliverydb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
@@ -79,3 +87,4 @@ logging:
   level:
     org.springframework.security: DEBUG
     com.deliverytech.delivery_api.security: DEBUG
+  directory: entregaveis/logs
