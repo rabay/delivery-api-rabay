@@ -1,112 +1,227 @@
-# Delivery API Rabay
+# 🚀 Delivery API Rabay
 
-[![Build, Testes e Coverage Java Maven](https://github.com/rabay/delivery-api-rabay/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/rabay/delivery-api-rabay/actions/workflows/build.yml)
-
-> Projeto base em Java 21 com Spring Boot para sistemas de delivery, pensado para desenvolvimento rápido, testes e evolução.
-
-## Visão geral
-
-- Gestão de clientes, restaurantes, produtos e pedidos
-- Contratos claros via DTOs
-- Exclusão lógica (soft delete) nas entidades principais
-- Inicialização de dados para desenvolvimento (UserDataLoader / data.sql)
-- Suíte de testes automatizados e collection Postman
-
-## Tecnologias
-
-- Java 21
-- Spring Boot 3.x
-- Spring Data JPA
-- Spring Security
-- MySQL (produção/testes)
-- Maven (wrapper), Docker, Docker Compose
-- GitHub Actions, Jacoco
-
-## Quick start
-
-Pré-requisitos: JDK 21 e Maven; Docker é opcional.
-
-Build, executar testes e gerar relatório de cobertura:
-
-```bash
-./mvnw clean verify
-# relatório Jacoco: target/site/jacoco/index.html
-```
-
-Executar localmente:
-
-```bash
-./mvnw spring-boot:run
-```
-
-Build de imagem Docker:
-
-```bash
-docker build -t delivery-api-rabay:latest .
-```
-
-Executar com Docker Compose:
-
-```bash
-docker compose up --build
-```
-
-Executar a collection Postman (Newman):
-
-```bash
-newman run entregaveis/delivery-api-rabay.postman_collection.json --reporters cli --insecure
-```
-
-## Inicialização de dados
-
-- `UserDataLoader` (src/main/java/.../config/UserDataLoader.java): cria contas padrão (admin, cliente, restaurante, entregador) em perfis de desenvolvimento quando o repositório de usuários estiver vazio.
-- `src/main/resources/data.sql`: script idempotente (MERGE INTO) com dados de exemplo; pode estar desabilitado via `spring.sql.init.mode`.
-
-Recomendação: use `UserDataLoader` para desenvolvimento e migrações (Flyway/Liquibase) em produção.
-
-## Endpoints principais
-
-- Health: `GET /health`
-- Info: `GET /info`
-
-Recursos principais:
-
-- Clientes: `GET/POST/PUT/DELETE /clientes` (DTOs)
-- Restaurantes: `GET/POST/PUT/DELETE /restaurantes`
-- Produtos: `GET/POST/PUT/DELETE /produtos`
-- Pedidos: `POST /pedidos`, `GET /pedidos/cliente/{clienteId}`, `PUT /pedidos/{id}/status`
-
-Endpoints de inspeção (ambiente dev — proteja com perfil/autenticação):
-
-- `GET /db/schema` — metadados do schema
-- `GET /db/integrity` — teste rápido de integridade
-- `POST /db/query` — executa apenas `SELECT` em JSON (use com cuidado)
-
-## Testes
-
-- Unit e Integration: Maven Surefire/Failsafe
-- E2E: Postman collection + Newman
-
-## Padrões de código
-
-- Use features de Java 21 quando fizer sentido
-- Separe interfaces e implementações de serviços
-- Use DTOs para contratos de API
-- Aplique `@Transactional` nos serviços e `readOnly` para métodos de leitura
-- Documente APIs públicas com JavaDoc
-
-## Troubleshooting rápido
-
-- Erro de conexão MySQL: verifique containers, credenciais e `application.yml`
-- Porta ocupada: ajuste `server.port`
-- Testes falhando: execute `./mvnw -DskipTests=false test` para ver detalhes
-
-## Recursos
-
-- Spring Boot: [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)
-- Spring Data JPA: [https://spring.io/projects/spring-data-jpa](https://spring.io/projects/spring-data-jpa)
-- GitHub Actions: [https://docs.github.com/en/actions](https://docs.github.com/en/actions)
+API backend desenvolvida em **Java 21** com **Spring Boot 3.x**, servindo como base para sistemas de delivery modernos, escaláveis e de fácil manutenção.
 
 ---
 
-Desenvolvido por Victor Alexandre Rabay
+## 📌 Visão Geral
+
+Este projeto oferece uma estrutura robusta para aplicações de delivery, incluindo:
+
+- Cadastro e gestão de clientes, restaurantes, produtos e pedidos
+- Contratos claros via DTOs
+- Exclusão lógica (soft delete) nas entidades principais
+- Inicialização de dados para desenvolvimento
+- Suíte de testes automatizados e collections Postman
+- Monitoramento e métricas via Actuator
+
+---
+
+## 🛠️ Tecnologias e Ferramentas
+
+- **Java 21** – última versão LTS
+- **Spring Boot 3.x** – APIs REST com configuração mínima
+- **Spring Data JPA** – persistência de dados
+- **Spring Security** – autenticação e autorização
+- **MySQL** – banco de dados para produção/testes
+- **Maven** – build e dependências (wrapper incluído)
+- **Docker & Docker Compose** – ambiente containerizado
+- **GitHub Actions** – CI/CD
+- **Jacoco** – cobertura de testes
+
+---
+
+## 📈 Status do Projeto
+
+✅ **Funcional**
+> Build, testes e cobertura automatizados. Dados de exemplo carregados e endpoints principais disponíveis.
+
+---
+
+## ✅ Funcionalidades Implementadas
+
+- [x] Estrutura inicial com Spring Boot
+- [x] Modelos de domínio (Cliente, Restaurante, Produto, Pedido)
+- [x] Repositórios com consultas customizadas
+- [x] DataLoader e scripts SQL para carga de dados
+- [x] Exclusão lógica (soft delete)
+- [x] Testes unitários, integração e E2E (Postman/Newman)
+- [x] Dockerfile e docker-compose para ambiente local
+- [x] Monitoramento com Actuator
+
+---
+
+## 📋 Guia de Alterações Recentes
+
+> Consulte o arquivo `README-atividade4.md` em `entregaveis/` para um histórico detalhado de correções, queries customizadas e melhorias recentes.
+
+---
+
+## 🚀 Como Executar
+
+⚠️ **IMPORTANTE:** A aplicação depende de uma instância MySQL provisionada. Recomenda-se executar via Docker Compose para garantir o ambiente completo.
+
+1. **Clone o repositório**
+2. **Execute a aplicação e o banco de dados com Docker Compose:**
+
+   ```bash
+   docker compose up --build
+   ```
+
+3. **(Opcional) Execute a collection Postman (Newman):**
+
+    ```bash
+    newman run entregaveis/delivery-api-rabay.postman_collection.json \
+       --environment entregaveis/delivery-api-rabay.postman_environment.json \
+       --reporters cli --insecure
+    ```
+
+---
+
+## 🗂️ Estrutura do Projeto
+
+```text
+src/
+├── main
+│   ├── java
+│   │   └── com
+│   │       └── deliverytech
+│   │           └── delivery_api
+│   │               ├── config
+│   │               ├── controller
+│   │               ├── dto
+│   │               │   ├── request
+│   │               │   └── response
+│   │               ├── exception
+│   │               ├── filter
+│   │               ├── mapper
+│   │               │   ├── converters
+│   │               │   └── typemaps
+│   │               ├── model
+│   │               ├── projection
+│   │               ├── repository
+│   │               ├── security
+│   │               ├── service
+│   │               │   └── impl
+│   │               └── validation
+│   └── resources
+│       ├── static
+│       └── templates
+└── test
+   ├── java
+   │   └── com
+   │       └── deliverytech
+   │           └── delivery_api
+   │               ├── config
+   │               ├── controller
+   │               ├── dto
+   │               │   └── response
+   │               ├── filter
+   │               ├── mapper
+   │               │   ├── converters
+   │               │   └── typemaps
+   │               ├── model
+   │               ├── repository
+   │               ├── security
+   │               ├── service
+   │               │   └── impl
+   │               ├── test
+   │               ├── util
+   │               └── validation
+   └── resources
+      └── mockito-extensions
+```
+
+---
+
+## 🔗 Endpoints Principais
+
+
+- **Healthcheck & Info:**
+   - `GET /health` — status da aplicação
+   - `GET /info` — informações do build
+
+- **Autenticação e Usuários:**
+   - `POST /auth/login` — autenticação de usuário
+   - `POST /auth/register` — cadastro de novo usuário
+   - `GET /usuarios` — listar usuários (admin)
+   - `GET /usuarios/{id}` — detalhes do usuário
+
+- **Clientes:**
+   - `GET /clientes` — listar clientes
+   - `POST /clientes` — criar cliente
+   - `PUT /clientes/{id}` — atualizar cliente
+   - `DELETE /clientes/{id}` — exclusão lógica
+
+- **Restaurantes:**
+   - `GET /restaurantes` — listar restaurantes
+   - `POST /restaurantes` — criar restaurante
+   - `PUT /restaurantes/{id}` — atualizar restaurante
+   - `DELETE /restaurantes/{id}` — exclusão lógica
+
+- **Produtos:**
+   - `GET /produtos` — listar produtos
+   - `POST /produtos` — criar produto
+   - `PUT /produtos/{id}` — atualizar produto
+   - `DELETE /produtos/{id}` — exclusão lógica
+
+- **Pedidos:**
+   - `POST /pedidos` — criar pedido
+   - `GET /pedidos/cliente/{clienteId}` — pedidos de um cliente
+   - `GET /pedidos/{id}` — detalhes do pedido
+   - `PUT /pedidos/{id}/status` — atualizar status do pedido
+
+- **Consultas Customizadas e Relatórios:**
+   - `GET /produtos/mais-vendidos` — top 5 produtos mais vendidos
+   - `GET /clientes/ranking` — ranking de clientes por pedidos
+   - `GET /restaurantes/relatorio-vendas` — relatório de vendas por restaurante
+   - `GET /pedidos/valor-acima/{valor}` — pedidos acima de determinado valor
+   - `GET /pedidos/periodo?inicio=...&fim=...&status=...` — pedidos por período e status
+
+- **Inspeção e Integração:**
+   - `GET /db/schema` — metadados do schema (dev)
+   - `GET /db/integrity` — teste de integridade (dev)
+   - `POST /db/query` — executar SELECT customizado (dev)
+
+- **Métricas e Monitoramento:**
+   - `GET /actuator/metrics` — métricas gerais
+   - `GET /actuator/prometheus` — endpoint Prometheus
+
+⚠️ **IMPORTANTE:** Endpoints de inspeção, métricas e queries customizadas estão disponíveis apenas em ambiente de desenvolvimento e/ou exigem autenticação/perfil adequado.
+
+---
+
+## 🧪 Testes
+
+- Unitários e integração: Maven Surefire/Failsafe
+- E2E: Postman + Newman
+
+---
+
+## 📝 Padrões de Código
+
+- Utilize recursos do Java 21
+- Separe interfaces e implementações de serviços
+- Use DTOs para contratos de API
+- Aplique `@Transactional` nos serviços
+- Documente APIs públicas com JavaDoc
+
+---
+
+## 🛠️ Troubleshooting Rápido
+
+- Erro de conexão MySQL: verifique containers, credenciais e `application.yml`
+- Porta ocupada: ajuste `server.port`
+- Testes falhando: execute `./mvnw -DskipTests=false test` para detalhes
+
+---
+
+## 📚 Recursos Úteis
+
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
+- [GitHub Actions](https://docs.github.com/en/actions)
+
+---
+
+Desenvolvido por Victor Alexandre Rabay para o curso de Arquitetura de Sistemas (turma T158 02728 de 2025).

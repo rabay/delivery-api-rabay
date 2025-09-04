@@ -1,123 +1,119 @@
 
-# Configuração e Inicialização do Banco de Dados MySQL
 
-## Visão Geral
+# Configuração e Execução do Banco de Dados MySQL
 
-Este documento descreve o processo de configuração e inicialização do banco de dados MySQL para a aplicação Delivery API Rabay. O setup do banco foi reestruturado para garantir a criação correta das tabelas, o estabelecimento dos relacionamentos e a carga de dados durante a inicialização do container MySQL.
+Este guia detalha como configurar, inicializar e utilizar o banco de dados MySQL para a aplicação Delivery API Rabay, cobrindo desde a estrutura de arquivos até dicas de troubleshooting e segurança.
 
-## Processo de Inicialização do Banco de Dados
+---
 
-### 1. Criação do Schema
+## 📦 Estrutura de Arquivos Relacionados ao Banco
 
-O schema do banco é criado durante a inicialização do container MySQL através do script `data.sql`, que é montado no diretório `/docker-entrypoint-initdb.d/`. Essa abordagem garante que:
-
-- As tabelas sejam criadas antes do início da aplicação
-- Os relacionamentos de chave estrangeira sejam corretamente estabelecidos
-- Os dados iniciais sejam carregados durante a inicialização do banco
-- O Hibernate não precise criar tabelas (ddl-auto está como "none")
-
-### 2. Carga de Dados
-
-Dois scripts SQL distintos realizam a carga de dados:
-
-1. **Dados de Produção/Desenvolvimento**: `src/main/resources/data.sql`
-   - Contém comandos de criação de tabelas
-   - Inclui dados de exemplo para desenvolvimento
-   - Usado no ambiente docker-compose
-
-2. **Dados de Teste**: `src/test/resources/data-test.sql`
-   - Contém comandos de criação de tabelas
-   - Inclui dados mínimos para testes de integração
-   - Usado no ambiente Testcontainers
-
-### 3. Configuração da Aplicação
-
-A aplicação está configurada para trabalhar com o banco já inicializado:
-
-- **Hibernate ddl-auto**: Definido como "none" para evitar que o Hibernate crie/modifique tabelas
-- **Spring SQL init mode**: Definido como "always" para garantir o processamento dos scripts
-- **Inicialização da fonte de dados**: Postergada para garantir a ordem correta
-
-## Estrutura de Arquivos
-
-```
+```text
 src/
 ├── main/
 │   └── resources/
 │       └── data.sql          # Schema e dados de produção/desenvolvimento
 └── test/
-   └── resources/
-      └── data-test.sql     # Schema e dados de teste
+    └── resources/
+        └── data-test.sql     # Schema e dados de teste
+docker-compose.yml           # Orquestração dos containers (MySQL e aplicação)
+config/
+└── mysql/
+    ├── 01-init.sql          # Scripts customizados de inicialização
+    ├── 02-charset.sql       # Configuração de charset
+    └── 03-optimize.sql      # Otimizações de banco
 ```
 
-## Esquema do Banco de Dados
+---
 
-O banco de dados contém as seguintes tabelas e seus relacionamentos:
+## 🚀 Inicialização e Execução
 
-1. **cliente** - Informações do cliente
-2. **restaurante** - Informações do restaurante
-3. **usuario** - Autenticação e autorização de usuários
-4. **produto** - Informações de produtos (relacionado a restaurante)
-5. **pedido** - Informações de pedidos (relacionado a cliente e restaurante)
-6. **item_pedido** - Itens do pedido (relacionado a pedido e produto)
+⚠️ **IMPORTANTE:** Sempre utilize Docker Compose para garantir que o banco MySQL seja provisionado corretamente antes da aplicação.
 
-## Instruções de Uso
+1. **Suba o ambiente completo:**
+   ```bash
+   docker compose up --build
+   ```
+   - O serviço `mysql` será inicializado com os scripts de schema e dados.
+   - O serviço da aplicação só tentará conectar após o banco estar pronto.
 
-### Inicialização com Docker Compose
+2. **Acesso ao banco para verificação:**
+   ```bash
+   docker exec -it delivery-mysql mysql -u deliveryuser -pdeliverypass deliverydb
+   SHOW TABLES;
+   SELECT COUNT(*) FROM cliente;
+   ```
 
-Ao iniciar a aplicação com Docker Compose:
+---
 
-```bash
-docker compose up --build
-```
+## 🗄️ Detalhes de Configuração
 
-O container MySQL irá:
-1. Inicializar com o schema do banco
-2. Carregar os dados iniciais do `data.sql`
-3. Ficar pronto para conexão da aplicação
+- **Usuário padrão:** `deliveryuser`
+- **Senha:** `deliverypass`
+- **Database:** `deliverydb`
+- **Host:** `delivery-mysql` (no contexto do Docker Compose)
+- **Porta:** `3306`
+- **Variáveis de ambiente:** Definidas no `docker-compose.yml` para facilitar customização.
+- **Scripts de inicialização:**
+  - `data.sql` (schema e dados)
+  - Scripts adicionais em `config/mysql/` são executados na ordem de prefixo numérico.
 
-### Inicialização em Ambiente de Teste
+---
 
-Durante os testes de integração:
-1. O Testcontainers inicia um container MySQL
-2. Os dados de teste são carregados do `data-test.sql`
-3. Os testes rodam contra o banco já inicializado
+## 🏗️ Esquema e Relacionamentos
 
-## Solução de Problemas
+O banco de dados contém as seguintes tabelas principais:
 
-### Problemas Comuns
+1. **cliente** - Dados cadastrais dos clientes
+2. **restaurante** - Dados dos restaurantes
+3. **usuario** - Controle de autenticação e perfis
+4. **produto** - Produtos ofertados (relacionados a restaurante)
+5. **pedido** - Pedidos realizados (relacionados a cliente e restaurante)
+6. **item_pedido** - Itens de cada pedido (relacionados a pedido e produto)
 
-1. **Erro de tabela inexistente**
-   - Certifique-se de que os scripts SQL possuem os comandos CREATE TABLE corretos
-   - Verifique se os scripts estão montados corretamente no container MySQL
+Todos os relacionamentos de chave estrangeira são definidos nos scripts SQL.
 
-2. **Violação de restrição de chave estrangeira**
-   - Confirme que as tabelas "pai" são criadas antes das "filhas"
-   - Garanta que os dados referenciais existam antes de criar os relacionamentos
+---
 
-3. **Falha na carga de dados**
-   - Verifique se a sintaxe SQL é compatível com o MySQL
-   - Consulte os logs do container MySQL para mensagens de erro específicas
+## 🧪 Ambientes de Execução
 
-### Verificação
+- **Desenvolvimento/Produção:**
+  - Usa `data.sql` para schema e dados iniciais.
+  - Scripts em `config/mysql/` podem ser customizados conforme necessidade.
+- **Testes automatizados:**
+  - Usa `data-test.sql` (mínimo necessário para integração).
+  - Testcontainers inicializa o banco isoladamente para cada execução.
 
-Para verificar a inicialização do banco:
+---
 
-```bash
-# Conecte-se ao container MySQL
-docker exec -it delivery-mysql mysql -u deliveryuser -pdeliverypass deliverydb
+## 🛠️ Troubleshooting
 
-# Verifique as tabelas
-SHOW TABLES;
+1. **Erro de tabela inexistente:**
+   - Confirme se os scripts SQL estão corretos e montados no container.
+2. **Violação de chave estrangeira:**
+   - Garanta a ordem de criação das tabelas e a existência dos dados referenciais.
+3. **Falha na carga de dados:**
+   - Verifique a sintaxe SQL e consulte os logs do container MySQL.
+4. **Conexão recusada:**
+   - Certifique-se de que o serviço MySQL está "healthy" antes de subir a aplicação.
 
-# Verifique os dados
-SELECT COUNT(*) FROM cliente;
-SELECT COUNT(*) FROM restaurante;
-SELECT COUNT(*) FROM produto;
-```
+---
 
-## Considerações de Segurança
+## 🔒 Segurança
 
-- As credenciais do banco são configuradas via variáveis de ambiente
-- O script `data.sql` não deve conter dados sensíveis de produção
-- Senhas nos scripts devem estar sempre criptografadas, nunca em texto puro
+- As credenciais do banco são definidas via variáveis de ambiente e podem ser alteradas facilmente.
+- Nunca armazene dados sensíveis ou senhas reais em scripts versionados.
+- Senhas de usuários de teste/demonstrativo devem ser criptografadas.
+- O acesso ao banco fora do ambiente Docker deve ser restrito.
+
+---
+
+## 📚 Referências e Dicas
+
+- [Documentação oficial MySQL Docker](https://hub.docker.com/_/mysql)
+- [Spring Boot DataSource Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#application-properties-data)
+- [Testcontainers MySQL Module](https://www.testcontainers.org/modules/databases/mysql/)
+
+---
+
+**Dica:** Para customizar o banco, adicione scripts `.sql` em `config/mysql/` com prefixos numéricos para garantir a ordem de execução.

@@ -77,9 +77,9 @@ dependency-check-report/**
 
 *.bak
 
-entregaveis/**/newman-*.*
-entregaveis/**/*report*.*
-entregaveis/**/*result*.*
+entregaveis/**/newman-*.json
+entregaveis/**/*report*.json
+entregaveis/**/*result*.json
 
 entregaveis/collections/
 
@@ -91,3 +91,5 @@ scripts/check_h2_schema.sh
 scripts/stop_server.sh
 scripts/start_server.sh
 scripts/run_dependency_check.py
+
+README-EXEMPLO.md

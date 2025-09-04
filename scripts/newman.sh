@@ -10,10 +10,11 @@ IFS=$'\n\t'
 COLLECTION="entregaveis/delivery-api-rabay.postman_collection.json"
 ENVIRONMENT="entregaveis/delivery-api-rabay.postman_environment.json"
 REPORT_JSON="entregaveis/newman-result.json"
+REPORT_HTML="entregaveis/newman-report.html"
 
 # Opções padrão do Newman (ajuste conforme necessário)
 DELAY_REQUEST=250
-REPORTERS="cli,json"
+REPORTERS="cli,json,html"
 
 # Função auxiliar: imprime mensagem com timestamp
 log() { printf '\n[%s] %s\n' "$(date --iso-8601=seconds)" "$*"; }
@@ -33,21 +34,27 @@ for f in "$COLLECTION" "$ENVIRONMENT"; do
 done
 
 log "Iniciando execução do Newman"
-log "colecao=$COLLECTION ambiente=$ENVIRONMENT reportadores=$REPORTERS relatorio_json=$REPORT_JSON"
+log "colecao=$COLLECTION ambiente=$ENVIRONMENT reportadores=$REPORTERS relatorio_json=$REPORT_JSON relatorio_html=$REPORT_HTML"
 
 # Garante que o diretório de saída exista
 mkdir -p "$(dirname "$REPORT_JSON")"
+mkdir -p "$(dirname "$REPORT_HTML")"
 
 # Executa o Newman e captura o código de saída para propagação adequada
 if newman run "$COLLECTION" \
 		-e "$ENVIRONMENT" \
 		--delay-request "$DELAY_REQUEST" \
 		--reporters "$REPORTERS" \
-		--reporter-json-export "$REPORT_JSON"; then
+		--reporter-json-export "$REPORT_JSON" \
+		--reporter-html-export "$REPORT_HTML"; then
 	EXIT_CODE=0
 else
 	EXIT_CODE=$?
 fi
 
 log "Newman finalizado com código de saída $EXIT_CODE"
+log "Relatórios gerados:"
+log "  - JSON: $REPORT_JSON"
+log "  - HTML: $REPORT_HTML"
+
 exit $EXIT_CODE
