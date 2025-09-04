@@ -80,3 +80,11 @@ dependency-check-report/**
 entregaveis/**/newman-*.*
 entregaveis/**/*report*.*
 entregaveis/**/*result*.*
+
+## Ignorar scripts que não devem ser versionados no repositório remoto
+scripts/test_integrity.sh
+scripts/limpeza_disco.sh
+scripts/dependency_check_summary.py
+scripts/check_h2_schema.sh
+scripts/stop_server.sh
+scripts/start_server.sh
