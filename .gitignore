@@ -90,3 +90,4 @@ scripts/dependency_check_summary.py
 scripts/check_h2_schema.sh
 scripts/stop_server.sh
 scripts/start_server.sh
+scripts/run_dependency_check.py
