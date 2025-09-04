@@ -64,6 +64,9 @@ class ClienteRepositoryTest extends BaseIntegrationTest {
 
         entityManager.flush();
 
+        // Use a time base in the future to isolate these orders from other tests
+        var baseData = java.time.LocalDateTime.now().plusYears(10);
+
         // Create 5 orders for "Ranking Teste" to ensure it ranks first
         for (int i = 0; i < 5; i++) {
             com.deliverytech.delivery_api.model.Pedido pedido = new com.deliverytech.delivery_api.model.Pedido();
@@ -72,7 +75,7 @@ class ClienteRepositoryTest extends BaseIntegrationTest {
             pedido.setValorTotal(new java.math.BigDecimal("20.00"));
             pedido.setSubtotal(new java.math.BigDecimal("20.00"));
             pedido.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CONFIRMADO);
-            pedido.setDataPedido(java.time.LocalDateTime.now().minusDays(i));
+            pedido.setDataPedido(baseData.minusDays(i));
             entityManager.persist(pedido);
 
             com.deliverytech.delivery_api.model.ItemPedido item = new com.deliverytech.delivery_api.model.ItemPedido();
@@ -92,7 +95,7 @@ class ClienteRepositoryTest extends BaseIntegrationTest {
             pedido.setValorTotal(new java.math.BigDecimal("15.00"));
             pedido.setSubtotal(new java.math.BigDecimal("15.00"));
             pedido.setStatus(com.deliverytech.delivery_api.model.StatusPedido.CONFIRMADO);
-            pedido.setDataPedido(java.time.LocalDateTime.now().minusDays(i + 10));
+            pedido.setDataPedido(baseData.minusDays(i + 5));
             entityManager.persist(pedido);
 
             com.deliverytech.delivery_api.model.ItemPedido item = new com.deliverytech.delivery_api.model.ItemPedido();
@@ -106,8 +109,8 @@ class ClienteRepositoryTest extends BaseIntegrationTest {
 
         entityManager.flush();
 
-        var inicio = java.time.LocalDateTime.now().minusYears(1);
-        var fim = java.time.LocalDateTime.now();
+        var inicio = baseData.minusYears(1);
+        var fim = baseData.plusYears(1);
         var pageable = org.springframework.data.domain.PageRequest.of(0, 10);
         List<RelatorioVendasClientes> ranking = clienteRepository.rankingClientesPorPedidos(inicio, fim, pageable);
         
