@@ -48,6 +48,14 @@ jobs:
           JACOCO_XML: target/site/jacoco/jacoco.xml
           JACOCO_HTML: target/site/jacoco/index.html
 
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
       # Build da imagem Docker apenas para validação. Não será feito push nem upload da imagem.
       - name: Build da imagem Docker
         uses: docker/build-push-action@v5
