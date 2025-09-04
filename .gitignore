@@ -75,5 +75,8 @@ dependency-check-report/**
 .azure/**/*
 !.azure/devops
 
-**/*.bakentregaveis/delivery-api-rabay.postman_collection.json.bak
 *.bak
+
+entregaveis/**/newman-*.*
+entregaveis/**/*report*.*
+entregaveis/**/*result*.*
