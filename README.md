@@ -51,12 +51,6 @@ Este projeto oferece uma estrutura robusta para aplicações de delivery, inclui
 
 ---
 
-## 📋 Guia de Alterações Recentes
-
-> Consulte o arquivo `README-atividade4.md` em `entregaveis/` para um histórico detalhado de correções, queries customizadas e melhorias recentes.
-
----
-
 ## 🚀 Como Executar
 
 ⚠️ **IMPORTANTE:** A aplicação depende de uma instância MySQL provisionada. Recomenda-se executar via Docker Compose para garantir o ambiente completo.
@@ -188,6 +182,34 @@ src/
    - `GET /actuator/prometheus` — endpoint Prometheus
 
 ⚠️ **IMPORTANTE:** Endpoints de inspeção, métricas e queries customizadas estão disponíveis apenas em ambiente de desenvolvimento e/ou exigem autenticação/perfil adequado.
+
+---
+
+## 🛡️ Filters
+
+O projeto implementa filtros (filters) para registrar todas as requisições e respostas HTTP, promovendo rastreabilidade e auditoria das operações da API.
+
+- **Como funciona:**
+   - Cada request e response é interceptada por um filter customizado.
+   - Informações como método, endpoint, status, payload e timestamp são registradas.
+   - Os logs são organizados por domínio (clientes, pedidos, produtos, restaurantes, autenticação etc).
+
+- **Locais dos logs:**
+   - Em ambiente de produção/desenvolvimento: `logs/`
+   - Em testes automatizados: `entregaveis/logs_test/`
+   - Exemplos de arquivos gerados:
+      - `logs/clientes.log`
+      - `logs/pedidos.log`
+      - `logs/produtos.log`
+      - `logs/restaurantes.log`
+      - `logs/auth.log`
+
+- **Benefícios:**
+   - Facilita troubleshooting e auditoria.
+   - Permite análise de uso e detecção de padrões anômalos.
+   - Segue boas práticas de observabilidade para APIs REST.
+
+> ⚠️ **IMPORTANTE:** Certifique-se de não registrar dados sensíveis nos logs. Em produção, utilize rotação e proteção adequada dos arquivos de log.
 
 ---
 
