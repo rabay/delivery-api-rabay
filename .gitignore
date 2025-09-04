@@ -81,6 +81,8 @@ entregaveis/**/newman-*.*
 entregaveis/**/*report*.*
 entregaveis/**/*result*.*
 
+entregaveis/collections/
+
 ## Ignorar scripts que não devem ser versionados no repositório remoto
 scripts/test_integrity.sh
 scripts/limpeza_disco.sh
