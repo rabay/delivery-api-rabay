@@ -5,8 +5,7 @@ import com.deliverytech.delivery_api.dto.request.PedidoRequest;
 import com.deliverytech.delivery_api.dto.response.PedidoResponse;
 import com.deliverytech.delivery_api.exception.BusinessException;
 import com.deliverytech.delivery_api.exception.EntityNotFoundException;
-import com.deliverytech.delivery_api.exception.EstoqueInsuficienteException;
-import com.deliverytech.delivery_api.exception.ProdutoIndisponivelException;
+
 import com.deliverytech.delivery_api.mapper.PedidoMapper;
 import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
@@ -161,8 +160,20 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<Pedido> buscarPorCliente(Long clienteId, org.springframework.data.domain.Pageable pageable) {
+        return pedidoRepository.findByClienteId(clienteId, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Pedido> buscarPorRestaurante(Long restauranteId) {
         return pedidoRepository.findByRestauranteId(restauranteId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<Pedido> buscarPorRestaurante(Long restauranteId, org.springframework.data.domain.Pageable pageable) {
+        return pedidoRepository.findByRestauranteId(restauranteId, pageable);
     }
 
     @Override
@@ -364,6 +375,20 @@ public class PedidoServiceImpl implements PedidoService {
     @Transactional(readOnly = true)
     public List<Pedido> listarTodos() {
         return pedidoRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<PedidoResponse> listarTodos(org.springframework.data.domain.Pageable pageable) {
+        var page = pedidoRepository.findAll(pageable);
+        return page.map(pedidoMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<PedidoResponse> buscarPedidosPorCliente(Long clienteId, org.springframework.data.domain.Pageable pageable) {
+        var page = pedidoRepository.findByClienteId(clienteId, pageable);
+        return page.map(pedidoMapper::toResponse);
     }
 
     @Override

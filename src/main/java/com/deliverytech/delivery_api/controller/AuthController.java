@@ -42,13 +42,16 @@ public class AuthController {
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Login de usuário", description = "Realizar o login do usuário")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
-        @ApiResponse(
-                responseCode = "401",
-                description = "Login inválido",
-                content = @Content(schema = @Schema(implementation = Void.class))),
+    @ApiResponse(responseCode = "200", description = "Login realizado com sucesso",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResult.class), examples = {
+            @io.swagger.v3.oas.annotations.media.ExampleObject(name = "login-success", value = "{\"data\":{\"token\":\"eyJhbGciOi...\"},\"message\":\"Login realizado com sucesso\",\"success\":true}")
+        })),
+    @ApiResponse(
+        responseCode = "401",
+        description = "Login inválido",
+        content = @Content(schema = @Schema(implementation = Void.class))),
     })
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         try {
             // Use username and password for authentication
             Authentication authentication =
@@ -61,11 +64,12 @@ public class AuthController {
             String token = jwtUtil.gerarToken(username);
 
             LoginResponse dto = new LoginResponse(token);
-            return ResponseEntity.ok(dto);
+            com.deliverytech.delivery_api.dto.response.ApiResult<LoginResponse> body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(dto, "Login realizado com sucesso", true);
+            return ResponseEntity.ok(body);
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Usuário ou senha inválidos", false));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Erro interno: " + e.getMessage(), false));
         }
     }
 
@@ -74,27 +78,31 @@ public class AuthController {
             summary = "Registrar um usuário",
             description = "Cadastrar um novo usuário na plataforma")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Registro salvo com sucesso"),
-        @ApiResponse(
-                responseCode = "400",
-                description = "Registro inválido",
-                content = @Content(schema = @Schema(implementation = Void.class))),
-        @ApiResponse(
-                responseCode = "409",
-                description = "Email já cadastrado",
-                content = @Content(schema = @Schema(implementation = Void.class))),
+    @ApiResponse(responseCode = "201", description = "Registro salvo com sucesso",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResult.class), examples = {
+            @io.swagger.v3.oas.annotations.media.ExampleObject(name = "register-success", value = "{\"data\":{\"id\":1,\"nome\":\"Usuário\",\"email\":\"user@test.com\"},\"message\":\"Registro salvo com sucesso\",\"success\":true}")
+        })),
+    @ApiResponse(
+        responseCode = "400",
+        description = "Registro inválido",
+        content = @Content(schema = @Schema(implementation = Void.class))),
+    @ApiResponse(
+        responseCode = "409",
+        description = "Email já cadastrado",
+        content = @Content(schema = @Schema(implementation = Void.class))),
     })
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<UserResponse>> register(@Valid @RequestBody RegisterRequest request) {
         try {
             Usuario novoUsuario = usuarioService.salvar(request);
             UserResponse response = UserResponse.fromEntity(novoUsuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            com.deliverytech.delivery_api.dto.response.ApiResult<UserResponse> body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(response, "Registro salvo com sucesso", true);
+            return ResponseEntity.status(HttpStatus.CREATED).body(body);
         } catch (EmailJaCadastradoException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Email já cadastrado: " + e.getMessage(), false));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Requisição inválida: " + e.getMessage(), false));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Erro interno: " + e.getMessage(), false));
         }
     }
 }

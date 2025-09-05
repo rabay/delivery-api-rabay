@@ -17,6 +17,7 @@ public interface RestauranteService {
     List<Restaurante> listarTodos();
 
     List<Restaurante> listarAtivos();
+    org.springframework.data.domain.Page<Restaurante> listarAtivos(org.springframework.data.domain.Pageable pageable);
 
     List<Restaurante> buscarPorCategoria(String categoria);
 
@@ -33,6 +34,7 @@ public interface RestauranteService {
     Restaurante alterarStatus(Long id, Boolean ativo);
 
     List<Restaurante> buscarProximos(String cep);
+    org.springframework.data.domain.Page<com.deliverytech.delivery_api.dto.response.RestauranteResponse> buscarProximos(String cep, org.springframework.data.domain.Pageable pageable);
 
     List<Restaurante> listarComFiltros(String categoria, Boolean ativo);
 
@@ -44,6 +46,9 @@ public interface RestauranteService {
     List<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria);
 
     List<RestauranteResponse> buscarRestaurantesDisponiveis();
+    org.springframework.data.domain.Page<RestauranteResponse> buscarRestaurantesDisponiveis(org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria, org.springframework.data.domain.Pageable pageable);
 
     RestauranteResponse atualizarRestaurante(Long id, RestauranteRequest restauranteRequest);
 }

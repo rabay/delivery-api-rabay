@@ -22,6 +22,10 @@ public interface PedidoService {
 
     List<Pedido> buscarPorRestaurante(Long restauranteId);
 
+    org.springframework.data.domain.Page<Pedido> buscarPorCliente(Long clienteId, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<Pedido> buscarPorRestaurante(Long restauranteId, org.springframework.data.domain.Pageable pageable);
+
     List<Pedido> buscarPorStatus(StatusPedido status);
 
     Pedido atualizarStatus(Long id, StatusPedido status);
@@ -45,6 +49,10 @@ public interface PedidoService {
     List<Pedido> buscarPorClienteComItens(Long clienteId);
 
     List<Pedido> listarTodos();
+
+    org.springframework.data.domain.Page<PedidoResponse> listarTodos(org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<PedidoResponse> buscarPedidosPorCliente(Long clienteId, org.springframework.data.domain.Pageable pageable);
 
     void deletar(Long id);
 

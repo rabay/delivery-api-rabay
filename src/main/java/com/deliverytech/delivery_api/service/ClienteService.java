@@ -27,6 +27,7 @@ public interface ClienteService {
     Optional<ClienteResponse> buscarPorEmail(String email);
 
     List<ClienteResponse> listarAtivos();
+        org.springframework.data.domain.Page<ClienteResponse> listarAtivos(org.springframework.data.domain.Pageable pageable);
 
     List<ClienteResponse> buscarPorNome(String nome);
 

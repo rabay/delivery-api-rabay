@@ -42,12 +42,12 @@ class ClienteControllerTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.nome").value("João Silva"))
-                .andExpect(jsonPath("$.email").value("joao@email.com"))
-                .andExpect(jsonPath("$.telefone").value("11999999999"))
-                .andExpect(jsonPath("$.endereco").value("Rua A, 123"))
-                .andExpect(jsonPath("$.ativo").value(true));
+                .andExpect(jsonPath("$.data.id").exists())
+                .andExpect(jsonPath("$.data.nome").value("João Silva"))
+                .andExpect(jsonPath("$.data.email").value("joao@email.com"))
+                .andExpect(jsonPath("$.data.telefone").value("11999999999"))
+                .andExpect(jsonPath("$.data.endereco").value("Rua A, 123"))
+                .andExpect(jsonPath("$.data.ativo").value(true));
     }
 
     @Test
@@ -120,17 +120,20 @@ class ClienteControllerTest extends BaseIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        // Parse the created client to get its ID
-        ClienteResponse createdClient = objectMapper.readValue(response, ClienteResponse.class);
+        // The API now returns an envelope ApiResult with a `data` field
+        // Parse the response and extract the data node first
+        com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response);
+        com.fasterxml.jackson.databind.JsonNode dataNode = root.path("data");
+        ClienteResponse createdClient = objectMapper.treeToValue(dataNode, ClienteResponse.class);
         Long clientId = createdClient.getId();
 
         // Now test finding by ID
         mockMvc.perform(get("/api/clientes/{id}", clientId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(clientId))
-                .andExpect(jsonPath("$.nome").value("Cliente Teste"))
-                .andExpect(jsonPath("$.email").value("cliente@teste.com"));
+                .andExpect(jsonPath("$.data.id").value(clientId))
+                .andExpect(jsonPath("$.data.nome").value("Cliente Teste"))
+                .andExpect(jsonPath("$.data.email").value("cliente@teste.com"));
     }
 
     @Test

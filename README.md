@@ -246,4 +246,12 @@ O projeto implementa filtros (filters) para registrar todas as requisições e r
 
 ---
 
+## Para saber mais
+
+- [Sobre a configuração do banco de dados MySQL](README-MySQL.md)
+- [Sobre a coleção de testes do Postman](entregaveis/README.md)
+- [Sobre os diagramas do sistema](diagramas/README.md)
+
+---
+
 Desenvolvido por Victor Alexandre Rabay para o curso de Arquitetura de Sistemas (turma T158 02728 de 2025).

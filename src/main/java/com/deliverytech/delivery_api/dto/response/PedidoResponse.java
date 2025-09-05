@@ -9,18 +9,18 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "DTO de resposta para pedidos.")
+@Schema(description = "DTO de resposta para pedidos.", title = "Pedido Response DTO")
 public class PedidoResponse {
-    @Schema(description = "ID do pedido.", example = "10")
+    @Schema(description = "ID único do pedido.", example = "10")
     private Long id;
 
-    @Schema(description = "Resumo do cliente.")
+    @Schema(description = "Informações resumidas do cliente.")
     private ClienteResumoResponse cliente;
 
     @Schema(description = "ID do restaurante.", example = "2")
     private Long restauranteId;
 
-    @Schema(description = "Endere\u00e7o de entrega do pedido.")
+    @Schema(description = "Endereço de entrega do pedido.")
     private Endereco enderecoEntrega;
 
     @Schema(description = "Valor total do pedido.", example = "99.90")

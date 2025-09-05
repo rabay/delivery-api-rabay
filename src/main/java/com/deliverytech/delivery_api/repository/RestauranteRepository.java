@@ -7,12 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.math.BigDecimal;
 import java.util.List;
 
+
 public interface RestauranteRepository extends JpaRepository<Restaurante, Long> {
     List<Restaurante> findByNomeContainingIgnoreCaseAndExcluidoFalse(String nome);
 
     List<Restaurante> findByCategoriaAndExcluidoFalse(String categoria);
+    org.springframework.data.domain.Page<Restaurante> findByCategoriaAndExcluidoFalse(String categoria, org.springframework.data.domain.Pageable pageable);
 
     List<Restaurante> findByAtivoTrueAndExcluidoFalse();
+    org.springframework.data.domain.Page<Restaurante> findByAtivoTrueAndExcluidoFalse(org.springframework.data.domain.Pageable pageable);
 
     List<Restaurante> findAllByExcluidoFalseOrderByAvaliacaoDesc();
 
@@ -25,4 +28,5 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
     List<Restaurante> findByCategoriaAndAtivoAndExcluidoFalse(String categoria, Boolean ativo);
 
     List<Restaurante> findTop5ByExcluidoFalseOrderByNomeAsc();
+    
 }

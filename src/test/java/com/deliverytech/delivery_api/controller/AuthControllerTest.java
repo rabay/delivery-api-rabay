@@ -85,7 +85,7 @@ class AuthControllerTest extends BaseIntegrationTest {
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.token").value("mock.jwt.token"));
+                .andExpect(jsonPath("$.data.token").value("mock.jwt.token"));
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(jwtUtil).gerarToken(loginRequest.getUsername());
@@ -142,9 +142,9 @@ class AuthControllerTest extends BaseIntegrationTest {
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.email").value(testUser.getEmail()))
-                .andExpect(jsonPath("$.nome").value(testUser.getNome()))
-                .andExpect(jsonPath("$.role").value(testUser.getRole().toString()));
+                .andExpect(jsonPath("$.data.email").value(testUser.getEmail()))
+                .andExpect(jsonPath("$.data.nome").value(testUser.getNome()))
+                .andExpect(jsonPath("$.data.role").value(testUser.getRole().toString()));
 
         verify(usuarioService).salvar(any(RegisterRequest.class));
     }

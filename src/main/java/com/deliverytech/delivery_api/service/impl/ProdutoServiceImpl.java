@@ -183,6 +183,13 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<ProdutoResponse> buscarProdutosPorRestaurante(Long restauranteId, org.springframework.data.domain.Pageable pageable) {
+        var page = produtoRepository.findByRestauranteIdAndExcluidoFalse(restauranteId, pageable);
+        return page.map(produtoMapper::toResponse);
+    }
+
+    @Override
     public ProdutoResponse atualizar(Long id, ProdutoRequest produtoRequest) {
         Produto existente =
                 produtoRepository
@@ -225,6 +232,27 @@ public class ProdutoServiceImpl implements ProdutoService {
     public List<ProdutoResponse> buscarDisponiveis() {
         List<Produto> produtos = produtoRepository.findByDisponivelTrueAndExcluidoFalse();
         return produtos.stream().map(produtoMapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<ProdutoResponse> buscarDisponiveis(org.springframework.data.domain.Pageable pageable) {
+        var page = produtoRepository.findByDisponivelTrueAndExcluidoFalse(pageable);
+        return page.map(produtoMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<ProdutoResponse> buscarProdutosPorCategoria(String categoria, org.springframework.data.domain.Pageable pageable) {
+        var page = produtoRepository.findByCategoriaAndExcluidoFalse(categoria, pageable);
+        return page.map(produtoMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<ProdutoResponse> buscarProdutosPorNome(String nome, org.springframework.data.domain.Pageable pageable) {
+        var page = produtoRepository.findByNomeContainingIgnoreCaseAndExcluidoFalse(nome, pageable);
+        return page.map(produtoMapper::toResponse);
     }
 
     // ===== MÉTODOS PARA CONTROLE DE ESTOQUE =====
@@ -317,5 +345,11 @@ public class ProdutoServiceImpl implements ProdutoService {
                 produtoRepository.save(produto);
             }
         }
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProdutoResponse> buscarProdutosPorNome(String nome) {
+        List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCaseAndExcluidoFalse(nome);
+        return produtos.stream().map(produtoMapper::toResponse).collect(java.util.stream.Collectors.toList());
     }
 }

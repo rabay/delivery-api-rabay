@@ -6,10 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "Resposta quando realizar o login", title = "Login Response DTO")
+@Schema(description = "DTO de resposta para autenticação de usuário.", title = "Login Response DTO")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginResponse {
+    @Schema(description = "Token JWT para autenticação nas requisições subsequentes.", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String token;
 }

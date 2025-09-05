@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByClienteId(Long clienteId);
@@ -42,6 +44,12 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByDataPedidoGreaterThanEqual(LocalDateTime data);
 
     List<Pedido> findByDataPedidoLessThanEqual(LocalDateTime data);
+
+                Page<Pedido> findByClienteId(Long clienteId, Pageable pageable);
+
+                Page<Pedido> findByRestauranteId(Long restauranteId, Pageable pageable);
+
+                Page<Pedido> findByStatus(StatusPedido status, Pageable pageable);
 
     // === CONSULTAS CUSTOMIZADAS ===
     @Query(

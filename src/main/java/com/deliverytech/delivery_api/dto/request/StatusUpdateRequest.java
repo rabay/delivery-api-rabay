@@ -4,12 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.NotBlank;
 
-@Schema(description = "DTO para atualização de status de pedido.")
+@Schema(description = "DTO para atualização de status de pedido.", title = "Status Update Request DTO")
 public class StatusUpdateRequest {
     @NotBlank(message = "Status é obrigatório")
     @Schema(
-            description = "Novo status do pedido (ex: CRIADO, ENTREGUE, CANCELADO).",
-            example = "ENTREGUE")
+            description = "Novo status do pedido (valores possíveis: CRIADO, CONFIRMADO, EM_PREPARACAO, PRONTO, EM_ENTREGA, ENTREGUE, CANCELADO).",
+            example = "ENTREGUE",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private String status;
 
     public StatusUpdateRequest() {}

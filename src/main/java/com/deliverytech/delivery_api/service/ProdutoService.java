@@ -40,11 +40,22 @@ public interface ProdutoService {
 
     List<ProdutoResponse> buscarProdutosPorRestaurante(Long restauranteId);
 
+    org.springframework.data.domain.Page<com.deliverytech.delivery_api.dto.response.ProdutoResponse> buscarProdutosPorRestaurante(Long restauranteId, org.springframework.data.domain.Pageable pageable);
+
     ProdutoResponse atualizar(Long id, ProdutoRequest produtoRequest);
 
     List<ProdutoResponse> buscarProdutosPorCategoria(String categoria);
 
     List<ProdutoResponse> buscarDisponiveis();
+
+    org.springframework.data.domain.Page<com.deliverytech.delivery_api.dto.response.ProdutoResponse> buscarProdutosPorCategoria(String categoria, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<com.deliverytech.delivery_api.dto.response.ProdutoResponse> buscarProdutosPorNome(String nome, org.springframework.data.domain.Pageable pageable);
+
+    // Versão paginada
+    org.springframework.data.domain.Page<ProdutoResponse> buscarDisponiveis(org.springframework.data.domain.Pageable pageable);
+
+    List<ProdutoResponse> buscarProdutosPorNome(String nome);
 
     // Métodos para controle de estoque
     void validarEstoque(Produto produto, Integer quantidadeSolicitada);

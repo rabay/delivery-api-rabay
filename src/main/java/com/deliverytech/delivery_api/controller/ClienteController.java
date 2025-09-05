@@ -2,11 +2,16 @@ package com.deliverytech.delivery_api.controller;
 
 import com.deliverytech.delivery_api.dto.request.ClienteRequest;
 import com.deliverytech.delivery_api.dto.response.ClienteResponse;
-import com.deliverytech.delivery_api.dto.response.PedidoResponse;
 import com.deliverytech.delivery_api.service.ClienteService;
 import com.deliverytech.delivery_api.service.PedidoService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
@@ -14,7 +19,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+// java.util.List não é mais necessário neste arquivo
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -33,147 +38,143 @@ public class ClienteController {
     @Operation(
             summary = "Cadastrar novo cliente",
             description = "Cria um novo cliente ativo no sistema.")
-    @PostMapping
-    public ResponseEntity<ClienteResponse> criar(
-            @Valid @RequestBody ClienteRequest clienteRequest) {
-        ClienteResponse novo = clienteService.cadastrar(clienteRequest);
-        return ResponseEntity.status(201).body(novo);
-    }
+        @PostMapping
+        public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<ClienteResponse>> criar(
+                        @Valid @RequestBody ClienteRequest clienteRequest) {
+                ClienteResponse novo = clienteService.cadastrar(clienteRequest);
+                var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(novo, "Cliente criado com sucesso", true);
+                return ResponseEntity.status(201).body(body);
+        }
 
-    @Operation(
-            summary = "Listar clientes ativos",
-            description = "Retorna todos os clientes ativos cadastrados.")
-    @GetMapping
-    public List<ClienteResponse> listar() {
-        return clienteService.listarAtivos();
-    }
+        @Operation(
+                        summary = "Listar clientes ativos",
+                        description = "Retorna todos os clientes ativos cadastrados.")
+        @Parameters({
+                @Parameter(name = "page", description = "Índice da página (0-based)", example = "0"),
+                @Parameter(name = "size", description = "Tamanho da página", example = "20")
+        })
+        @ApiResponses({
+                @ApiResponse(responseCode = "200", description = "Clientes paginados (ApiResult<PagedResponse<ClienteResponse>>)",
+                                content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResultClientePaged.class))),
+                @ApiResponse(responseCode = "400", description = "Parâmetros inválidos"),
+                @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+        })
+        @GetMapping
+        public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<com.deliverytech.delivery_api.dto.response.PagedResponse<com.deliverytech.delivery_api.dto.response.ClienteResponse>>> listar(
+                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+                var pageable = org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
+                var pageResult = clienteService.listarAtivos(pageable);
+                var paged = new com.deliverytech.delivery_api.dto.response.PagedResponse<>(pageResult.getContent(), pageResult.getTotalElements(), pageResult.getNumber(), pageResult.getSize(), "Clientes obtidos com sucesso", true);
+                return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Clientes obtidos com sucesso", true));
+        }
 
     @Operation(
             summary = "Buscar cliente por e-mail",
             description = "Consulta um cliente pelo e-mail.")
     @GetMapping("/email/{email}")
-    public ResponseEntity<ClienteResponse> buscarPorEmail(@PathVariable String email) {
-        return clienteService
-                .buscarPorEmail(email)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+                public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<ClienteResponse>> buscarPorEmail(@PathVariable String email) {
+                        var opt = clienteService.buscarPorEmail(email);
+                        if (opt.isPresent()) {
+                                var c = opt.get();
+                                return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(c, "Cliente encontrado", true));
+                        }
+                        return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
+                                        .body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Cliente não encontrado", false));
+                }
 
     @Operation(
             summary = "Buscar cliente por ID",
             description = "Consulta um cliente pelo seu identificador único.")
     @GetMapping("/{id:[0-9]+}")
-    public ResponseEntity<ClienteResponse> buscarPorId(@PathVariable Long id) {
-        try {
-            System.out.println("ClienteController.buscarPorId called with id: " + id);
-            ClienteResponse cliente = clienteService.buscarPorId(id);
-            return ResponseEntity.ok(cliente);
-        } catch (RuntimeException e) {
-            System.err.println("RuntimeException in buscarPorId: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+        public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<ClienteResponse>> buscarPorId(@PathVariable Long id) {
+                try {
+                        ClienteResponse cliente = clienteService.buscarPorId(id);
+                        return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(cliente, "Cliente obtido com sucesso", true));
+                } catch (RuntimeException e) {
+                        return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
+                                        .body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Cliente não encontrado", false));
+                }
         }
-    }
 
     @Operation(
             summary = "Atualizar cliente",
             description = "Atualiza os dados de um cliente existente.")
-    @PutMapping("/{id:[0-9]+}")
-    public ResponseEntity<ClienteResponse> atualizar(
-            @PathVariable Long id, @Valid @RequestBody ClienteRequest clienteRequest) {
-        ClienteResponse atualizado = clienteService.atualizar(id, clienteRequest);
-        return ResponseEntity.ok(atualizado);
-    }
+        @PutMapping("/{id:[0-9]+}")
+        public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<ClienteResponse>> atualizar(
+                        @PathVariable Long id, @Valid @RequestBody ClienteRequest clienteRequest) {
+                ClienteResponse atualizado = clienteService.atualizar(id, clienteRequest);
+                return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(atualizado, "Cliente atualizado com sucesso", true));
+        }
 
     @Operation(
             summary = "Inativar cliente",
             description = "Inativa um cliente pelo seu ID, tornando-o indisponível para operações.")
-    @DeleteMapping("/{id:[0-9]+}")
-    public ResponseEntity<Void> inativar(@PathVariable Long id) {
-        clienteService.inativar(id);
-        return ResponseEntity.noContent().build();
-    }
+        @ApiResponses({
+                @ApiResponse(responseCode = "200", description = "Cliente inativado com sucesso",
+                        content = @Content(mediaType = "application/json", examples = @io.swagger.v3.oas.annotations.media.ExampleObject(value = "{\"data\":null, \"message\":\"Cliente inativado com sucesso\", \"success\":true}"))),
+                @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
+                @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+        })
+        @DeleteMapping("/{id:[0-9]+}")
+                public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Void>> inativar(@PathVariable Long id) {
+                                clienteService.inativar(id);
+                                return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Cliente inativado com sucesso", true));
+                }
 
     @Operation(
             summary = "Ativar/Desativar cliente",
             description = "Alterna o status ativo/inativo de um cliente.")
-    @PatchMapping("/{id:[0-9]+}/status")
-    public ResponseEntity<ClienteResponse> alterarStatus(@PathVariable Long id) {
-        ClienteResponse atualizado = clienteService.ativarDesativarCliente(id);
-        return ResponseEntity.ok(atualizado);
-    }
-
-    @Operation(
-            summary = "Listar pedidos do cliente",
-            description = "Retorna todos os pedidos realizados por um cliente específico.")
-    @GetMapping("/{clienteId:[0-9]+}/pedidos")
-    public ResponseEntity<List<PedidoResponse>> buscarPedidosDoCliente(
-            @PathVariable Long clienteId) {
-        try {
-            // Log the clienteId to see what's being passed
-            System.out.println("Received request for pedidos of clienteId: " + clienteId);
-            System.out.println("clienteId class: " + clienteId.getClass().getName());
-            System.out.println("clienteId value: " + clienteId);
-            
-            // Validate that clienteId is not null or negative
-            if (clienteId == null || clienteId <= 0) {
-                System.out.println("Invalid clienteId: " + clienteId);
-                return ResponseEntity.badRequest().build();
-            }
-            
-            // Carregar pedidos com itens e produtos para evitar problemas de lazy loading ao mapear
-            // para DTOs
-            System.out.println("Calling pedidoService.buscarPorClienteComItens with clienteId: " + clienteId);
-            List<com.deliverytech.delivery_api.model.Pedido> pedidos =
-                    pedidoService.buscarPorClienteComItens(clienteId);
-            System.out.println("pedidoService returned " + (pedidos != null ? pedidos.size() : "null") + " pedidos");
-            List<PedidoResponse> responses =
-                    pedidos == null
-                            ? List.of()
-                            : pedidos.stream().map(this::mapToResponse).toList();
-            System.out.println("Mapped to " + responses.size() + " PedidoResponse objects");
-            return ResponseEntity.ok(responses);
-        } catch (RuntimeException ex) {
-            // Logar a exceção para diagnóstico e manter contrato da API retornando lista vazia
-            System.err.println("RuntimeException in buscarPedidosDoCliente: " + ex.getMessage());
-            ex.printStackTrace();
-            return ResponseEntity.ok(List.of());
-        } catch (Exception ex) {
-            // Log the exception for debugging
-            System.err.println("Exception in buscarPedidosDoCliente: " + ex.getMessage());
-            ex.printStackTrace();
-            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
+        @ApiResponses({
+                @ApiResponse(responseCode = "200", description = "Status do cliente alterado com sucesso",
+                        content = @Content(mediaType = "application/json", examples = @io.swagger.v3.oas.annotations.media.ExampleObject(value = "{\"data\": {\"id\": 1, \"nome\": \"João\"}, \"message\": \"Status do cliente alterado\", \"success\": true}"))),
+                @ApiResponse(responseCode = "400", description = "Requisição inválida"),
+                @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
+                @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+        })
+        @PatchMapping("/{id:[0-9]+}/status")
+        public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<ClienteResponse>> alterarStatus(@PathVariable Long id) {
+                ClienteResponse atualizado = clienteService.ativarDesativarCliente(id);
+                return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(atualizado, "Status do cliente alterado", true));
         }
-    }
 
-    private PedidoResponse mapToResponse(com.deliverytech.delivery_api.model.Pedido pedido) {
-        return new PedidoResponse(
-                pedido.getId(),
-                (pedido.getCliente() != null)
-                        ? new com.deliverytech.delivery_api.dto.response.ClienteResumoResponse(
-                                pedido.getCliente().getId(), pedido.getCliente().getNome())
-                        : null,
-                pedido.getRestaurante() != null ? pedido.getRestaurante().getId() : null,
-                pedido.getEnderecoEntrega(),
-                pedido.getValorTotal(),
-                pedido.getStatus(),
-                pedido.getDataPedido(),
-                pedido.getItens() != null
-                        ? pedido.getItens().stream()
-                                .map(
-                                        item ->
-                                                new com.deliverytech.delivery_api.dto.response
-                                                        .ItemPedidoResponse(
-                                                        item.getProduto() != null
-                                                                ? item.getProduto().getId()
-                                                                : null,
-                                                        item.getProduto() != null
-                                                                ? item.getProduto().getNome()
-                                                                : null,
-                                                        item.getQuantidade(),
-                                                        item.getPrecoUnitario()))
-                                .toList()
-                        : List.of());
-    }
+        @Operation(
+                        summary = "Listar pedidos do cliente",
+                        description = "Retorna todos os pedidos realizados por um cliente específico.")
+        @Parameters({
+                @Parameter(name = "page", description = "Índice da página (0-based)", example = "0"),
+                @Parameter(name = "size", description = "Tamanho da página", example = "20")
+        })
+        @ApiResponses({
+                @ApiResponse(responseCode = "200", description = "Pedidos do cliente paginados (ApiResult<PagedResponse<PedidoResponse>>)",
+                                content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResultPedidoPaged.class))),
+                @ApiResponse(responseCode = "400", description = "clienteId inválido"),
+                @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
+                @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+        })
+        @GetMapping("/{clienteId:[0-9]+}/pedidos")
+        public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<com.deliverytech.delivery_api.dto.response.PagedResponse<com.deliverytech.delivery_api.dto.response.PedidoResponse>>> buscarPedidosDoCliente(
+                        @PathVariable Long clienteId,
+                        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                        @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+                try {
+                        if (clienteId == null || clienteId <= 0) {
+                                return ResponseEntity.badRequest().body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "clienteId inválido", false));
+                        }
+
+                        var pageable = org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
+                        var pageResult = pedidoService.buscarPedidosPorCliente(clienteId, pageable);
+                        var paged = new com.deliverytech.delivery_api.dto.response.PagedResponse<>(pageResult.getContent(), pageResult.getTotalElements(), pageResult.getNumber(), pageResult.getSize(), "Pedidos do cliente obtidos", true);
+                        return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Pedidos do cliente obtidos", true));
+                } catch (RuntimeException ex) {
+                        // Em caso de erro (ex.: cliente não existe)
+                        return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
+                                        .body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Cliente não encontrado", false));
+                } catch (Exception ex) {
+                        return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
+                }
+        }
+
+        // Removido método mapToResponse pois não é utilizado neste controller.
 }

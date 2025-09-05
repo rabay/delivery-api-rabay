@@ -10,19 +10,25 @@ import com.deliverytech.delivery_api.model.StatusPedido;
 import com.deliverytech.delivery_api.service.PedidoService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.deliverytech.delivery_api.dto.response.ApiResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/pedidos")
@@ -42,30 +48,58 @@ public class PedidoController {
     @Operation(
             summary = "Listar todos os pedidos",
             description = "Retorna todos os pedidos cadastrados no sistema.")
+    @Parameters({
+        @Parameter(name = "page", description = "Índice da página (0-based)", example = "0"),
+        @Parameter(name = "size", description = "Tamanho da página", example = "20")
+    })
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Pedidos paginados (ApiResult<PagedResponse<PedidoResponse>>)",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResult.class))),
+        @ApiResponse(responseCode = "400", description = "Parâmetros inválidos"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @GetMapping
-    public ResponseEntity<List<PedidoResponse>> listarTodos() {
+    public ResponseEntity<ApiResult<com.deliverytech.delivery_api.dto.response.PagedResponse<PedidoResponse>>> listarTodos(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
         try {
-            List<Pedido> pedidos = pedidoService.listarTodos();
-            List<PedidoResponse> responses = pedidos.stream().map(this::mapToResponse).toList();
-            return ResponseEntity.ok(responses);
+            var pageable = org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
+            var pageResult = pedidoService.listarTodos(pageable);
+            var paged = new com.deliverytech.delivery_api.dto.response.PagedResponse<>(pageResult.getContent(), pageResult.getTotalElements(), pageResult.getNumber(), pageResult.getSize(), "Pedidos obtidos com sucesso", true);
+            return ResponseEntity.ok(new ApiResult<>(paged, "Pedidos obtidos com sucesso", true));
         } catch (Exception ex) {
             logger.error("Erro ao listar todos os pedidos: {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
         }
     }
 
     @Operation(
             summary = "Listar todos os pedidos (resumo)",
             description = "Retorna um resumo de todos os pedidos cadastrados no sistema.")
+    @Parameters({
+        @Parameter(name = "page", description = "Índice da página (0-based)", example = "0"),
+        @Parameter(name = "size", description = "Tamanho da página", example = "20")
+    })
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Resumo de pedidos paginados (ApiResult<PagedResponse<PedidoResumoResponse>>)",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResult.class))),
+        @ApiResponse(responseCode = "400", description = "Parâmetros inválidos"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @GetMapping("/resumo")
-    public ResponseEntity<List<PedidoResumoResponse>> listarTodosResumo() {
+    public ResponseEntity<ApiResult<com.deliverytech.delivery_api.dto.response.PagedResponse<PedidoResumoResponse>>> listarTodosResumo(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
         try {
-            List<Pedido> pedidos = pedidoService.listarTodos();
-            List<PedidoResumoResponse> responses = pedidos.stream().map(this::mapToResumoResponse).toList();
-            return ResponseEntity.ok(responses);
+            var pageable = org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
+            var pageResult = pedidoService.listarTodos(pageable);
+            // map to resumo
+            var resumoPage = pageResult.map(p -> mapToResumoResponse(pedidoService.buscarPorId(p.getId())));
+            var paged = new com.deliverytech.delivery_api.dto.response.PagedResponse<>(resumoPage.getContent(), resumoPage.getTotalElements(), resumoPage.getNumber(), resumoPage.getSize(), "Resumo de pedidos obtido", true);
+            return ResponseEntity.ok(new ApiResult<>(paged, "Resumo de pedidos obtido", true));
         } catch (Exception ex) {
             logger.error("Erro ao listar todos os pedidos (resumo): {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
         }
     }
 
@@ -73,21 +107,20 @@ public class PedidoController {
             summary = "Buscar pedido por ID",
             description = "Retorna um pedido pelo seu identificador.")
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoResponse> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<ApiResult<PedidoResponse>> buscarPorId(@PathVariable Long id) {
         try {
             Pedido pedido = pedidoService.buscarPorId(id);
             if (pedido == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResult<>(null, "Pedido não encontrado", false));
             }
-            return ResponseEntity.ok(mapToResponse(pedido));
+            return ResponseEntity.ok(new ApiResult<>(mapToResponse(pedido), "Pedido obtido com sucesso", true));
         } catch (RuntimeException ex) {
-            if (ex.getMessage() != null
-                    && ex.getMessage().toLowerCase().contains("não encontrado")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            if (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("não encontrado")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResult<>(null, "Pedido não encontrado", false));
             }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResult<>(null, "Requisição inválida: " + ex.getMessage(), false));
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
         }
     }
 
@@ -95,7 +128,7 @@ public class PedidoController {
             summary = "Criar novo pedido",
             description = "Cria um novo pedido para um cliente em um restaurante.")
     @PostMapping
-    public ResponseEntity<PedidoResponse> criar(@Valid @RequestBody PedidoRequest pedidoRequest) {
+    public ResponseEntity<ApiResult<PedidoResponse>> criar(@Valid @RequestBody PedidoRequest pedidoRequest) {
         try {
             logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
             Pedido pedido = mapToEntity(pedidoRequest);
@@ -103,16 +136,16 @@ public class PedidoController {
             Pedido novo = pedidoService.criar(pedido);
             PedidoResponse response = mapToResponse(novo);
             logger.info(
-                    "Pedido criado com sucesso: id={} status={}",
+                    "Pedido criado com sucesso: id={} status= {}",
                     response.getId(),
                     response.getStatus());
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResult<>(response, "Pedido criado com sucesso", true));
         } catch (RuntimeException ex) {
             logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResult<>(null, "Erro de negócio: " + ex.getMessage(), false));
         } catch (Exception ex) {
             logger.error("Erro inesperado ao criar pedido: {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
         }
     }
 
@@ -120,21 +153,21 @@ public class PedidoController {
             summary = "Criar novo pedido (DTO)",
             description = "Cria um novo pedido para um cliente em um restaurante usando DTO.")
     @PostMapping("/dto")
-    public ResponseEntity<PedidoResponse> criarPedido(@Valid @RequestBody PedidoRequest pedidoRequest) {
+    public ResponseEntity<ApiResult<PedidoResponse>> criarPedido(@Valid @RequestBody PedidoRequest pedidoRequest) {
         try {
             logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
             PedidoResponse response = pedidoService.criarPedido(pedidoRequest);
             logger.info(
-                    "Pedido criado com sucesso: id={} status={}",
+                    "Pedido criado com sucesso: id={} status= {}",
                     response.getId(),
                     response.getStatus());
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResult<>(response, "Pedido criado com sucesso", true));
         } catch (RuntimeException ex) {
             logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResult<>(null, "Erro de negócio: " + ex.getMessage(), false));
         } catch (Exception ex) {
             logger.error("Erro inesperado ao criar pedido: {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
         }
     }
 
@@ -143,30 +176,61 @@ public class PedidoController {
             description =
                     "Atualiza o status de um pedido existente (ex: CRIADO, ENTREGUE, CANCELADO).")
     @PutMapping("/{id}/status")
-    public ResponseEntity<PedidoResponse> atualizarStatus(
+    public ResponseEntity<ApiResult<PedidoResponse>> atualizarStatus(
             @PathVariable Long id, @Valid @RequestBody StatusUpdateRequest statusUpdateRequest) {
         StatusPedido status = StatusPedido.valueOf(statusUpdateRequest.getStatus());
         Pedido atualizado = pedidoService.atualizarStatus(id, status);
         // Buscar novamente o pedido com itens para evitar LazyInitializationException
-        return pedidoService
-                .buscarPorIdComItens(atualizado.getId())
-                .map(pedidoComItens -> ResponseEntity.ok(mapToResponse(pedidoComItens)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        var opt = pedidoService.buscarPorIdComItens(atualizado.getId());
+        if (opt.isPresent()) {
+            var pedidoComItens = opt.get();
+            return ResponseEntity.ok(new ApiResult<>(mapToResponse(pedidoComItens), "Status atualizado", true));
+        }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResult<>(null, "Pedido não encontrado", false));
+    }
+
+    @Operation(
+            summary = "Atualizar status do pedido (parcial)",
+            description = "Atualiza parcialmente o status de um pedido.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Status atualizado com sucesso",
+            content = @Content(mediaType = "application/json", examples = @io.swagger.v3.oas.annotations.media.ExampleObject(value = "{\"data\": {\"id\": 1, \"status\": \"ENTREGUE\"}, \"message\": \"Status atualizado\", \"success\": true}"))),
+        @ApiResponse(responseCode = "400", description = "Status inválido ou requisição inválida"),
+        @ApiResponse(responseCode = "404", description = "Pedido não encontrado"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResult<PedidoResponse>> atualizarStatusPatch(@PathVariable Long id, @RequestBody StatusUpdateRequest statusUpdateRequest) {
+        try {
+            StatusPedido novoStatus = StatusPedido.valueOf(statusUpdateRequest.getStatus().toUpperCase());
+            Pedido pedidoAtualizado = pedidoService.atualizarStatus(id, novoStatus);
+            return ResponseEntity.ok(new ApiResult<>(mapToResponse(pedidoAtualizado), "Status atualizado", true));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ApiResult<>(null, "Status inválido", false));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResult<>(null, "Pedido não encontrado", false));
+        }
     }
 
     @Operation(summary = "Cancelar pedido", description = "Cancela um pedido existente.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Pedido cancelado com sucesso",
+            content = @Content(mediaType = "application/json", examples = @io.swagger.v3.oas.annotations.media.ExampleObject(value = "{\"data\": {\"id\": 1, \"status\": \"CANCELADO\"}, \"message\": \"Pedido cancelado\", \"success\": true}"))),
+        @ApiResponse(responseCode = "400", description = "Erro de negócio ao cancelar pedido"),
+        @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<PedidoResponse> cancelarPedido(@PathVariable Long id) {
+    public ResponseEntity<ApiResult<PedidoResponse>> cancelarPedido(@PathVariable Long id) {
         try {
             Pedido cancelado = pedidoService.cancelar(id);
             PedidoResponse response = mapToResponse(cancelado);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(new ApiResult<>(response, "Pedido cancelado", true));
         } catch (RuntimeException ex) {
             logger.error("Erro ao cancelar pedido {}: {}", id, ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResult<>(null, "Erro de negócio: " + ex.getMessage(), false));
         } catch (Exception ex) {
             logger.error("Erro inesperado ao cancelar pedido {}: {}", id, ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
         }
     }
 
@@ -174,7 +238,7 @@ public class PedidoController {
             summary = "Calcular total do pedido",
             description = "Calcula o total de um pedido sem persisti-lo no banco de dados.")
     @PostMapping("/calcular")
-    public ResponseEntity<Map<String, Object>> calcularTotal(
+    public ResponseEntity<ApiResult<java.util.Map<String, Object>>> calcularTotal(
             @Valid @RequestBody PedidoRequest pedidoRequest) {
         try {
             java.math.BigDecimal total =
@@ -184,13 +248,13 @@ public class PedidoController {
             response.put("quantidade_itens", pedidoRequest.getItens().size());
             response.put("clienteId", pedidoRequest.getClienteId());
             response.put("restauranteId", pedidoRequest.getRestauranteId());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(new ApiResult<>(response, "Total calculado", true));
         } catch (RuntimeException ex) {
             logger.error("Erro ao calcular total do pedido: {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResult<>(null, "Erro de negócio: " + ex.getMessage(), false));
         } catch (Exception ex) {
             logger.error("Erro inesperado ao calcular total do pedido: {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
         }
     }
 

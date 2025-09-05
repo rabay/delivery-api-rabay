@@ -93,11 +93,31 @@ class PedidoControllerIntegrationTest extends BaseIntegrationTest {
         System.out.println("Auth response status: " + authResp.getStatusCode());
         System.out.println("Auth response body: " + authResp.getBody());
         assertThat(authResp.getStatusCode()).isEqualTo(HttpStatus.OK);
-        String token = authResp.getBody().substring(authResp.getBody().indexOf(":\"") + 2, authResp.getBody().lastIndexOf("\""));
+
+        // Extract token from ApiResult.data.token using Jackson
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        String token = null;
+        try {
+            com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(authResp.getBody());
+            com.fasterxml.jackson.databind.JsonNode data = root.path("data");
+            if (!data.isMissingNode()) {
+                com.fasterxml.jackson.databind.JsonNode tokenNode = data.path("token");
+                if (!tokenNode.isMissingNode()) {
+                    token = tokenNode.asText();
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to parse auth response: " + e.getMessage());
+        }
+        System.out.println("Extracted token: " + token);
+        assertThat(token).isNotNull();
 
         // Configurar headers com token
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        if (token == null) {
+            throw new IllegalStateException("Token not found in auth response");
+        }
         headers.setBearerAuth(token);
 
         // Criar cliente

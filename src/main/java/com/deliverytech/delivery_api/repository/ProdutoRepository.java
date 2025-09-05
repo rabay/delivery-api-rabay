@@ -1,3 +1,5 @@
+
+
 package com.deliverytech.delivery_api.repository;
 
 import com.deliverytech.delivery_api.model.Produto;
@@ -15,13 +17,20 @@ import java.util.List;
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
+                List<Produto> findByNomeContainingIgnoreCaseAndExcluidoFalse(String nome);
+                org.springframework.data.domain.Page<Produto> findByNomeContainingIgnoreCaseAndExcluidoFalse(String nome, org.springframework.data.domain.Pageable pageable);
+
     List<Produto> findByDisponivelTrueAndExcluidoFalse();
+    
+        org.springframework.data.domain.Page<Produto> findByDisponivelTrueAndExcluidoFalse(org.springframework.data.domain.Pageable pageable);
 
     List<Produto> findByRestauranteIdAndExcluidoFalse(Long restauranteId);
 
     List<Produto> findByRestauranteAndExcluidoFalse(com.deliverytech.delivery_api.model.Restaurante restaurante);
 
-    List<Produto> findByCategoriaAndExcluidoFalse(String categoria);
+        List<Produto> findByCategoriaAndExcluidoFalse(String categoria);
+        org.springframework.data.domain.Page<Produto> findByCategoriaAndExcluidoFalse(String categoria, org.springframework.data.domain.Pageable pageable);
+                org.springframework.data.domain.Page<Produto> findByRestauranteIdAndExcluidoFalse(Long restauranteId, org.springframework.data.domain.Pageable pageable);
 
     List<Produto> findByPrecoLessThanEqualAndExcluidoFalse(java.math.BigDecimal preco);
 

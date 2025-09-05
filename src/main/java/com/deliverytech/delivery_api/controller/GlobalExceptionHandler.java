@@ -21,89 +21,122 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.HashMap;
 import java.util.Map;
+// OffsetDateTime não utilizado
 
 @ControllerAdvice
+@Tag(name = "Tratamento de Erros", description = "Tratamento global de exceções da aplicação")
 public class GlobalExceptionHandler {
     @ExceptionHandler(EmailDuplicadoException.class)
-    public ResponseEntity<String> handleEmailDuplicado(EmailDuplicadoException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    @Operation(summary = "Tratamento de email duplicado", 
+               description = "Retorna erro quando um email já está cadastrado")
+    @ApiResponses({
+        @ApiResponse(responseCode = "409", description = "Email já cadastrado")
+    })
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Object>> handleEmailDuplicado(EmailDuplicadoException ex) {
+        var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Email duplicado: " + ex.getMessage(), false);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
     
     @ExceptionHandler(EstoqueInsuficienteException.class)
-    public ResponseEntity<String> handleEstoqueInsuficiente(EstoqueInsuficienteException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Object>> handleEstoqueInsuficiente(EstoqueInsuficienteException ex) {
+        var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Estoque insuficiente: " + ex.getMessage(), false);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
     
     @ExceptionHandler(ProdutoIndisponivelException.class)
-    public ResponseEntity<String> handleProdutoIndisponivel(ProdutoIndisponivelException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Object>> handleProdutoIndisponivel(ProdutoIndisponivelException ex) {
+        var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Produto indisponível: " + ex.getMessage(), false);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
     
     @ExceptionHandler(EntityNotFoundException.class)
+    @Operation(summary = "Tratamento de entidade não encontrada", 
+               description = "Retorna erro quando uma entidade não é encontrada")
+    @ApiResponses({
+        @ApiResponse(responseCode = "404", description = "Entidade não encontrada")
+    })
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handleEntityNotFound(EntityNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Object>> handleEntityNotFound(EntityNotFoundException ex) {
+        var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Entidade não encontrada: " + ex.getMessage(), false);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
     
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleBusinessException(BusinessException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Object>> handleBusinessException(BusinessException ex) {
+        var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Erro de negócio: " + ex.getMessage(), false);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
     
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<java.util.Map<String,String>>> handleValidationException(ValidationException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("error", ex.getMessage());
-        return ResponseEntity.badRequest().body(errors);
+    var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(errors, "Erro de validação", false);
+        return ResponseEntity.badRequest().body(body);
     }
     
     @ExceptionHandler(TransactionException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<String> handleTransactionException(TransactionException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro de transação: " + ex.getMessage());
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Object>> handleTransactionException(TransactionException ex) {
+        var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Erro de transação: " + ex.getMessage(), false);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    @Operation(summary = "Tratamento de validação de argumentos", 
+               description = "Retorna erros de validação quando argumentos não são válidos")
+    @ApiResponses({
+        @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos")
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<java.util.Map<String,String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ResponseEntity.badRequest().body(errors);
+    var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(errors, "Erro de validação", false);
+    return ResponseEntity.badRequest().body(body);
     }
     
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<java.util.Map<String,String>>> handleConstraintViolationException(ConstraintViolationException ex) {
         Map<String, String> errors = new HashMap<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             String fieldName = violation.getPropertyPath().toString();
             String errorMessage = violation.getMessage();
             errors.put(fieldName, errorMessage);
         }
-        return ResponseEntity.badRequest().body(errors);
+    var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(errors, "Erro de validação", false);
+    return ResponseEntity.badRequest().body(body);
     }
     
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleMissingParams(MissingServletRequestParameterException ex) {
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<java.util.Map<String,String>>> handleMissingParams(MissingServletRequestParameterException ex) {
         Map<String, String> errors = new HashMap<>();
-        errors.put("parameter", "Missing required parameter: " + ex.getParameterName());
-        return ResponseEntity.badRequest().body(errors);
+        errors.put("parameter", "Parâmetro obrigatório ausente: " + ex.getParameterName());
+    var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(errors, "Erro de validação", false);
+    return ResponseEntity.badRequest().body(body);
     }
     
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<java.util.Map<String,String>>> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
         Map<String, String> errors = new HashMap<>();
-        errors.put("parameter", "Invalid parameter value for: " + ex.getName());
-        return ResponseEntity.badRequest().body(errors);
+        errors.put("parameter", "Valor do parâmetro inválido para: " + ex.getName());
+    var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(errors, "Erro de validação", false);
+    return ResponseEntity.badRequest().body(body);
     }
 }

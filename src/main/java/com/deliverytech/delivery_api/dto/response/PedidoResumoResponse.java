@@ -5,24 +5,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Schema(description = "Resumo do pedido para listagens.")
+@Schema(description = "DTO de resposta resumida para pedido (usado em listagens).", title = "Pedido Resumo Response DTO")
 public class PedidoResumoResponse {
-    @Schema(description = "ID do pedido.", example = "1")
+    @Schema(description = "ID único do pedido.", example = "10")
     private Long id;
     
-    @Schema(description = "Nome do cliente.", example = "João Silva")
+    @Schema(description = "Nome completo do cliente.", example = "João Silva")
     private String clienteNome;
     
     @Schema(description = "Nome do restaurante.", example = "Restaurante do Zé")
     private String restauranteNome;
     
-    @Schema(description = "Valor total do pedido.", example = "49.90")
+    @Schema(description = "Valor total do pedido.", example = "99.90")
     private BigDecimal valorTotal;
     
     @Schema(description = "Desconto aplicado ao pedido.", example = "10.00")
     private BigDecimal desconto;
     
-    @Schema(description = "Status do pedido.", example = "ENTREGUE")
+    @Schema(description = "Status atual do pedido.", example = "ENTREGUE")
     private String status;
     
     @Schema(description = "Data/hora do pedido.", example = "2025-08-21T12:34:56")

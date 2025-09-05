@@ -4,6 +4,7 @@ import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.projection.RelatorioVendasClientes;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,4 +34,5 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
             @Param("inicio") java.time.LocalDateTime inicio,
             @Param("fim") java.time.LocalDateTime fim,
             Pageable pageable);
+        Page<Cliente> findByAtivoTrueAndExcluidoFalse(org.springframework.data.domain.Pageable pageable);
 }

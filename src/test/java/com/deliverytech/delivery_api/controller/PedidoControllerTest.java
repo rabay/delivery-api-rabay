@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -69,13 +68,20 @@ class PedidoControllerTest extends BaseIntegrationTest {
     @DisplayName("Cliente deve conseguir acessar seus próprios pedidos")
     @WithMockJwtUser(email = "cliente@test.com", role = Role.CLIENTE, id = 1L)
     void clienteDeveAcessarPropriosPedidos() throws Exception {
-        Pedido pedido = new Pedido();
-        pedido.setId(1L);
-        when(pedidoService.buscarPorClienteComItens(1L)).thenReturn(java.util.List.of(pedido));
-        
+        // Prepare a PedidoResponse (controller/service contract uses DTO in paged responses)
+        com.deliverytech.delivery_api.dto.response.PedidoResponse pedidoResp = new com.deliverytech.delivery_api.dto.response.PedidoResponse();
+        pedidoResp.setId(1L);
+
+        // Mock service to return a Page of PedidoResponse
+        org.springframework.data.domain.Page<com.deliverytech.delivery_api.dto.response.PedidoResponse> page =
+                new org.springframework.data.domain.PageImpl<>(java.util.List.of(pedidoResp));
+
+        when(pedidoService.buscarPedidosPorCliente(eq(1L), any(org.springframework.data.domain.Pageable.class))).thenReturn(page);
+
         mockMvc.perform(get("/api/clientes/1/pedidos"))
-                .andExpect(status().isOk());
-                
-        verify(pedidoService).buscarPorClienteComItens(1L);
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.items[0].id").value(1));
+
+        verify(pedidoService).buscarPedidosPorCliente(eq(1L), any(org.springframework.data.domain.Pageable.class));
     }
 }

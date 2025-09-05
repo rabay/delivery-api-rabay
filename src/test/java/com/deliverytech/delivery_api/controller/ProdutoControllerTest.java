@@ -70,7 +70,8 @@ class ProdutoControllerTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(2));
+                // now the response is an ApiResult with data.items (paged response)
+                .andExpect(jsonPath("$.data.items.length()").value(2));
     }
 
     @Test
@@ -116,8 +117,8 @@ class ProdutoControllerTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/produtos/{id}", savedProduto.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(savedProduto.getId()))
-                .andExpect(jsonPath("$.nome").value("Produto Teste"));
+                .andExpect(jsonPath("$.data.id").value(savedProduto.getId()))
+                .andExpect(jsonPath("$.data.nome").value("Produto Teste"));
     }
 
     @Test

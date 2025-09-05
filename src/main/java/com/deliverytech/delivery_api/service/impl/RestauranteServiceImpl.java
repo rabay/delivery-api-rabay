@@ -67,6 +67,12 @@ public class RestauranteServiceImpl implements RestauranteService {
 
     @Override
     @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<Restaurante> listarAtivos(org.springframework.data.domain.Pageable pageable) {
+        return restauranteRepository.findByAtivoTrueAndExcluidoFalse(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Restaurante> buscarPorCategoria(String categoria) {
         return restauranteRepository.findByCategoriaAndExcluidoFalse(categoria);
     }
@@ -237,11 +243,25 @@ public class RestauranteServiceImpl implements RestauranteService {
 
     @Override
     @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria, org.springframework.data.domain.Pageable pageable) {
+        var page = restauranteRepository.findByCategoriaAndExcluidoFalse(categoria, pageable);
+        return page.map(restauranteMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<RestauranteResponse> buscarRestaurantesDisponiveis() {
         List<Restaurante> restaurantes = restauranteRepository.findByAtivoTrueAndExcluidoFalse();
         return restaurantes.stream()
                 .map(restauranteMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<RestauranteResponse> buscarRestaurantesDisponiveis(org.springframework.data.domain.Pageable pageable) {
+        var page = restauranteRepository.findByAtivoTrueAndExcluidoFalse(pageable);
+        return page.map(restauranteMapper::toResponse);
     }
 
     @Override
@@ -269,5 +289,28 @@ public class RestauranteServiceImpl implements RestauranteService {
 
         Restaurante atualizado = restauranteRepository.save(existente);
         return restauranteMapper.toResponse(atualizado);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<RestauranteResponse> buscarProximos(String cep, org.springframework.data.domain.Pageable pageable) {
+        // Reuse buscarProximos logic but page the results by querying active restaurants pageable and then filter by region
+        var page = restauranteRepository.findByAtivoTrueAndExcluidoFalse(pageable);
+        // For simplicity, if region filter reduces results it will be applied in-memory on the page content
+        String primeirosDigitos = cep.substring(0, Math.min(2, cep.length()));
+        try {
+            int codigoRegiao = Integer.parseInt(primeirosDigitos);
+            if (codigoRegiao <= 5) {
+                return page.map(restauranteMapper::toResponse);
+            } else {
+        var filteredEntities = page.getContent().stream()
+            .filter(r -> r.getTaxaEntrega().compareTo(new java.math.BigDecimal("10.00")) <= 0)
+            .toList();
+        var filtered = filteredEntities.stream().map(restauranteMapper::toResponse).toList();
+        return new org.springframework.data.domain.PageImpl<com.deliverytech.delivery_api.dto.response.RestauranteResponse>(filtered, pageable, filtered.size());
+            }
+        } catch (NumberFormatException e) {
+            return page.map(restauranteMapper::toResponse);
+        }
     }
 }

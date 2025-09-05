@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 
-@Schema(description = "DTO de resposta para item de pedido.")
+@Schema(description = "DTO de resposta para item de pedido.", title = "Item Pedido Response DTO")
 public class ItemPedidoResponse {
     @Schema(description = "ID do produto.", example = "5")
     private Long produtoId;

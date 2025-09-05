@@ -87,6 +87,13 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<ClienteResponse> listarAtivos(org.springframework.data.domain.Pageable pageable) {
+        var page = clienteRepository.findByAtivoTrueAndExcluidoFalse(pageable);
+        return page.map(clienteMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ClienteResponse> buscarPorNome(String nome) {
         return clienteRepository.findByAtivoTrueAndExcluidoFalse().stream()
                 .filter(
