@@ -3,9 +3,9 @@ package com.deliverytech.delivery_api.projection;
 import java.math.BigDecimal;
 
 public interface RelatorioVendas {
-    String getNomeRestaurante();
+  String getNomeRestaurante();
 
-    BigDecimal getTotalVendas();
+  BigDecimal getTotalVendas();
 
-    Long getQuantidadePedidos();
+  Long getQuantidadePedidos();
 }

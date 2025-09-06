@@ -2,7 +2,6 @@ package com.deliverytech.delivery_api.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,18 +22,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidPrice {
 
-    /** Mensagem de erro padrão exibida quando a validação falha */
-    String message() default "Preço deve ser positivo, mínimo R$ 0,01 e máximo R$ 999.999,99";
+  /** Mensagem de erro padrão exibida quando a validação falha */
+  String message() default "Preço deve ser positivo, mínimo R$ 0,01 e máximo R$ 999.999,99";
 
-    /** Valor mínimo permitido (em centavos) */
-    long min() default 1; // R$ 0,01
+  /** Valor mínimo permitido (em centavos) */
+  long min() default 1; // R$ 0,01
 
-    /** Valor máximo permitido (em centavos) */
-    long max() default 99999999; // R$ 999.999,99
+  /** Valor máximo permitido (em centavos) */
+  long max() default 99999999; // R$ 999.999,99
 
-    /** Grupos de validação - permite agrupar validações */
-    Class<?>[] groups() default {};
+  /** Grupos de validação - permite agrupar validações */
+  Class<?>[] groups() default {};
 
-    /** Payload - permite anexar metadados à validação */
-    Class<? extends Payload>[] payload() default {};
+  /** Payload - permite anexar metadados à validação */
+  Class<? extends Payload>[] payload() default {};
 }

@@ -3,52 +3,59 @@ package com.deliverytech.delivery_api.service;
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.dto.response.RestauranteResponse;
 import com.deliverytech.delivery_api.model.Restaurante;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 public interface RestauranteService {
-    // Métodos existentes com Entity
-    Restaurante cadastrar(RestauranteRequest restauranteRequest);
+  // Métodos existentes com Entity
+  Restaurante cadastrar(RestauranteRequest restauranteRequest);
 
-    Optional<Restaurante> buscarPorId(Long id);
+  Optional<Restaurante> buscarPorId(Long id);
 
-    List<Restaurante> listarTodos();
+  List<Restaurante> listarTodos();
 
-    List<Restaurante> listarAtivos();
-    org.springframework.data.domain.Page<Restaurante> listarAtivos(org.springframework.data.domain.Pageable pageable);
+  List<Restaurante> listarAtivos();
 
-    List<Restaurante> buscarPorCategoria(String categoria);
+  org.springframework.data.domain.Page<Restaurante> listarAtivos(
+      org.springframework.data.domain.Pageable pageable);
 
-    List<Restaurante> buscarPorAvaliacao(BigDecimal minAvaliacao);
+  List<Restaurante> buscarPorCategoria(String categoria);
 
-    List<Restaurante> buscarPorTaxaEntrega(BigDecimal maxTaxa);
+  List<Restaurante> buscarPorAvaliacao(BigDecimal minAvaliacao);
 
-    Restaurante atualizar(Long id, RestauranteRequest restauranteRequest);
+  List<Restaurante> buscarPorTaxaEntrega(BigDecimal maxTaxa);
 
-    void inativar(Long id);
+  Restaurante atualizar(Long id, RestauranteRequest restauranteRequest);
 
-    BigDecimal calcularTaxaEntrega(Long restauranteId, String cep);
+  void inativar(Long id);
 
-    Restaurante alterarStatus(Long id, Boolean ativo);
+  BigDecimal calcularTaxaEntrega(Long restauranteId, String cep);
 
-    List<Restaurante> buscarProximos(String cep);
-    org.springframework.data.domain.Page<com.deliverytech.delivery_api.dto.response.RestauranteResponse> buscarProximos(String cep, org.springframework.data.domain.Pageable pageable);
+  Restaurante alterarStatus(Long id, Boolean ativo);
 
-    List<Restaurante> listarComFiltros(String categoria, Boolean ativo);
+  List<Restaurante> buscarProximos(String cep);
 
-    // Novos métodos com DTOs
-    RestauranteResponse cadastrarRestaurante(RestauranteRequest restauranteRequest);
+  org.springframework.data.domain.Page<
+          com.deliverytech.delivery_api.dto.response.RestauranteResponse>
+      buscarProximos(String cep, org.springframework.data.domain.Pageable pageable);
 
-    RestauranteResponse buscarRestaurantePorId(Long id);
+  List<Restaurante> listarComFiltros(String categoria, Boolean ativo);
 
-    List<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria);
+  // Novos métodos com DTOs
+  RestauranteResponse cadastrarRestaurante(RestauranteRequest restauranteRequest);
 
-    List<RestauranteResponse> buscarRestaurantesDisponiveis();
-    org.springframework.data.domain.Page<RestauranteResponse> buscarRestaurantesDisponiveis(org.springframework.data.domain.Pageable pageable);
+  RestauranteResponse buscarRestaurantePorId(Long id);
 
-    org.springframework.data.domain.Page<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria, org.springframework.data.domain.Pageable pageable);
+  List<RestauranteResponse> buscarRestaurantesPorCategoria(String categoria);
 
-    RestauranteResponse atualizarRestaurante(Long id, RestauranteRequest restauranteRequest);
+  List<RestauranteResponse> buscarRestaurantesDisponiveis();
+
+  org.springframework.data.domain.Page<RestauranteResponse> buscarRestaurantesDisponiveis(
+      org.springframework.data.domain.Pageable pageable);
+
+  org.springframework.data.domain.Page<RestauranteResponse> buscarRestaurantesPorCategoria(
+      String categoria, org.springframework.data.domain.Pageable pageable);
+
+  RestauranteResponse atualizarRestaurante(Long id, RestauranteRequest restauranteRequest);
 }

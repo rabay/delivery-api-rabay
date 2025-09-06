@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class DeliveryApiApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(DeliveryApiApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(DeliveryApiApplication.class, args);
+  }
 }

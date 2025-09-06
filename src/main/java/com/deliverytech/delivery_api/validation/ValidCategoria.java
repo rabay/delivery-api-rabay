@@ -2,7 +2,6 @@ package com.deliverytech.delivery_api.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,22 +24,22 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidCategoria {
 
-    /** Mensagem de erro padrão exibida quando a validação falha */
-    String message() default "Categoria deve ser uma categoria válida";
+  /** Mensagem de erro padrão exibida quando a validação falha */
+  String message() default "Categoria deve ser uma categoria válida";
 
-    /** Tipo de categoria a ser validada */
-    Type type() default Type.GERAL;
+  /** Tipo de categoria a ser validada */
+  Type type() default Type.GERAL;
 
-    /** Grupos de validação - permite agrupar validações */
-    Class<?>[] groups() default {};
+  /** Grupos de validação - permite agrupar validações */
+  Class<?>[] groups() default {};
 
-    /** Payload - permite anexar metadados à validação */
-    Class<? extends Payload>[] payload() default {};
+  /** Payload - permite anexar metadados à validação */
+  Class<? extends Payload>[] payload() default {};
 
-    /** Enum que define os tipos de categoria */
-    enum Type {
-        RESTAURANTE,
-        PRODUTO,
-        GERAL
-    }
+  /** Enum que define os tipos de categoria */
+  enum Type {
+    RESTAURANTE,
+    PRODUTO,
+    GERAL
+  }
 }

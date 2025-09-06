@@ -2,7 +2,6 @@ package com.deliverytech.delivery_api.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,12 +22,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidEstado {
 
-    /** Mensagem de erro padrão exibida quando a validação falha */
-    String message() default "Estado deve ser um código UF válido do Brasil";
+  /** Mensagem de erro padrão exibida quando a validação falha */
+  String message() default "Estado deve ser um código UF válido do Brasil";
 
-    /** Grupos de validação - permite agrupar validações */
-    Class<?>[] groups() default {};
+  /** Grupos de validação - permite agrupar validações */
+  Class<?>[] groups() default {};
 
-    /** Payload - permite anexar metadados à validação */
-    Class<? extends Payload>[] payload() default {};
+  /** Payload - permite anexar metadados à validação */
+  Class<? extends Payload>[] payload() default {};
 }
