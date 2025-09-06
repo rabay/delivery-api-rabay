@@ -14,12 +14,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import java.net.URI;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.bind.annotation.*;
 
 // java.util.List não é mais necessário neste arquivo
 
 @RestController
-@RequestMapping("/api/clientes")
+@RequestMapping(value = "/api/clientes", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(
     name = "Clientes",
     description = "Operações de cadastro, consulta, atualização e inativação de clientes.")
@@ -42,7 +44,9 @@ public class ClienteController {
     var body =
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             novo, "Cliente criado com sucesso", true);
-    return ResponseEntity.status(201).body(body);
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(novo.getId()).toUri();
+    return ResponseEntity.created(location).body(body);
   }
 
   @Operation(

@@ -14,11 +14,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Map;
+import java.net.URI;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/restaurantes")
+@RequestMapping(value = "/api/restaurantes", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(
     name = "Restaurantes",
     description =
@@ -41,7 +43,11 @@ public class RestauranteController {
   public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Restaurante>> criar(
       @Valid @RequestBody RestauranteRequest restauranteRequest) {
     Restaurante novo = restauranteService.cadastrar(restauranteRequest);
-    return ResponseEntity.status(201)
+
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(novo.getId()).toUri();
+
+    return ResponseEntity.created(location)
         .body(
             new com.deliverytech.delivery_api.dto.response.ApiResult<>(
                 novo, "Restaurante criado com sucesso", true));

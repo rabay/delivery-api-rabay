@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import java.net.URI;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(value = "/api/auth", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(
     name = "Autenticação",
     description = "Operações relacionadas com autenticação e cadastro de usuários")
@@ -131,7 +133,9 @@ public class AuthController {
       com.deliverytech.delivery_api.dto.response.ApiResult<UserResponse> body =
           new com.deliverytech.delivery_api.dto.response.ApiResult<>(
               response, "Registro salvo com sucesso", true);
-      return ResponseEntity.status(HttpStatus.CREATED).body(body);
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+      return ResponseEntity.created(location).body(body);
     } catch (EmailJaCadastradoException e) {
       return ResponseEntity.status(HttpStatus.CONFLICT)
           .body(

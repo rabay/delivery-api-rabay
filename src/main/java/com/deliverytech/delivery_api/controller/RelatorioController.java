@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/relatorios")
+@RequestMapping(value = "/api/relatorios", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Relatórios", description = "Relatórios e estatísticas de vendas e pedidos")
 public class RelatorioController {
   @Autowired private RelatorioService relatorioService;

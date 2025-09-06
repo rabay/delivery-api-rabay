@@ -141,6 +141,7 @@ class AuthControllerTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.data.email").value(testUser.getEmail()))
                 .andExpect(jsonPath("$.data.nome").value(testUser.getNome()))

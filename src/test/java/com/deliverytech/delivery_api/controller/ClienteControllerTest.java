@@ -42,6 +42,7 @@ class ClienteControllerTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.nome").value("João Silva"))
                 .andExpect(jsonPath("$.data.email").value("joao@email.com"))
@@ -116,6 +117,7 @@ class ClienteControllerTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();

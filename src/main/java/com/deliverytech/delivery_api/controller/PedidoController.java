@@ -24,10 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import java.net.URI;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/pedidos")
+@RequestMapping(value = "/api/pedidos", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(
     name = "Pedidos",
     description = "Criação, consulta e atualização de pedidos realizados pelos clientes.")
@@ -175,12 +177,13 @@ public class PedidoController {
       logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
       Pedido pedido = mapToEntity(pedidoRequest);
       logger.debug("Pedido mapeado: {}", pedido);
-      Pedido novo = pedidoService.criar(pedido);
-      PedidoResponse response = mapToResponse(novo);
-      logger.info(
-          "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
-      return ResponseEntity.status(HttpStatus.CREATED)
-          .body(new ApiResult<>(response, "Pedido criado com sucesso", true));
+    Pedido novo = pedidoService.criar(pedido);
+    PedidoResponse response = mapToResponse(novo);
+    logger.info(
+      "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
+    URI location =
+      ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+    return ResponseEntity.created(location).body(new ApiResult<>(response, "Pedido criado com sucesso", true));
     } catch (RuntimeException ex) {
       logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -200,11 +203,12 @@ public class PedidoController {
       @Valid @RequestBody PedidoRequest pedidoRequest) {
     try {
       logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
-      PedidoResponse response = pedidoService.criarPedido(pedidoRequest);
-      logger.info(
-          "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
-      return ResponseEntity.status(HttpStatus.CREATED)
-          .body(new ApiResult<>(response, "Pedido criado com sucesso", true));
+    PedidoResponse response = pedidoService.criarPedido(pedidoRequest);
+    logger.info(
+      "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
+    URI location =
+      ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+    return ResponseEntity.created(location).body(new ApiResult<>(response, "Pedido criado com sucesso", true));
     } catch (RuntimeException ex) {
       logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
