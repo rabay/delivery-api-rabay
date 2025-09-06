@@ -93,3 +93,6 @@ scripts/start_server.sh
 scripts/run_dependency_check.py
 
 README-EXEMPLO.md
+
+scripts/downloads/
+scripts/reports/
