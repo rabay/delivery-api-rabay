@@ -6,6 +6,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+@SuppressWarnings("resource")
 @Testcontainers
 public class SharedTestcontainersConfig {
     private static final String MYSQL_IMAGE = "mysql:8.0";

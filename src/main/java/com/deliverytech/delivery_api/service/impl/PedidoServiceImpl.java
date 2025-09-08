@@ -380,6 +380,14 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
+  public org.springframework.data.domain.Page<PedidoResponse> buscarPedidosPorRestaurante(
+      Long restauranteId, org.springframework.data.domain.Pageable pageable) {
+    var page = pedidoRepository.findByRestauranteId(restauranteId, pageable);
+    return page.map(pedidoMapper::toResponse);
+  }
+
+  @Override
   public void deletar(Long id) {
     Pedido pedido =
         pedidoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pedido", id));

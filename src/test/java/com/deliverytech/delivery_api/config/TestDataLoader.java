@@ -2,6 +2,7 @@ package com.deliverytech.delivery_api.config;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.lang.NonNull;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ public class TestDataLoader implements ApplicationListener<ContextRefreshedEvent
     }
     
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
         // Load test data immediately since tables are created by data-test.sql
         try {
             loadTestData();

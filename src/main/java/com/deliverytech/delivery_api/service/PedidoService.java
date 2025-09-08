@@ -57,6 +57,10 @@ public interface PedidoService {
   org.springframework.data.domain.Page<PedidoResponse> buscarPedidosPorCliente(
       Long clienteId, org.springframework.data.domain.Pageable pageable);
 
+    // Página de pedidos por restaurante (DTO)
+    org.springframework.data.domain.Page<PedidoResponse> buscarPedidosPorRestaurante(
+            Long restauranteId, org.springframework.data.domain.Pageable pageable);
+
   void deletar(Long id);
 
   // Novos métodos com DTOs

@@ -4,6 +4,7 @@ import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.dto.request.StatusRequest;
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.service.ProdutoService;
+import com.deliverytech.delivery_api.service.PedidoService;
 import com.deliverytech.delivery_api.service.RestauranteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -27,14 +28,16 @@ import org.springframework.web.bind.annotation.*;
         "Gerenciamento de restaurantes, incluindo cadastro, consulta, atualização,"
             + " inativação e busca por categoria.")
 public class RestauranteController {
-  private final RestauranteService restauranteService;
-  private final ProdutoService produtoService;
+    private final RestauranteService restauranteService;
+    private final ProdutoService produtoService;
+    private final PedidoService pedidoService;
 
-  public RestauranteController(
-      RestauranteService restauranteService, ProdutoService produtoService) {
-    this.restauranteService = restauranteService;
-    this.produtoService = produtoService;
-  }
+    public RestauranteController(
+            RestauranteService restauranteService, ProdutoService produtoService, PedidoService pedidoService) {
+        this.restauranteService = restauranteService;
+        this.produtoService = produtoService;
+        this.pedidoService = pedidoService;
+    }
 
   @Operation(
       summary = "Cadastrar novo restaurante",
@@ -376,6 +379,60 @@ public class RestauranteController {
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Restaurantes próximos obtidos", true));
   }
+
+    @Operation(
+            summary = "Listar pedidos do restaurante",
+            description = "Retorna os pedidos realizados para um restaurante específico.")
+    @Parameters({
+        @io.swagger.v3.oas.annotations.Parameter(name = "page", description = "Índice da página (0-based)", example = "0"),
+        @io.swagger.v3.oas.annotations.Parameter(name = "size", description = "Tamanho da página", example = "20")
+    })
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Pedidos do restaurante paginados (ApiResult<PagedResponse<PedidoResponse>>)",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResultPedidoPaged.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "restauranteId inválido"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Restaurante não encontrado"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    @GetMapping("/{restauranteId:[0-9]+}/pedidos")
+    public ResponseEntity<
+                    com.deliverytech.delivery_api.dto.response.ApiResult<
+                            com.deliverytech.delivery_api.dto.response.PagedResponse<
+                                    com.deliverytech.delivery_api.dto.response.PedidoResponse>>>
+            buscarPedidosDoRestaurante(
+                    @PathVariable Long restauranteId,
+                    @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                    @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+            var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
+            var pageResult = pedidoService.buscarPedidosPorRestaurante(restauranteId, pageable);
+
+            var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+            java.util.Map<String, String> links = new java.util.HashMap<>();
+            links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+            int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+            links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+            if (pageResult.hasNext()) {
+                links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+            }
+            if (pageResult.hasPrevious()) {
+                links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+            }
+
+            var paged =
+                    new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                            pageResult.getContent(),
+                            pageResult.getTotalElements(),
+                            pageResult.getNumber(),
+                            pageResult.getSize(),
+                            pageResult.getTotalPages(),
+                            links,
+                            "Pedidos do restaurante obtidos",
+                            true);
+
+            return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Pedidos do restaurante obtidos", true));
+    }
 
   @Operation(
       summary = "Listar produtos de um restaurante",
