@@ -70,28 +70,44 @@ public class ProdutoController {
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
   })
   @GetMapping
-  public ResponseEntity<
-          com.deliverytech.delivery_api.dto.response.ApiResult<
-              com.deliverytech.delivery_api.dto.response.PagedResponse<
-                  com.deliverytech.delivery_api.dto.response.ProdutoResponse>>>
-      listar(
-          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-          @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-    var pageable =
-        org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
-    var pageResult = produtoService.buscarDisponiveis(pageable);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageResult.getContent(),
-            pageResult.getTotalElements(),
-            pageResult.getNumber(),
-            pageResult.getSize(),
-            "Produtos obtidos com sucesso",
-            true);
-    return ResponseEntity.ok(
-        new com.deliverytech.delivery_api.dto.response.ApiResult<>(
-            paged, "Produtos obtidos com sucesso", true));
-  }
+    public ResponseEntity<
+                    com.deliverytech.delivery_api.dto.response.ApiResult<
+                            com.deliverytech.delivery_api.dto.response.PagedResponse<
+                                    com.deliverytech.delivery_api.dto.response.ProdutoResponse>>>
+            listar(
+                    @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                    @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+        // Allow-list de propriedades permitidas para sort em Produto.
+        // TODO: extrair para constante central ou configuração por entidade.
+    var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PRODUTO);
+        var pageResult = produtoService.buscarDisponiveis(pageable);
+
+        // Construir links de navegação
+        var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links = new java.util.HashMap<>();
+        links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+        links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+        if (pageResult.hasNext()) {
+            links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+        }
+        if (pageResult.hasPrevious()) {
+            links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+        }
+
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageResult.getContent(),
+                        pageResult.getTotalElements(),
+                        pageResult.getNumber(),
+                        pageResult.getSize(),
+                        pageResult.getTotalPages(),
+                        links,
+                        "Produtos obtidos com sucesso",
+                        true);
+        return ResponseEntity.ok(
+                new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Produtos obtidos com sucesso", true));
+    }
 
   @Operation(
       summary = "Buscar produto por ID",
@@ -239,29 +255,41 @@ public class ProdutoController {
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
   })
   @GetMapping("/buscar")
-  public ResponseEntity<
-          com.deliverytech.delivery_api.dto.response.ApiResult<
-              com.deliverytech.delivery_api.dto.response.PagedResponse<
-                  com.deliverytech.delivery_api.dto.response.ProdutoResponse>>>
-      buscarPorNome(
-          @RequestParam String nome,
-          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-          @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-    var pageable =
-        org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
-    var pageResult = produtoService.buscarProdutosPorNome(nome, pageable);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageResult.getContent(),
-            pageResult.getTotalElements(),
-            pageResult.getNumber(),
-            pageResult.getSize(),
-            "Produtos encontrados",
-            true);
-    return ResponseEntity.ok(
-        new com.deliverytech.delivery_api.dto.response.ApiResult<>(
-            paged, "Produtos encontrados", true));
-  }
+    public ResponseEntity<
+                    com.deliverytech.delivery_api.dto.response.ApiResult<
+                            com.deliverytech.delivery_api.dto.response.PagedResponse<
+                                    com.deliverytech.delivery_api.dto.response.ProdutoResponse>>>
+            buscarPorNome(
+                    @RequestParam String nome,
+                    @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                    @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+    var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PRODUTO);
+        var pageResult = produtoService.buscarProdutosPorNome(nome, pageable);
+
+        var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links = new java.util.HashMap<>();
+        links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+        links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+        if (pageResult.hasNext()) {
+            links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+        }
+        if (pageResult.hasPrevious()) {
+            links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+        }
+
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageResult.getContent(),
+                        pageResult.getTotalElements(),
+                        pageResult.getNumber(),
+                        pageResult.getSize(),
+                        pageResult.getTotalPages(),
+                        links,
+                        "Produtos encontrados",
+                        true);
+        return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Produtos encontrados", true));
+    }
 
   @Operation(
       summary = "Buscar produtos por categoria",
@@ -287,27 +315,39 @@ public class ProdutoController {
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
   })
   @GetMapping("/categoria/{categoria}")
-  public ResponseEntity<
-          com.deliverytech.delivery_api.dto.response.ApiResult<
-              com.deliverytech.delivery_api.dto.response.PagedResponse<
-                  com.deliverytech.delivery_api.dto.response.ProdutoResponse>>>
-      buscarPorCategoria(
-          @PathVariable String categoria,
-          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-          @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-    var pageable =
-        org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
-    var pageResult = produtoService.buscarProdutosPorCategoria(categoria, pageable);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageResult.getContent(),
-            pageResult.getTotalElements(),
-            pageResult.getNumber(),
-            pageResult.getSize(),
-            "Produtos por categoria",
-            true);
-    return ResponseEntity.ok(
-        new com.deliverytech.delivery_api.dto.response.ApiResult<>(
-            paged, "Produtos por categoria", true));
-  }
+    public ResponseEntity<
+                    com.deliverytech.delivery_api.dto.response.ApiResult<
+                            com.deliverytech.delivery_api.dto.response.PagedResponse<
+                                    com.deliverytech.delivery_api.dto.response.ProdutoResponse>>>
+            buscarPorCategoria(
+                    @PathVariable String categoria,
+                    @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                    @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+    var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PRODUTO);
+        var pageResult = produtoService.buscarProdutosPorCategoria(categoria, pageable);
+
+        var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links = new java.util.HashMap<>();
+        links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+        links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+        if (pageResult.hasNext()) {
+            links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+        }
+        if (pageResult.hasPrevious()) {
+            links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+        }
+
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageResult.getContent(),
+                        pageResult.getTotalElements(),
+                        pageResult.getNumber(),
+                        pageResult.getSize(),
+                        pageResult.getTotalPages(),
+                        links,
+                        "Produtos por categoria",
+                        true);
+        return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Produtos por categoria", true));
+    }
 }

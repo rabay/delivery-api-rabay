@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ProdutoRepositoryTest extends BaseIntegrationTest {
+class ProdutoRepositoryIT extends BaseIntegrationTest {
 
     @Autowired
     private ProdutoRepository produtoRepository;

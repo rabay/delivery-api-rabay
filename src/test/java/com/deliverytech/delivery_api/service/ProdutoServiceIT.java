@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class ProdutoServiceTest extends BaseIntegrationTest {
+class ProdutoServiceIT extends BaseIntegrationTest {
 
     @Autowired
     private ProdutoService produtoService;

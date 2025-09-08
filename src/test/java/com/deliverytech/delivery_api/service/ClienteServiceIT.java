@@ -15,7 +15,7 @@ import java.util.List;
 @Import({com.deliverytech.delivery_api.service.impl.ClienteServiceImpl.class, com.deliverytech.delivery_api.mapper.ClienteMapper.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-class ClienteServiceTest extends BaseIntegrationTest {
+class ClienteServiceIT extends BaseIntegrationTest {
     @Autowired
     private ClienteService clienteService;
 

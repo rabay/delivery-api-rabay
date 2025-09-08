@@ -71,18 +71,32 @@ public class PedidoController {
           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
           @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
     try {
-      var pageable =
-          org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
-      var pageResult = pedidoService.listarTodos(pageable);
-      var paged =
-          new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-              pageResult.getContent(),
-              pageResult.getTotalElements(),
-              pageResult.getNumber(),
-              pageResult.getSize(),
-              "Pedidos obtidos com sucesso",
-              true);
-      return ResponseEntity.ok(new ApiResult<>(paged, "Pedidos obtidos com sucesso", true));
+          var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
+          var pageResult = pedidoService.listarTodos(pageable);
+
+          var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+          java.util.Map<String, String> links = new java.util.HashMap<>();
+          links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+          int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+          links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+          if (pageResult.hasNext()) {
+            links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+          }
+          if (pageResult.hasPrevious()) {
+            links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+          }
+
+          var paged =
+              new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                  pageResult.getContent(),
+                  pageResult.getTotalElements(),
+                  pageResult.getNumber(),
+                  pageResult.getSize(),
+                  pageResult.getTotalPages(),
+                  links,
+                  "Pedidos obtidos com sucesso",
+                  true);
+          return ResponseEntity.ok(new ApiResult<>(paged, "Pedidos obtidos com sucesso", true));
     } catch (Exception ex) {
       logger.error("Erro ao listar todos os pedidos: {}", ex.getMessage(), ex);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -119,21 +133,34 @@ public class PedidoController {
           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
           @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
     try {
-      var pageable =
-          org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
-      var pageResult = pedidoService.listarTodos(pageable);
-      // map to resumo
-      var resumoPage =
-          pageResult.map(p -> mapToResumoResponse(pedidoService.buscarPorId(p.getId())));
-      var paged =
-          new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-              resumoPage.getContent(),
-              resumoPage.getTotalElements(),
-              resumoPage.getNumber(),
-              resumoPage.getSize(),
-              "Resumo de pedidos obtido",
-              true);
-      return ResponseEntity.ok(new ApiResult<>(paged, "Resumo de pedidos obtido", true));
+          var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
+          var pageResult = pedidoService.listarTodos(pageable);
+          // map to resumo
+          var resumoPage = pageResult.map(p -> mapToResumoResponse(pedidoService.buscarPorId(p.getId())));
+
+          var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+          java.util.Map<String, String> links = new java.util.HashMap<>();
+          links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+          int lastPage = Math.max(0, resumoPage.getTotalPages() - 1);
+          links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+          if (resumoPage.hasNext()) {
+            links.put("next", uriBuilder.replaceQueryParam("page", resumoPage.getNumber() + 1).build().toUriString());
+          }
+          if (resumoPage.hasPrevious()) {
+            links.put("prev", uriBuilder.replaceQueryParam("page", resumoPage.getNumber() - 1).build().toUriString());
+          }
+
+          var paged =
+              new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                  resumoPage.getContent(),
+                  resumoPage.getTotalElements(),
+                  resumoPage.getNumber(),
+                  resumoPage.getSize(),
+                  resumoPage.getTotalPages(),
+                  links,
+                  "Resumo de pedidos obtido",
+                  true);
+          return ResponseEntity.ok(new ApiResult<>(paged, "Resumo de pedidos obtido", true));
     } catch (Exception ex) {
       logger.error("Erro ao listar todos os pedidos (resumo): {}", ex.getMessage(), ex);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

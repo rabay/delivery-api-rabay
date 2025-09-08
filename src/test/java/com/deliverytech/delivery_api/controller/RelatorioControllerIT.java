@@ -6,6 +6,7 @@ import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.model.StatusPedido;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
+import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,15 +30,19 @@ class RelatorioControllerIT extends BaseIntegrationTest {
     @Autowired
     private RestauranteRepository restauranteRepository;
     @Autowired
+    private ProdutoRepository produtoRepository;
+    @Autowired
     private ClienteRepository clienteRepository;
     @Autowired
     private PedidoRepository pedidoRepository;
 
     @BeforeEach
     void setup() {
-        pedidoRepository.deleteAll();
-        restauranteRepository.deleteAll();
-        clienteRepository.deleteAll();
+    pedidoRepository.deleteAll();
+    // remover produtos antes de restaurantes para evitar violação de FK
+    produtoRepository.deleteAll();
+    restauranteRepository.deleteAll();
+    clienteRepository.deleteAll();
     }
 
     @Test

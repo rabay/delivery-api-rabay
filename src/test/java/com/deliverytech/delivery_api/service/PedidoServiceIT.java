@@ -3,8 +3,6 @@ package com.deliverytech.delivery_api.service;
 import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.deliverytech.delivery_api.dto.request.*;
 import com.deliverytech.delivery_api.dto.response.ClienteResponse;
-import com.deliverytech.delivery_api.dto.response.PedidoResponse;
-import com.deliverytech.delivery_api.dto.response.RestauranteResponse;
 import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-class PedidoServiceTest extends BaseIntegrationTest {
+class PedidoServiceIT extends BaseIntegrationTest {
 
     @Autowired
     private PedidoService pedidoService;

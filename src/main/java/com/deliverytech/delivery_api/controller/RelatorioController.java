@@ -70,16 +70,29 @@ public class RelatorioController {
     var to = Math.min(from + pageable.getPageSize(), total);
     var pageList =
         data == null || total == 0 ? java.util.List.<RelatorioVendas>of() : data.subList(from, to);
-    var pageImpl =
-        new org.springframework.data.domain.PageImpl<RelatorioVendas>(pageList, pageable, total);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageImpl.getContent(),
-            pageImpl.getTotalElements(),
-            pageImpl.getNumber(),
-            pageImpl.getSize(),
-            "Relatório gerado com sucesso",
-            true);
+        var pageImpl =
+                new org.springframework.data.domain.PageImpl<RelatorioVendas>(pageList, pageable, total);
+        var uriBuilder = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links = new java.util.HashMap<>();
+        links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage = Math.max(0, pageImpl.getTotalPages() - 1);
+        links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+        if (pageImpl.hasNext()) {
+            links.put("next", uriBuilder.replaceQueryParam("page", pageImpl.getNumber() + 1).build().toUriString());
+        }
+        if (pageImpl.hasPrevious()) {
+            links.put("prev", uriBuilder.replaceQueryParam("page", pageImpl.getNumber() - 1).build().toUriString());
+        }
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageImpl.getContent(),
+                        pageImpl.getTotalElements(),
+                        pageImpl.getNumber(),
+                        pageImpl.getSize(),
+                        pageImpl.getTotalPages(),
+                        links,
+                        "Relatório gerado com sucesso",
+                        true);
     return ResponseEntity.ok(
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Relatório gerado com sucesso", true));
@@ -133,17 +146,30 @@ public class RelatorioController {
         data == null || total == 0
             ? java.util.List.<RelatorioVendasProdutos>of()
             : data.subList(from, to);
-    var pageImpl =
-        new org.springframework.data.domain.PageImpl<RelatorioVendasProdutos>(
-            pageList, pageable, total);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageImpl.getContent(),
-            pageImpl.getTotalElements(),
-            pageImpl.getNumber(),
-            pageImpl.getSize(),
-            "Relatório gerado com sucesso",
-            true);
+        var pageImpl =
+                new org.springframework.data.domain.PageImpl<RelatorioVendasProdutos>(
+                        pageList, pageable, total);
+        var uriBuilder2 = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links2 = new java.util.HashMap<>();
+        links2.put("first", uriBuilder2.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage2 = Math.max(0, pageImpl.getTotalPages() - 1);
+        links2.put("last", uriBuilder2.replaceQueryParam("page", lastPage2).build().toUriString());
+        if (pageImpl.hasNext()) {
+            links2.put("next", uriBuilder2.replaceQueryParam("page", pageImpl.getNumber() + 1).build().toUriString());
+        }
+        if (pageImpl.hasPrevious()) {
+            links2.put("prev", uriBuilder2.replaceQueryParam("page", pageImpl.getNumber() - 1).build().toUriString());
+        }
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageImpl.getContent(),
+                        pageImpl.getTotalElements(),
+                        pageImpl.getNumber(),
+                        pageImpl.getSize(),
+                        pageImpl.getTotalPages(),
+                        links2,
+                        "Relatório gerado com sucesso",
+                        true);
     return ResponseEntity.ok(
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Relatório gerado com sucesso", true));
@@ -197,17 +223,30 @@ public class RelatorioController {
         data == null || total == 0
             ? java.util.List.<RelatorioVendasClientes>of()
             : data.subList(from, to);
-    var pageImpl =
-        new org.springframework.data.domain.PageImpl<RelatorioVendasClientes>(
-            pageList, pageable, total);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageImpl.getContent(),
-            pageImpl.getTotalElements(),
-            pageImpl.getNumber(),
-            pageImpl.getSize(),
-            "Relatório gerado com sucesso",
-            true);
+        var pageImpl =
+                new org.springframework.data.domain.PageImpl<RelatorioVendasClientes>(
+                        pageList, pageable, total);
+        var uriBuilder3 = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links3 = new java.util.HashMap<>();
+        links3.put("first", uriBuilder3.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage3 = Math.max(0, pageImpl.getTotalPages() - 1);
+        links3.put("last", uriBuilder3.replaceQueryParam("page", lastPage3).build().toUriString());
+        if (pageImpl.hasNext()) {
+            links3.put("next", uriBuilder3.replaceQueryParam("page", pageImpl.getNumber() + 1).build().toUriString());
+        }
+        if (pageImpl.hasPrevious()) {
+            links3.put("prev", uriBuilder3.replaceQueryParam("page", pageImpl.getNumber() - 1).build().toUriString());
+        }
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageImpl.getContent(),
+                        pageImpl.getTotalElements(),
+                        pageImpl.getNumber(),
+                        pageImpl.getSize(),
+                        pageImpl.getTotalPages(),
+                        links3,
+                        "Relatório gerado com sucesso",
+                        true);
     return ResponseEntity.ok(
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Relatório gerado com sucesso", true));
@@ -259,17 +298,30 @@ public class RelatorioController {
         data == null || total == 0
             ? java.util.List.<Map<String, Object>>of()
             : data.subList(from, to);
-    var pageImpl =
-        new org.springframework.data.domain.PageImpl<java.util.Map<String, Object>>(
-            pageList, pageable, total);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageImpl.getContent(),
-            pageImpl.getTotalElements(),
-            pageImpl.getNumber(),
-            pageImpl.getSize(),
-            "Relatório gerado com sucesso",
-            true);
+        var pageImpl =
+                new org.springframework.data.domain.PageImpl<java.util.Map<String, Object>>(
+                        pageList, pageable, total);
+        var uriBuilder4 = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links4 = new java.util.HashMap<>();
+        links4.put("first", uriBuilder4.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage4 = Math.max(0, pageImpl.getTotalPages() - 1);
+        links4.put("last", uriBuilder4.replaceQueryParam("page", lastPage4).build().toUriString());
+        if (pageImpl.hasNext()) {
+            links4.put("next", uriBuilder4.replaceQueryParam("page", pageImpl.getNumber() + 1).build().toUriString());
+        }
+        if (pageImpl.hasPrevious()) {
+            links4.put("prev", uriBuilder4.replaceQueryParam("page", pageImpl.getNumber() - 1).build().toUriString());
+        }
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageImpl.getContent(),
+                        pageImpl.getTotalElements(),
+                        pageImpl.getNumber(),
+                        pageImpl.getSize(),
+                        pageImpl.getTotalPages(),
+                        links4,
+                        "Relatório gerado com sucesso",
+                        true);
     return ResponseEntity.ok(
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Relatório gerado com sucesso", true));
@@ -320,17 +372,30 @@ public class RelatorioController {
         data == null || total == 0
             ? java.util.List.<Map<String, Object>>of()
             : data.subList(from, to);
-    var pageImpl =
-        new org.springframework.data.domain.PageImpl<java.util.Map<String, Object>>(
-            pageList, pageable, total);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageImpl.getContent(),
-            pageImpl.getTotalElements(),
-            pageImpl.getNumber(),
-            pageImpl.getSize(),
-            "Relatório gerado com sucesso",
-            true);
+        var pageImpl =
+                new org.springframework.data.domain.PageImpl<java.util.Map<String, Object>>(
+                        pageList, pageable, total);
+        var uriBuilder5 = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links5 = new java.util.HashMap<>();
+        links5.put("first", uriBuilder5.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage5 = Math.max(0, pageImpl.getTotalPages() - 1);
+        links5.put("last", uriBuilder5.replaceQueryParam("page", lastPage5).build().toUriString());
+        if (pageImpl.hasNext()) {
+            links5.put("next", uriBuilder5.replaceQueryParam("page", pageImpl.getNumber() + 1).build().toUriString());
+        }
+        if (pageImpl.hasPrevious()) {
+            links5.put("prev", uriBuilder5.replaceQueryParam("page", pageImpl.getNumber() - 1).build().toUriString());
+        }
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageImpl.getContent(),
+                        pageImpl.getTotalElements(),
+                        pageImpl.getNumber(),
+                        pageImpl.getSize(),
+                        pageImpl.getTotalPages(),
+                        links5,
+                        "Relatório gerado com sucesso",
+                        true);
     return ResponseEntity.ok(
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Relatório gerado com sucesso", true));

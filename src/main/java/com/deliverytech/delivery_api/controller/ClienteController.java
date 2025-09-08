@@ -72,28 +72,43 @@ public class ClienteController {
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
   })
   @GetMapping
-  public ResponseEntity<
-          com.deliverytech.delivery_api.dto.response.ApiResult<
-              com.deliverytech.delivery_api.dto.response.PagedResponse<
-                  com.deliverytech.delivery_api.dto.response.ClienteResponse>>>
-      listar(
-          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-          @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-    var pageable =
-        org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
-    var pageResult = clienteService.listarAtivos(pageable);
-    var paged =
-        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-            pageResult.getContent(),
-            pageResult.getTotalElements(),
-            pageResult.getNumber(),
-            pageResult.getSize(),
-            "Clientes obtidos com sucesso",
-            true);
-    return ResponseEntity.ok(
-        new com.deliverytech.delivery_api.dto.response.ApiResult<>(
-            paged, "Clientes obtidos com sucesso", true));
-  }
+    public ResponseEntity<
+                    com.deliverytech.delivery_api.dto.response.ApiResult<
+                            com.deliverytech.delivery_api.dto.response.PagedResponse<
+                                    com.deliverytech.delivery_api.dto.response.ClienteResponse>>>
+            listar(
+                    @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                    @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+        // Usar PageableUtil para padronizar comportamento de paginação
+        var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.CLIENTE);
+        var pageResult = clienteService.listarAtivos(pageable);
+
+        // Construir links de navegação
+        var uriBuilder = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest();
+        java.util.Map<String, String> links = new java.util.HashMap<>();
+        links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+        int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+        links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+        if (pageResult.hasNext()) {
+            links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+        }
+        if (pageResult.hasPrevious()) {
+            links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+        }
+
+        var paged =
+                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                        pageResult.getContent(),
+                        pageResult.getTotalElements(),
+                        pageResult.getNumber(),
+                        pageResult.getSize(),
+                        pageResult.getTotalPages(),
+                        links,
+                        "Clientes obtidos com sucesso",
+                        true);
+        return ResponseEntity.ok(
+                new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Clientes obtidos com sucesso", true));
+    }
 
   @Operation(
       summary = "Buscar cliente por e-mail",
@@ -240,20 +255,34 @@ public class ClienteController {
                     null, "clienteId inválido", false));
       }
 
-      var pageable =
-          org.springframework.data.domain.PageRequest.of(Math.max(0, page), Math.max(1, size));
-      var pageResult = pedidoService.buscarPedidosPorCliente(clienteId, pageable);
-      var paged =
-          new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-              pageResult.getContent(),
-              pageResult.getTotalElements(),
-              pageResult.getNumber(),
-              pageResult.getSize(),
-              "Pedidos do cliente obtidos",
-              true);
-      return ResponseEntity.ok(
-          new com.deliverytech.delivery_api.dto.response.ApiResult<>(
-              paged, "Pedidos do cliente obtidos", true));
+                var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
+                var pageResult = pedidoService.buscarPedidosPorCliente(clienteId, pageable);
+
+                var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+                java.util.Map<String, String> links = new java.util.HashMap<>();
+                links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+                int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+                links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+                if (pageResult.hasNext()) {
+                    links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+                }
+                if (pageResult.hasPrevious()) {
+                    links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+                }
+
+                var paged =
+                        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+                                pageResult.getContent(),
+                                pageResult.getTotalElements(),
+                                pageResult.getNumber(),
+                                pageResult.getSize(),
+                                pageResult.getTotalPages(),
+                                links,
+                                "Pedidos do cliente obtidos",
+                                true);
+                return ResponseEntity.ok(
+                        new com.deliverytech.delivery_api.dto.response.ApiResult<>(
+                                paged, "Pedidos do cliente obtidos", true));
     } catch (RuntimeException ex) {
       // Em caso de erro (ex.: cliente não existe)
       return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)
