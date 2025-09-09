@@ -39,7 +39,7 @@ public class AuthController {
   @Autowired private JwtUtil jwtUtil;
 
   @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Login de usuário", description = "Realizar o login do usuário")
+  @Operation(summary = "Login de usuário", description = "Realizar o login do usuário e retornar JWT")
   @ApiResponses({
     @ApiResponse(
         responseCode = "200",
@@ -55,12 +55,15 @@ public class AuthController {
                   @io.swagger.v3.oas.annotations.media.ExampleObject(
                       name = "login-success",
                       value =
-                          "{\"data\":{\"token\":\"eyJhbGciOi...\"},\"message\":\"Login realizado"
-                              + " com sucesso\",\"success\":true}")
+                          "{\"data\":{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNjQ5ODI1NjAwLCJleHAiOjE2NDk4MjkyMDB9.example\"},\"message\":\"Login realizado com sucesso\",\"success\":true}")
                 })),
     @ApiResponse(
+        responseCode = "400",
+        description = "Request inválido",
+        content = @Content(schema = @Schema(implementation = Void.class))),
+    @ApiResponse(
         responseCode = "401",
-        description = "Login inválido",
+        description = "Credenciais inválidas",
         content = @Content(schema = @Schema(implementation = Void.class))),
   })
   public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<LoginResponse>> login(

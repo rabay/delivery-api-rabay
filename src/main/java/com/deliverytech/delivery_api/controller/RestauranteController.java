@@ -42,6 +42,20 @@ public class RestauranteController {
   @Operation(
       summary = "Cadastrar novo restaurante",
       description = "Cria um novo restaurante ativo no sistema.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "201",
+        description = "Restaurante criado com sucesso",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResult.class))),
+    @ApiResponse(
+        responseCode = "400",
+        description = "Request inválido",
+        content = @Content(schema = @Schema(implementation = Void.class))),
+    @ApiResponse(
+        responseCode = "500",
+        description = "Erro interno do servidor",
+        content = @Content(schema = @Schema(implementation = Void.class)))
+  })
   @PostMapping
   public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<Restaurante>> criar(
       @Valid @RequestBody RestauranteRequest restauranteRequest) {

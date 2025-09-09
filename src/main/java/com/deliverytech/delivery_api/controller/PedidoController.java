@@ -197,6 +197,20 @@ public class PedidoController {
   @Operation(
       summary = "Criar novo pedido",
       description = "Cria um novo pedido para um cliente em um restaurante.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "201",
+        description = "Pedido criado com sucesso",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResult.class))),
+    @ApiResponse(
+        responseCode = "400",
+        description = "Request inválido ou erro de negócio",
+        content = @Content(schema = @Schema(implementation = Void.class))),
+    @ApiResponse(
+        responseCode = "500",
+        description = "Erro interno do servidor",
+        content = @Content(schema = @Schema(implementation = Void.class)))
+  })
   @PostMapping
   public ResponseEntity<ApiResult<PedidoResponse>> criar(
       @Valid @RequestBody PedidoRequest pedidoRequest) {
