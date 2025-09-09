@@ -32,11 +32,15 @@ public class PedidoRequest {
   @NotNull
   @Schema(
       description = "Endereço de entrega do pedido.",
+      example = "{\"rua\": \"Rua das Flores\", \"numero\": \"123\", \"bairro\": \"Centro\", \"cidade\": \"São Paulo\", \"estado\": \"SP\", \"cep\": \"01234-567\"}",
       requiredMode = Schema.RequiredMode.REQUIRED)
   private EnderecoRequest enderecoEntrega;
 
   @NotNull
-  @Schema(description = "Lista de itens do pedido.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(
+      description = "Lista de itens do pedido.",
+      example = "[{\"produtoId\": 5, \"quantidade\": 2}, {\"produtoId\": 10, \"quantidade\": 1}]",
+      requiredMode = Schema.RequiredMode.REQUIRED)
   @NotEmpty(message = "Pedido deve conter ao menos um item")
   @Valid
   private List<ItemPedidoRequest> itens;
