@@ -1,5 +1,8 @@
 package com.deliverytech.delivery_api.dto.request;
 
+import com.deliverytech.delivery_api.validation.ValidCategoria;
+import com.deliverytech.delivery_api.validation.ValidPhone;
+import com.deliverytech.delivery_api.validation.ValidTempoEntrega;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
@@ -25,6 +28,7 @@ public class RestauranteRequest {
 
   @NotBlank(message = "Categoria é obrigatória")
   @Size(max = 50, message = "Categoria não pode ter mais de 50 caracteres")
+  @ValidCategoria(type = ValidCategoria.Type.RESTAURANTE)
   @Schema(
       description = "Categoria do restaurante. Máximo de 50 caracteres.",
       example = "Comida Brasileira",
@@ -48,14 +52,15 @@ public class RestauranteRequest {
   private BigDecimal taxaEntrega;
 
   @NotNull(message = "Tempo de entrega é obrigatório")
-  @Min(value = 1, message = "Tempo de entrega deve ser pelo menos 1 minuto")
+  @Min(value = 10, message = "Tempo de entrega deve ser pelo menos 10 minutos")
+  @ValidTempoEntrega
   @Schema(
-      description = "Tempo estimado de entrega em minutos. Deve ser pelo menos 1 minuto.",
+      description = "Tempo estimado de entrega em minutos. Deve ser pelo menos 10 minutos.",
       example = "30",
       requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer tempoEntregaMinutos;
 
-  @Pattern(regexp = "\\d{10,11}", message = "Telefone deve ter 10 ou 11 dígitos")
+  @ValidPhone
   @Schema(
       description = "Telefone de contato do restaurante. Deve ter 10 ou 11 dígitos.",
       example = "11987654321")

@@ -1,6 +1,8 @@
 package com.deliverytech.delivery_api.dto.request;
 
+import com.deliverytech.delivery_api.validation.ValidCategoria;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,22 +30,24 @@ public class ProdutoRequest {
 
   @NotBlank(message = "Categoria é obrigatória")
   @Size(max = 50, message = "Categoria não pode ter mais de 50 caracteres")
+  @ValidCategoria(type = ValidCategoria.Type.PRODUTO)
   @Schema(
       description = "Categoria do produto. Máximo de 50 caracteres.",
       example = "Pizzas",
       requiredMode = Schema.RequiredMode.REQUIRED)
   private String categoria;
 
-  @Size(max = 500, message = "Descrição não pode ter mais de 500 caracteres")
+  @Size(min = 10, max = 500, message = "Descrição deve ter pelo menos 10 caracteres")
   @Schema(
-      description = "Descrição detalhada do produto. Máximo de 500 caracteres.",
+      description = "Descrição detalhada do produto. Deve ter pelo menos 10 caracteres.",
       example = "Pizza tradicional com molho de tomate, mussarela e manjericão")
   private String descricao;
 
   @NotNull(message = "Preço é obrigatório")
   @DecimalMin(value = "0.01", message = "Preço deve ser maior que zero")
+  @DecimalMax(value = "500.00", message = "Preço máximo é R$500,00")
   @Schema(
-      description = "Preço do produto. Deve ser maior que zero.",
+      description = "Preço do produto. Deve ser maior que zero e máximo R$500,00.",
       example = "29.90",
       requiredMode = Schema.RequiredMode.REQUIRED)
   private BigDecimal preco;

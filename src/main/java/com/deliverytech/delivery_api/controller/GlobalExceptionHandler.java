@@ -1,6 +1,7 @@
 package com.deliverytech.delivery_api.controller;
 
 import com.deliverytech.delivery_api.exception.BusinessException;
+import com.deliverytech.delivery_api.exception.ConflictException;
 import com.deliverytech.delivery_api.exception.EmailDuplicadoException;
 import com.deliverytech.delivery_api.exception.EntityNotFoundException;
 import com.deliverytech.delivery_api.exception.EstoqueInsuficienteException;
@@ -61,6 +62,17 @@ public class GlobalExceptionHandler {
         new com.deliverytech.delivery_api.dto.response.ErrorResponse(
             "ProdutoIndisponivel", "Produto indisponível: " + ex.getMessage(), HttpStatus.CONFLICT.value(), java.time.OffsetDateTime.now());
     var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(error, "Produto indisponível", false);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+  }
+
+  @ExceptionHandler(ConflictException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<com.deliverytech.delivery_api.dto.response.ErrorResponse>>
+      handleConflictException(ConflictException ex) {
+    var error =
+        new com.deliverytech.delivery_api.dto.response.ErrorResponse(
+            "Conflict", "Conflito de dados: " + ex.getMessage(), HttpStatus.CONFLICT.value(), java.time.OffsetDateTime.now());
+    var body = new com.deliverytech.delivery_api.dto.response.ApiResult<>(error, "Conflito de dados", false);
     return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
   }
 

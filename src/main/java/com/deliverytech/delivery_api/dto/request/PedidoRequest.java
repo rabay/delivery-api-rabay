@@ -1,6 +1,8 @@
 package com.deliverytech.delivery_api.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,6 +37,8 @@ public class PedidoRequest {
 
   @NotNull
   @Schema(description = "Lista de itens do pedido.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotEmpty(message = "Pedido deve conter ao menos um item")
+  @Valid
   private List<ItemPedidoRequest> itens;
 
   @Schema(description = "Valor do desconto aplicado ao pedido.", example = "10.00")

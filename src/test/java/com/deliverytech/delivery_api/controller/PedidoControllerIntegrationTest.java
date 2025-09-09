@@ -136,7 +136,7 @@ class PedidoControllerIntegrationTest extends BaseIntegrationTest {
 
         // Criar restaurante
         System.out.println("Creating restaurant...");
-        String restauranteJson = "{\"nome\": \"Rest Int\", \"categoria\": \"Geral\", \"endereco\": \"Rua Teste, 123\", \"taxaEntrega\": 5.0, \"tempoEntregaMinutos\": 30, \"telefone\": \"11999999999\", \"email\": \"rest@test.com\", \"avaliacao\": 4.0 }";
+    String restauranteJson = "{\"nome\": \"Rest Int\", \"categoria\": \"Pizzaria\", \"endereco\": \"Rua Teste, 123\", \"taxaEntrega\": 5.0, \"tempoEntregaMinutos\": 30, \"telefone\": \"11999999999\", \"email\": \"rest@test.com\", \"avaliacao\": 4.0 }";
         HttpEntity<String> restReq = new HttpEntity<>(restauranteJson, headers);
         ResponseEntity<String> restResp = restTemplate.postForEntity("http://localhost:" + port + "/api/restaurantes", restReq, String.class);
         System.out.println("Restaurant response status: " + restResp.getStatusCode());
@@ -149,7 +149,7 @@ class PedidoControllerIntegrationTest extends BaseIntegrationTest {
 
         // Criar produto
         System.out.println("Creating product...");
-        String produtoJson = "{\"nome\": \"Prod Int\", \"categoria\": \"Geral\", \"preco\": 9.9, \"disponivel\": true, \"restauranteId\": " + restauranteId + ", \"quantidadeEstoque\": 10 }";
+    String produtoJson = "{\"nome\": \"Prod Int\", \"categoria\": \"Pizza\", \"preco\": 9.9, \"disponivel\": true, \"restauranteId\": " + restauranteId + ", \"quantidadeEstoque\": 10 }";
         HttpEntity<String> prodReq = new HttpEntity<>(produtoJson, headers);
         ResponseEntity<String> prodResp = restTemplate.postForEntity("http://localhost:" + port + "/api/produtos", prodReq, String.class);
         System.out.println("Product response status: " + prodResp.getStatusCode());
