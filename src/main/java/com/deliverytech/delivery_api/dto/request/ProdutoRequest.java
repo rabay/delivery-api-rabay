@@ -21,9 +21,9 @@ import lombok.NoArgsConstructor;
 @Schema(description = "DTO para criação/atualização de produto.", title = "Produto Request DTO")
 public class ProdutoRequest {
   @NotBlank(message = "Nome é obrigatório")
-  @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
+    @Size(min = 2, max = 50, message = "Nome deve ter entre 2 e 50 caracteres")
   @Schema(
-      description = "Nome do produto. Deve ter entre 2 e 100 caracteres.",
+    description = "Nome do produto. Deve ter entre 2 e 50 caracteres.",
       example = "Pizza Margherita",
       requiredMode = Schema.RequiredMode.REQUIRED)
   private String nome;

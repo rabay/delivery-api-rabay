@@ -44,7 +44,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     if (produto.getQuantidadeEstoque() == null) {
       throw new BusinessException("Quantidade em estoque é obrigatória");
     }
-    return produtoRepository.save(produto);
+  return produtoRepository.save(produto);
   }
 
   @Override
@@ -149,7 +149,16 @@ public class ProdutoServiceImpl implements ProdutoService {
   @Override
   public ProdutoResponse cadastrar(ProdutoRequest produtoRequest) {
     Produto produto = produtoMapper.toEntity(produtoRequest);
-    Produto salvo = produtoRepository.save(produto);
+  // Verifica duplicidade de nome no mesmo restaurante
+  if (produto.getRestaurante() != null
+    && produto.getNome() != null
+    && produtoRepository.existsByRestauranteIdAndNomeIgnoreCaseAndExcluidoFalse(
+      produto.getRestaurante().getId(), produto.getNome())) {
+    throw new com.deliverytech.delivery_api.exception.ConflictException(
+      "Produto com mesmo nome j\u00e1 cadastrado para este restaurante");
+  }
+
+  Produto salvo = produtoRepository.save(produto);
     return produtoMapper.toResponse(salvo);
   }
 

@@ -10,4 +10,4 @@ import java.time.OffsetDateTime;
     example =
         "{\"error\":\"BadRequest\",\"message\":\"Requisição"
             + " inválida\",\"status\":400,\"timestamp\":\"2025-09-05T12:34:56Z\"}")
-public record ErrorResponse(String error, String message, int status, OffsetDateTime timestamp) {}
+public record ErrorResponse(String error, String message, int status, OffsetDateTime timestamp, String path, java.util.Map<String, Object> details) {}

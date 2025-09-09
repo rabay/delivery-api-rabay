@@ -25,6 +25,8 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
   List<Produto> findByRestauranteIdAndExcluidoFalse(Long restauranteId);
 
+    boolean existsByRestauranteIdAndNomeIgnoreCaseAndExcluidoFalse(Long restauranteId, String nome);
+
   List<Produto> findByRestauranteAndExcluidoFalse(
       com.deliverytech.delivery_api.model.Restaurante restaurante);
 
