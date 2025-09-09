@@ -84,13 +84,70 @@ Controllers com anotações completas:
 - ✅ Listagem de restaurantes: Retorna dados paginados
 - ✅ Listagem de produtos: Retorna dados com relacionamentos
 
-## 📁 Arquivos modificados
-- `src/main/java/com/deliverytech/delivery_api/config/OpenApiConfig.java`
-- `src/main/java/com/deliverytech/delivery_api/controller/AuthController.java`
-- `src/main/java/com/deliverytech/delivery_api/controller/PedidoController.java`
-- `src/main/java/com/deliverytech/delivery_api/controller/RestauranteController.java`
-- `src/main/java/com/deliverytech/delivery_api/controller/ProdutoController.java`
-- `src/main/java/com/deliverytech/delivery_api/dto/request/PedidoRequest.java`
+## � Implementações realizadas
+
+### 1. Configuração OpenAPI (OpenApiConfig.java)
+```java
+@Bean
+public OpenAPI customOpenAPI() {
+    return new OpenAPI()
+        .info(new Info()
+            .title("Delivery API Rabay")
+            .version("1.0")
+            .description("API pública para operações de delivery...")
+            .contact(new Contact().name("Equipe Rabay Delivery").email("contato@rabay.com.br"))
+            .license(new License().name("MIT License")))
+        .servers(List.of(new Server().url("http://localhost:8080")))
+        .components(new Components()
+            .addSecuritySchemes("bearerAuth", 
+                new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")))
+        .security(List.of(new SecurityRequirement().addList("bearerAuth")));
+}
+```
+
+### 2. Controllers com @ApiResponses
+**AuthController.java:**
+```java
+@ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Login realizado com sucesso",
+        content = @Content(mediaType = "application/json",
+            examples = @ExampleObject(value = "{\"data\":{\"token\":\"eyJ...\"},\"message\":\"Login realizado\",\"success\":true}"))),
+    @ApiResponse(responseCode = "400", description = "Request inválido"),
+    @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+})
+```
+
+**PedidoController.java:**
+```java
+@ApiResponses(value = {
+    @ApiResponse(responseCode = "201", description = "Pedido criado com sucesso"),
+    @ApiResponse(responseCode = "400", description = "Request inválido ou erro de negócio"),
+    @ApiResponse(responseCode = "404", description = "Entidade não encontrada"),
+    @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+})
+```
+
+### 3. DTOs com exemplos (PedidoRequest.java)
+```java
+@Schema(description = "DTO para criação de pedido", 
+        example = "{\"clienteId\":1,\"restauranteId\":2,\"enderecoEntrega\":{\"rua\":\"Rua das Flores\",\"numero\":\"123\",\"bairro\":\"Centro\",\"cidade\":\"São Paulo\",\"estado\":\"SP\",\"cep\":\"01234-567\"},\"itens\":[{\"produtoId\":5,\"quantidade\":2},{\"produtoId\":10,\"quantidade\":1}],\"desconto\":10.0}")
+public class PedidoRequest {
+    // ... campos com @Schema
+}
+```
+
+### 4. Propriedades Springdoc (application.properties)
+```properties
+# Springdoc OpenAPI
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.swagger-ui.operationsSorter=method
+springdoc.swagger-ui.tagsSorter=alpha
+springdoc.swagger-ui.tryItOutEnabled=true
+```
 
 ## 🔐 Credenciais de teste
 Para testar a autenticação no Swagger UI:
