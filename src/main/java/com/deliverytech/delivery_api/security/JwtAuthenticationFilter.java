@@ -44,6 +44,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     var token = this.recoverToken(request);
     if (token != null) {
       try {
+        var claims = jwtUtil.validarToken(token);
+
+        if (claims == null) {
+          log.warn("Invalid or expired JWT token");
+          response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+          response.setContentType("application/json");
+          response.getWriter().write("{\"message\":\"Token inválido ou expirado\",\"reason\":\"" + JwtErrorReason.INVALID_TOKEN.getCode() + "\"}");
+          return; // stop filter chain
+        }
+
         var login = jwtUtil.getEmailFromToken(token);
         log.debug("Trying to authenticate user with email: {}", login);
 
@@ -58,8 +68,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } else {
           log.warn("User not found for email: {}", login);
         }
+      } catch (io.jsonwebtoken.ExpiredJwtException eje) {
+        log.warn("JWT expired", eje);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+         response.getWriter().write("{\"message\":\"Token expirado\",\"reason\":\"" + JwtErrorReason.TOKEN_EXPIRED.getCode() + "\"}");
+        return;
+      } catch (io.jsonwebtoken.security.SignatureException se) {
+        log.warn("JWT signature invalid", se);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+         response.getWriter().write("{\"message\":\"Assinatura inválida\",\"reason\":\"" + JwtErrorReason.INVALID_SIGNATURE.getCode() + "\"}");
+        return;
+      } catch (io.jsonwebtoken.MalformedJwtException mfe) {
+        log.warn("JWT malformed", mfe);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+         response.getWriter().write("{\"message\":\"Token malformado\",\"reason\":\"" + JwtErrorReason.MALFORMED_TOKEN.getCode() + "\"}");
+        return;
       } catch (Exception e) {
         log.error("Error during JWT authentication", e);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+         response.getWriter().write("{\"message\":\"Erro de autenticação JWT\",\"reason\":\"" + JwtErrorReason.AUTH_ERROR.getCode() + "\"}");
+        return;
       }
     } else {
       log.debug("No JWT token found in request");

@@ -77,7 +77,8 @@ class AuthControllerTest extends BaseIntegrationTest {
         when(mockAuth.getName()).thenReturn(loginRequest.getUsername());
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(mockAuth);
-        when(jwtUtil.gerarToken(loginRequest.getUsername())).thenReturn("mock.jwt.token");
+    when(usuarioService.buscarPorEmail(loginRequest.getUsername())).thenReturn(java.util.Optional.of(testUser));
+    when(jwtUtil.gerarTokenFromUsuario(testUser)).thenReturn("mock.jwt.token");
 
         // When & Then
         mockMvc.perform(post("/api/auth/login")
@@ -87,8 +88,9 @@ class AuthControllerTest extends BaseIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.data.token").value("mock.jwt.token"));
 
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtUtil).gerarToken(loginRequest.getUsername());
+    verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+    verify(usuarioService).buscarPorEmail(loginRequest.getUsername());
+    verify(jwtUtil).gerarTokenFromUsuario(testUser);
     }
 
     @Test
@@ -104,7 +106,8 @@ class AuthControllerTest extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized());
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtUtil, never()).gerarToken(any());
+    verify(jwtUtil, never()).gerarToken(any());
+    verify(usuarioService, never()).buscarPorEmail(any());
     }
 
     @Test

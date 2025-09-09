@@ -1,7 +1,11 @@
 package com.deliverytech.delivery_api.security;
 
-import com.deliverytech.delivery_api.util.JwtTestUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import javax.crypto.SecretKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+// ...existing code...
 
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(properties = {
@@ -66,10 +70,11 @@ class JwtUtilTest {
         String invalidToken = "invalid.token.here";
 
         // When
-        Claims claims = jwtUtil.validarToken(invalidToken);
-
-        // Then
-        assertThat(claims).isNull();
+    // Then
+    org.junit.jupiter.api.Assertions.assertThrows(
+        io.jsonwebtoken.JwtException.class,
+        () -> jwtUtil.validarToken(invalidToken)
+    );
     }
 
     @Test
@@ -116,6 +121,37 @@ class JwtUtilTest {
 
         // Then
         assertThat(tokenDuration).isEqualTo(testExpiration);
+    }
+
+    @Test
+    void validarToken_WithExpiredToken_ShouldThrowExpiredJwtException() {
+    // Build a token with expiration in the past using the same secret
+    SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(testSecret));
+    Date issuedAt = new Date(System.currentTimeMillis() - 2000L);
+    Date expiredAt = new Date(System.currentTimeMillis() - 1000L);
+
+    String expiredToken = Jwts.builder()
+        .subject(testEmail)
+        .issuedAt(issuedAt)
+        .expiration(expiredAt)
+        .signWith(key)
+        .compact();
+
+    // When / Then
+    org.junit.jupiter.api.Assertions.assertThrows(
+        io.jsonwebtoken.ExpiredJwtException.class,
+        () -> jwtUtil.validarToken(expiredToken)
+    );
+    }
+
+    @Test
+    void validarToken_WithMalformedToken_ShouldThrow() {
+    String malformed = "abc.def"; // not a valid JWT (only two parts)
+
+    org.junit.jupiter.api.Assertions.assertThrows(
+        io.jsonwebtoken.JwtException.class,
+        () -> jwtUtil.validarToken(malformed)
+    );
     }
 
     @Test

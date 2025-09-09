@@ -72,9 +72,19 @@ public class AuthController {
               new UsernamePasswordAuthenticationToken(
                   request.getUsername(), request.getPassword()));
 
-      // If authentication is successful, generate JWT token
+      // If authentication is successful, generate JWT token using the full Usuario entity
       String username = authentication.getName();
-      String token = jwtUtil.gerarToken(username);
+      java.util.Optional<com.deliverytech.delivery_api.model.Usuario> usuarioOpt =
+          usuarioService.buscarPorEmail(username);
+
+      if (usuarioOpt.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(
+                new com.deliverytech.delivery_api.dto.response.ApiResult<>(
+                    null, "Usuário autenticado não encontrado para geração de token", false));
+      }
+
+      String token = jwtUtil.gerarTokenFromUsuario(usuarioOpt.get());
 
       LoginResponse dto = new LoginResponse(token);
       com.deliverytech.delivery_api.dto.response.ApiResult<LoginResponse> body =
@@ -153,4 +163,20 @@ public class AuthController {
                   null, "Erro interno: " + e.getMessage(), false));
     }
   }
+
+    @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<UserResponse>> me() {
+        try {
+            var usuarioOpt = com.deliverytech.delivery_api.security.SecurityUtils.getCurrentUser();
+            if (usuarioOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Usuário não autenticado", false));
+            }
+            UserResponse response = UserResponse.fromEntity(usuarioOpt.get());
+            return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(response, "Usuário obtido", true));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Erro interno: " + e.getMessage(), false));
+        }
+    }
 }
