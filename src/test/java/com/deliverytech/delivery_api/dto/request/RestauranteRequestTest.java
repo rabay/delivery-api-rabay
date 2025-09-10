@@ -240,7 +240,8 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Nome não pode ter mais de 100 caracteres");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Nome não pode ter mais de 100 caracteres");
       assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("nome");
     }
   }
@@ -323,7 +324,8 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Categoria deve ser uma categoria válida");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Categoria deve ser uma categoria válida");
       assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("categoria");
     }
   }
@@ -392,7 +394,8 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Endereço não pode ter mais de 255 caracteres");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Endereço não pode ter mais de 255 caracteres");
       assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("endereco");
     }
   }
@@ -413,8 +416,10 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Taxa de entrega é obrigatória");
-      assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("taxaEntrega");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Taxa de entrega é obrigatória");
+      assertThat(violations.iterator().next().getPropertyPath().toString())
+          .isEqualTo("taxaEntrega");
     }
 
     @Test
@@ -429,8 +434,10 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Taxa de entrega deve ser positiva");
-      assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("taxaEntrega");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Taxa de entrega deve ser positiva");
+      assertThat(violations.iterator().next().getPropertyPath().toString())
+          .isEqualTo("taxaEntrega");
     }
 
     @Test
@@ -464,8 +471,10 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Tempo de entrega é obrigatório");
-      assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("tempoEntregaMinutos");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Tempo de entrega é obrigatório");
+      assertThat(violations.iterator().next().getPropertyPath().toString())
+          .isEqualTo("tempoEntregaMinutos");
     }
 
     @Test
@@ -480,8 +489,10 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Tempo de entrega deve ser pelo menos 10 minutos");
-      assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("tempoEntregaMinutos");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Tempo de entrega deve ser pelo menos 10 minutos");
+      assertThat(violations.iterator().next().getPropertyPath().toString())
+          .isEqualTo("tempoEntregaMinutos");
     }
 
     @Test
@@ -496,8 +507,10 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Tempo de entrega não pode exceder 120 minutos");
-      assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("tempoEntregaMinutos");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Tempo de entrega não pode exceder 120 minutos");
+      assertThat(violations.iterator().next().getPropertyPath().toString())
+          .isEqualTo("tempoEntregaMinutos");
     }
   }
 
@@ -559,7 +572,8 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Telefone deve ter um formato válido brasileiro");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Telefone deve ter um formato válido brasileiro");
       assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("telefone");
     }
   }
@@ -608,7 +622,8 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Email deve ter formato válido");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Email deve ter formato válido");
       assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("email");
     }
 
@@ -626,7 +641,8 @@ class RestauranteRequestTest {
       // Then
       // Email pode falhar na validação de formato se for muito longo
       if (!violations.isEmpty()) {
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("Email deve ter formato válido");
+        assertThat(violations.iterator().next().getMessage())
+            .isEqualTo("Email deve ter formato válido");
       }
     }
 
@@ -643,9 +659,10 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(2);
-      Set<String> messages = violations.stream()
-          .map(ConstraintViolation::getMessage)
-          .collect(java.util.stream.Collectors.toSet());
+      Set<String> messages =
+          violations.stream()
+              .map(ConstraintViolation::getMessage)
+              .collect(java.util.stream.Collectors.toSet());
       assertThat(messages).contains("Email não pode ter mais de 100 caracteres");
       assertThat(messages).contains("Email deve ter formato válido");
     }
@@ -681,7 +698,8 @@ class RestauranteRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Avaliação deve ser positiva");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Avaliação deve ser positiva");
       assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("avaliacao");
     }
 

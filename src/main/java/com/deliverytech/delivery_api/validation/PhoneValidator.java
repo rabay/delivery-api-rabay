@@ -15,7 +15,8 @@ public class PhoneValidator implements ConstraintValidator<ValidPhone, String> {
       "^\\(\\d{2}\\)\\s?9\\d{4}-\\d{4}$"; // (11) 99999-9999
 
   private static final String PHONE_PATTERN_FORMATTED_LANDLINE =
-      "^\\(\\d{2}\\)\\s?[2-5]\\d{3}-\\d{4}$"; // (11) 3333-4444
+      "^\\(\\d{2}\\)\\s?[2-5]\\d{3}-\\d{4}$"; // (11)
+  // 3333-4444
 
   private static final String PHONE_PATTERN_UNFORMATTED_MOBILE = "^\\d{2}9\\d{8}$"; // 11999999999
 

@@ -3,8 +3,8 @@ package com.deliverytech.delivery_api.util;
 import java.util.Set;
 
 /**
- * Constantes com propriedades permitidas para ordenação (sort) por entidade.
- * Centraliza as allow-lists usadas pelo PageableUtil e controllers.
+ * Constantes com propriedades permitidas para ordenação (sort) por entidade. Centraliza as
+ * allow-lists usadas pelo PageableUtil e controllers.
  */
 public final class SortableProperties {
   private SortableProperties() {}

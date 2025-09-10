@@ -15,20 +15,22 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import java.net.URI;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping(value = "/api/auth", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+    value = "/api/auth",
+    produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(
     name = "Autenticação",
     description = "Operações relacionadas com autenticação e cadastro de usuários")
@@ -39,7 +41,9 @@ public class AuthController {
   @Autowired private JwtUtil jwtUtil;
 
   @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Login de usuário", description = "Realizar o login do usuário e retornar JWT")
+  @Operation(
+      summary = "Login de usuário",
+      description = "Realizar o login do usuário e retornar JWT")
   @ApiResponses({
     @ApiResponse(
         responseCode = "200",
@@ -55,7 +59,8 @@ public class AuthController {
                   @io.swagger.v3.oas.annotations.media.ExampleObject(
                       name = "login-success",
                       value =
-                          "{\"data\":{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNjQ5ODI1NjAwLCJleHAiOjE2NDk4MjkyMDB9.example\"},\"message\":\"Login realizado com sucesso\",\"success\":true}")
+                          "{\"data\":{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNjQ5ODI1NjAwLCJleHAiOjE2NDk4MjkyMDB9.example\"},\"message\":\"Login"
+                              + " realizado com sucesso\",\"success\":true}")
                 })),
     @ApiResponse(
         responseCode = "400",
@@ -147,7 +152,10 @@ public class AuthController {
           new com.deliverytech.delivery_api.dto.response.ApiResult<>(
               response, "Registro salvo com sucesso", true);
       URI location =
-          ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/{id}")
+              .buildAndExpand(response.getId())
+              .toUri();
       return ResponseEntity.created(location).body(body);
     } catch (EmailJaCadastradoException e) {
       return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -167,19 +175,25 @@ public class AuthController {
     }
   }
 
-    @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<UserResponse>> me() {
-        try {
-            var usuarioOpt = com.deliverytech.delivery_api.security.SecurityUtils.getCurrentUser();
-            if (usuarioOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Usuário não autenticado", false));
-            }
-            UserResponse response = UserResponse.fromEntity(usuarioOpt.get());
-            return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(response, "Usuário obtido", true));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new com.deliverytech.delivery_api.dto.response.ApiResult<>(null, "Erro interno: " + e.getMessage(), false));
-        }
+  @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<com.deliverytech.delivery_api.dto.response.ApiResult<UserResponse>> me() {
+    try {
+      var usuarioOpt = com.deliverytech.delivery_api.security.SecurityUtils.getCurrentUser();
+      if (usuarioOpt.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(
+                new com.deliverytech.delivery_api.dto.response.ApiResult<>(
+                    null, "Usuário não autenticado", false));
+      }
+      UserResponse response = UserResponse.fromEntity(usuarioOpt.get());
+      return ResponseEntity.ok(
+          new com.deliverytech.delivery_api.dto.response.ApiResult<>(
+              response, "Usuário obtido", true));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(
+              new com.deliverytech.delivery_api.dto.response.ApiResult<>(
+                  null, "Erro interno: " + e.getMessage(), false));
     }
+  }
 }

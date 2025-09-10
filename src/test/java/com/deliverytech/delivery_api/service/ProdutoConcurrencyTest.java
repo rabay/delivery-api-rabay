@@ -8,7 +8,6 @@ import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
-import com.deliverytech.delivery_api.service.ProdutoService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +22,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 
 @SpringBootTest
 @Testcontainers

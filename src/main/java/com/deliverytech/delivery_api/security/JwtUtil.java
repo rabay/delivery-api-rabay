@@ -1,13 +1,10 @@
 package com.deliverytech.delivery_api.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,25 +39,27 @@ public class JwtUtil {
     Date dataExpiracao = new Date(agora.getTime() + expiration);
     SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secret));
 
-  var builder = Jwts.builder()
-        .subject(usuario.getEmail())
-        .issuedAt(agora)
-        .expiration(dataExpiracao)
-        .claim("userId", usuario.getId())
-        .claim("role", usuario.getRole() != null ? usuario.getRole().name() : null)
-        .claim("restauranteId", usuario.getRestauranteId())
-        .signWith(key);
+    var builder =
+        Jwts.builder()
+            .subject(usuario.getEmail())
+            .issuedAt(agora)
+            .expiration(dataExpiracao)
+            .claim("userId", usuario.getId())
+            .claim("role", usuario.getRole() != null ? usuario.getRole().name() : null)
+            .claim("restauranteId", usuario.getRestauranteId())
+            .signWith(key);
 
     return builder.compact();
   }
 
   // Valida um token JWT e retorna as claims
   public Claims validarToken(String token) {
-  if (token == null) return null;
-  SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secret));
+    if (token == null) return null;
+    SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secret));
 
-  // Let exceptions from jjwt propagate (ExpiredJwtException, SignatureException, MalformedJwtException, etc.)
-  return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+    // Let exceptions from jjwt propagate (ExpiredJwtException, SignatureException,
+    // MalformedJwtException, etc.)
+    return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
   }
 
   // Extrai o email (subject) do token

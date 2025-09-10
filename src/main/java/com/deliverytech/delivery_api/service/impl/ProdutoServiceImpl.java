@@ -44,7 +44,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     if (produto.getQuantidadeEstoque() == null) {
       throw new BusinessException("Quantidade em estoque é obrigatória");
     }
-  return produtoRepository.save(produto);
+    return produtoRepository.save(produto);
   }
 
   @Override
@@ -149,16 +149,16 @@ public class ProdutoServiceImpl implements ProdutoService {
   @Override
   public ProdutoResponse cadastrar(ProdutoRequest produtoRequest) {
     Produto produto = produtoMapper.toEntity(produtoRequest);
-  // Verifica duplicidade de nome no mesmo restaurante
-  if (produto.getRestaurante() != null
-    && produto.getNome() != null
-    && produtoRepository.existsByRestauranteIdAndNomeIgnoreCaseAndExcluidoFalse(
-      produto.getRestaurante().getId(), produto.getNome())) {
-    throw new com.deliverytech.delivery_api.exception.ConflictException(
-      "Produto com mesmo nome j\u00e1 cadastrado para este restaurante");
-  }
+    // Verifica duplicidade de nome no mesmo restaurante
+    if (produto.getRestaurante() != null
+        && produto.getNome() != null
+        && produtoRepository.existsByRestauranteIdAndNomeIgnoreCaseAndExcluidoFalse(
+            produto.getRestaurante().getId(), produto.getNome())) {
+      throw new com.deliverytech.delivery_api.exception.ConflictException(
+          "Produto com mesmo nome j\u00e1 cadastrado para este restaurante");
+    }
 
-  Produto salvo = produtoRepository.save(produto);
+    Produto salvo = produtoRepository.save(produto);
     return produtoMapper.toResponse(salvo);
   }
 
@@ -306,8 +306,10 @@ public class ProdutoServiceImpl implements ProdutoService {
   @Transactional
   public void ajustarEstoque(Long produtoId, Integer quantidade) {
     // Buscar produto com lock pessimista para evitar race conditions
-    Produto produto = produtoRepository.findByIdWithLock(produtoId)
-        .orElseThrow(() -> new EntityNotFoundException("Produto", produtoId));
+    Produto produto =
+        produtoRepository
+            .findByIdWithLock(produtoId)
+            .orElseThrow(() -> new EntityNotFoundException("Produto", produtoId));
 
     // Only adjust stock for non-infinite stock products
     if (!produto.isInfiniteStock()) {
@@ -322,8 +324,10 @@ public class ProdutoServiceImpl implements ProdutoService {
     // Reserve stock for all items in the order
     for (ItemPedido item : pedido.getItens()) {
       // Buscar produto com lock pessimista para evitar race conditions
-      Produto produto = produtoRepository.findByIdWithLock(item.getProduto().getId())
-          .orElseThrow(() -> new EntityNotFoundException("Produto", item.getProduto().getId()));
+      Produto produto =
+          produtoRepository
+              .findByIdWithLock(item.getProduto().getId())
+              .orElseThrow(() -> new EntityNotFoundException("Produto", item.getProduto().getId()));
 
       // Validate stock availability
       validarEstoque(produto, item.getQuantidade());
@@ -351,8 +355,10 @@ public class ProdutoServiceImpl implements ProdutoService {
     // Release reserved stock back to available stock
     for (ItemPedido item : pedido.getItens()) {
       // Buscar produto com lock pessimista para evitar race conditions
-      Produto produto = produtoRepository.findByIdWithLock(item.getProduto().getId())
-          .orElseThrow(() -> new EntityNotFoundException("Produto", item.getProduto().getId()));
+      Produto produto =
+          produtoRepository
+              .findByIdWithLock(item.getProduto().getId())
+              .orElseThrow(() -> new EntityNotFoundException("Produto", item.getProduto().getId()));
 
       // Only restore stock for non-infinite stock products
       if (!produto.isInfiniteStock()) {

@@ -118,7 +118,9 @@ class RegisterRequestTest {
     @DisplayName("Deve aceitar nome com 100 caracteres")
     void shouldAcceptNameWithMaximumLength() {
       // Given
-      String name100Chars = "João Silva Santos Pereira Oliveira Costa Rodrigues Fernandes Carvalho Mendes Barbosa Ribeiro Alme";
+      String name100Chars =
+          "João Silva Santos Pereira Oliveira Costa Rodrigues Fernandes Carvalho Mendes Barbosa"
+              + " Ribeiro Alme";
       RegisterRequest request = new RegisterRequest();
       request.setNome(name100Chars);
       request.setEmail("joao@email.com");
@@ -150,7 +152,8 @@ class RegisterRequestTest {
       // O email é válido, mas pode falhar na validação de formato se for muito longo
       // Vamos aceitar tanto sucesso quanto falha de formato
       if (!violations.isEmpty()) {
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("Email deve ter formato válido");
+        assertThat(violations.iterator().next().getMessage())
+            .isEqualTo("Email deve ter formato válido");
       }
     }
 
@@ -347,9 +350,10 @@ class RegisterRequestTest {
       // Then
       // @NotBlank falha com apenas espaços, mas @Email também falha
       assertThat(violations).hasSize(2);
-      Set<String> messages = violations.stream()
-          .map(ConstraintViolation::getMessage)
-          .collect(java.util.stream.Collectors.toSet());
+      Set<String> messages =
+          violations.stream()
+              .map(ConstraintViolation::getMessage)
+              .collect(java.util.stream.Collectors.toSet());
       assertThat(messages).contains("Email é obrigatório");
       assertThat(messages).contains("Email deve ter formato válido");
     }
@@ -369,7 +373,8 @@ class RegisterRequestTest {
 
       // Then
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Email deve ter formato válido");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Email deve ter formato válido");
       assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("email");
     }
 
@@ -390,7 +395,8 @@ class RegisterRequestTest {
       // Then
       // A classe RegisterRequest não tem validação de tamanho máximo para email
       assertThat(violations).hasSize(1);
-      assertThat(violations.iterator().next().getMessage()).isEqualTo("Email deve ter formato válido");
+      assertThat(violations.iterator().next().getMessage())
+          .isEqualTo("Email deve ter formato válido");
       assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("email");
     }
 
@@ -659,9 +665,10 @@ class RegisterRequestTest {
       assertThat(violations).hasSize(3);
 
       // Verificar mensagens de erro
-      Set<String> messages = violations.stream()
-          .map(ConstraintViolation::getMessage)
-          .collect(java.util.stream.Collectors.toSet());
+      Set<String> messages =
+          violations.stream()
+              .map(ConstraintViolation::getMessage)
+              .collect(java.util.stream.Collectors.toSet());
 
       assertThat(messages).contains("Nome é obrigatório");
       assertThat(messages).contains("Email deve ter formato válido");
@@ -670,7 +677,9 @@ class RegisterRequestTest {
     }
 
     @Test
-    @DisplayName("Deve validar restauranteId obrigatório quando role é RESTAURANTE com outros campos inválidos")
+    @DisplayName(
+        "Deve validar restauranteId obrigatório quando role é RESTAURANTE com outros campos"
+            + " inválidos")
     void shouldValidateRestauranteIdRequiredWithOtherInvalidFields() {
       // Given
       RegisterRequest request = new RegisterRequest();
@@ -687,9 +696,10 @@ class RegisterRequestTest {
       assertThat(violations).hasSize(1);
 
       // Verificar mensagens de erro
-      Set<String> messages = violations.stream()
-          .map(ConstraintViolation::getMessage)
-          .collect(java.util.stream.Collectors.toSet());
+      Set<String> messages =
+          violations.stream()
+              .map(ConstraintViolation::getMessage)
+              .collect(java.util.stream.Collectors.toSet());
 
       assertThat(messages).contains("Email deve ter formato válido");
       // Nome vazio não gera erro porque @NotBlank falha apenas se for null ou apenas espaços

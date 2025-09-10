@@ -18,18 +18,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import java.net.URI;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping(value = "/api/pedidos", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+    value = "/api/pedidos",
+    produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(
     name = "Pedidos",
     description = "Criação, consulta e atualização de pedidos realizados pelos clientes.")
@@ -71,32 +73,41 @@ public class PedidoController {
           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
           @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
     try {
-          var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
-          var pageResult = pedidoService.listarTodos(pageable);
+      var pageable =
+          com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+              page,
+              size,
+              (String) null,
+              com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
+      var pageResult = pedidoService.listarTodos(pageable);
 
-          var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
-          java.util.Map<String, String> links = new java.util.HashMap<>();
-          links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-          int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
-          links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-          if (pageResult.hasNext()) {
-            links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
-          }
-          if (pageResult.hasPrevious()) {
-            links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
-          }
+      var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+      java.util.Map<String, String> links = new java.util.HashMap<>();
+      links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+      int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+      links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+      if (pageResult.hasNext()) {
+        links.put(
+            "next",
+            uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+      }
+      if (pageResult.hasPrevious()) {
+        links.put(
+            "prev",
+            uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+      }
 
-          var paged =
-              new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                  pageResult.getContent(),
-                  pageResult.getTotalElements(),
-                  pageResult.getNumber(),
-                  pageResult.getSize(),
-                  pageResult.getTotalPages(),
-                  links,
-                  "Pedidos obtidos com sucesso",
-                  true);
-          return ResponseEntity.ok(new ApiResult<>(paged, "Pedidos obtidos com sucesso", true));
+      var paged =
+          new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+              pageResult.getContent(),
+              pageResult.getTotalElements(),
+              pageResult.getNumber(),
+              pageResult.getSize(),
+              pageResult.getTotalPages(),
+              links,
+              "Pedidos obtidos com sucesso",
+              true);
+      return ResponseEntity.ok(new ApiResult<>(paged, "Pedidos obtidos com sucesso", true));
     } catch (Exception ex) {
       logger.error("Erro ao listar todos os pedidos: {}", ex.getMessage(), ex);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -133,34 +144,44 @@ public class PedidoController {
           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
           @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
     try {
-          var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
-          var pageResult = pedidoService.listarTodos(pageable);
-          // map to resumo
-          var resumoPage = pageResult.map(p -> mapToResumoResponse(pedidoService.buscarPorId(p.getId())));
+      var pageable =
+          com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+              page,
+              size,
+              (String) null,
+              com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
+      var pageResult = pedidoService.listarTodos(pageable);
+      // map to resumo
+      var resumoPage =
+          pageResult.map(p -> mapToResumoResponse(pedidoService.buscarPorId(p.getId())));
 
-          var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
-          java.util.Map<String, String> links = new java.util.HashMap<>();
-          links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-          int lastPage = Math.max(0, resumoPage.getTotalPages() - 1);
-          links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-          if (resumoPage.hasNext()) {
-            links.put("next", uriBuilder.replaceQueryParam("page", resumoPage.getNumber() + 1).build().toUriString());
-          }
-          if (resumoPage.hasPrevious()) {
-            links.put("prev", uriBuilder.replaceQueryParam("page", resumoPage.getNumber() - 1).build().toUriString());
-          }
+      var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+      java.util.Map<String, String> links = new java.util.HashMap<>();
+      links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+      int lastPage = Math.max(0, resumoPage.getTotalPages() - 1);
+      links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+      if (resumoPage.hasNext()) {
+        links.put(
+            "next",
+            uriBuilder.replaceQueryParam("page", resumoPage.getNumber() + 1).build().toUriString());
+      }
+      if (resumoPage.hasPrevious()) {
+        links.put(
+            "prev",
+            uriBuilder.replaceQueryParam("page", resumoPage.getNumber() - 1).build().toUriString());
+      }
 
-          var paged =
-              new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                  resumoPage.getContent(),
-                  resumoPage.getTotalElements(),
-                  resumoPage.getNumber(),
-                  resumoPage.getSize(),
-                  resumoPage.getTotalPages(),
-                  links,
-                  "Resumo de pedidos obtido",
-                  true);
-          return ResponseEntity.ok(new ApiResult<>(paged, "Resumo de pedidos obtido", true));
+      var paged =
+          new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+              resumoPage.getContent(),
+              resumoPage.getTotalElements(),
+              resumoPage.getNumber(),
+              resumoPage.getSize(),
+              resumoPage.getTotalPages(),
+              links,
+              "Resumo de pedidos obtido",
+              true);
+      return ResponseEntity.ok(new ApiResult<>(paged, "Resumo de pedidos obtido", true));
     } catch (Exception ex) {
       logger.error("Erro ao listar todos os pedidos (resumo): {}", ex.getMessage(), ex);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -201,7 +222,10 @@ public class PedidoController {
     @ApiResponse(
         responseCode = "201",
         description = "Pedido criado com sucesso",
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResult.class))),
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiResult.class))),
     @ApiResponse(
         responseCode = "400",
         description = "Request inválido ou erro de negócio",
@@ -218,13 +242,17 @@ public class PedidoController {
       logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
       Pedido pedido = mapToEntity(pedidoRequest);
       logger.debug("Pedido mapeado: {}", pedido);
-    Pedido novo = pedidoService.criar(pedido);
-    PedidoResponse response = mapToResponse(novo);
-    logger.info(
-      "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
-    URI location =
-      ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
-    return ResponseEntity.created(location).body(new ApiResult<>(response, "Pedido criado com sucesso", true));
+      Pedido novo = pedidoService.criar(pedido);
+      PedidoResponse response = mapToResponse(novo);
+      logger.info(
+          "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/{id}")
+              .buildAndExpand(response.getId())
+              .toUri();
+      return ResponseEntity.created(location)
+          .body(new ApiResult<>(response, "Pedido criado com sucesso", true));
     } catch (RuntimeException ex) {
       logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -244,12 +272,16 @@ public class PedidoController {
       @Valid @RequestBody PedidoRequest pedidoRequest) {
     try {
       logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
-    PedidoResponse response = pedidoService.criarPedido(pedidoRequest);
-    logger.info(
-      "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
-    URI location =
-      ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
-    return ResponseEntity.created(location).body(new ApiResult<>(response, "Pedido criado com sucesso", true));
+      PedidoResponse response = pedidoService.criarPedido(pedidoRequest);
+      logger.info(
+          "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
+      URI location =
+          ServletUriComponentsBuilder.fromCurrentRequest()
+              .path("/{id}")
+              .buildAndExpand(response.getId())
+              .toUri();
+      return ResponseEntity.created(location)
+          .body(new ApiResult<>(response, "Pedido criado com sucesso", true));
     } catch (RuntimeException ex) {
       logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)

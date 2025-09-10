@@ -5,15 +5,20 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 /**
- * Implementa a interface para validar a anotação @ValidHorarioFuncionamento
- * Valida strings que representam horários de funcionamento no formato HH:MM-HH:MM
+ * Implementa a interface para validar a anotação @ValidHorarioFuncionamento Valida strings que
+ * representam horários de funcionamento no formato HH:MM-HH:MM
  */
-public class HorarioFuncionamentoValidator implements ConstraintValidator<ValidHorarioFuncionamento, String> {
+public class HorarioFuncionamentoValidator
+    implements ConstraintValidator<ValidHorarioFuncionamento, String> {
 
   // Padrão regex para formato HH:MM-HH:MM (exige duas casas para horas, 00-23)
-  private static final Pattern HORARIO_PATTERN = Pattern.compile("^(?:[01]\\d|2[0-3]):[0-5]\\d-(?:[01]\\d|2[0-3]):[0-5]\\d$");
+  private static final Pattern HORARIO_PATTERN =
+      Pattern.compile("^(?:[01]\\d|2[0-3]):[0-5]\\d-(?:[01]\\d|2[0-3]):[0-5]\\d$");
 
-  /** Método que contém a regra de validação 'value' é o valor do campo anotado com @ValidHorarioFuncionamento */
+  /**
+   * Método que contém a regra de validação 'value' é o valor do campo anotado
+   * com @ValidHorarioFuncionamento
+   */
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
 

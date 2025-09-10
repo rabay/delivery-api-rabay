@@ -14,8 +14,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Import(TestConfig.class)
 public abstract class BaseRepositoryTest {
 
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        TestConfig.configureProperties(registry);
-    }
+  @DynamicPropertySource
+  static void configureProperties(DynamicPropertyRegistry registry) {
+    TestConfig.configureProperties(registry);
+  }
 }

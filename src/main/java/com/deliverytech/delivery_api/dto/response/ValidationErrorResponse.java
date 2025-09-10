@@ -13,4 +13,8 @@ import java.util.Map;
             + " inválido\",\"senha\":\"Tamanho mínimo 8"
             + " caracteres\"},\"status\":422,\"timestamp\":\"2025-09-05T12:34:56Z\"}")
 public record ValidationErrorResponse(
-    String error, Map<String, String> fieldErrors, int status, OffsetDateTime timestamp, String path) {}
+    String error,
+    Map<String, String> fieldErrors,
+    int status,
+    OffsetDateTime timestamp,
+    String path) {}

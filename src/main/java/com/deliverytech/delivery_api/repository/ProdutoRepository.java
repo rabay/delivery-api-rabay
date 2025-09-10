@@ -3,6 +3,7 @@ package com.deliverytech.delivery_api.repository;
 import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.projection.FaturamentoPorCategoriaProjection;
 import com.deliverytech.delivery_api.projection.RelatorioVendasProdutos;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +12,6 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import jakarta.persistence.LockModeType;
 
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
@@ -28,7 +28,7 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
   List<Produto> findByRestauranteIdAndExcluidoFalse(Long restauranteId);
 
-    boolean existsByRestauranteIdAndNomeIgnoreCaseAndExcluidoFalse(Long restauranteId, String nome);
+  boolean existsByRestauranteIdAndNomeIgnoreCaseAndExcluidoFalse(Long restauranteId, String nome);
 
   List<Produto> findByRestauranteAndExcluidoFalse(
       com.deliverytech.delivery_api.model.Restaurante restaurante);

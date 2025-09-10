@@ -3,6 +3,8 @@ package com.deliverytech.delivery_api.config;
 import com.deliverytech.delivery_api.model.Role;
 import com.deliverytech.delivery_api.model.Usuario;
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -12,12 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 /**
- * Test-specific data loader that creates minimal test users
- * only when running integration tests that need them
+ * Test-specific data loader that creates minimal test users only when running integration tests
+ * that need them
  */
 @Component
 @RequiredArgsConstructor
@@ -26,26 +25,27 @@ import java.util.List;
 @Profile("test") // Only run in test profile
 public class TestUserDataLoader implements CommandLineRunner {
 
-    private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
+  private final UsuarioRepository usuarioRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    @Override
-    @Transactional
-    public void run(String... args) throws Exception {
-        loadTestUsers();
+  @Override
+  @Transactional
+  public void run(String... args) throws Exception {
+    loadTestUsers();
+  }
+
+  private void loadTestUsers() {
+    // Check if users already exist
+    if (usuarioRepository.count() > 0) {
+      log.debug("Test users already exist, skipping initialization");
+      return;
     }
 
-    private void loadTestUsers() {
-        // Check if users already exist
-        if (usuarioRepository.count() > 0) {
-            log.debug("Test users already exist, skipping initialization");
-            return;
-        }
+    log.debug("Creating test users for JWT authentication");
 
-        log.debug("Creating test users for JWT authentication");
-
-        // Create minimal test users with batch save
-        List<Usuario> testUsers = List.of(
+    // Create minimal test users with batch save
+    List<Usuario> testUsers =
+        List.of(
             Usuario.builder()
                 .nome("Administrator")
                 .email("admin@deliveryapi.com")
@@ -54,7 +54,6 @@ public class TestUserDataLoader implements CommandLineRunner {
                 .ativo(true)
                 .dataCriacao(LocalDateTime.now())
                 .build(),
-            
             Usuario.builder()
                 .nome("Cliente Teste")
                 .email("cliente@test.com")
@@ -63,7 +62,6 @@ public class TestUserDataLoader implements CommandLineRunner {
                 .ativo(true)
                 .dataCriacao(LocalDateTime.now())
                 .build(),
-            
             Usuario.builder()
                 .nome("Restaurante Teste")
                 .email("restaurante@test.com")
@@ -73,7 +71,6 @@ public class TestUserDataLoader implements CommandLineRunner {
                 .dataCriacao(LocalDateTime.now())
                 .restauranteId(1L)
                 .build(),
-            
             Usuario.builder()
                 .nome("Entregador Teste")
                 .email("entregador@test.com")
@@ -81,10 +78,9 @@ public class TestUserDataLoader implements CommandLineRunner {
                 .role(Role.ENTREGADOR)
                 .ativo(true)
                 .dataCriacao(LocalDateTime.now())
-                .build()
-        );
+                .build());
 
-        usuarioRepository.saveAll(testUsers);
-        log.debug("✅ {} test users created successfully", testUsers.size());
-    }
+    usuarioRepository.saveAll(testUsers);
+    log.debug("✅ {} test users created successfully", testUsers.size());
+  }
 }

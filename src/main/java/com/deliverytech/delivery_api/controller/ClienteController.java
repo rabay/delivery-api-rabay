@@ -13,15 +13,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import java.net.URI;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 // java.util.List não é mais necessário neste arquivo
 
 @RestController
-@RequestMapping(value = "/api/clientes", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+    value = "/api/clientes",
+    produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(
     name = "Clientes",
     description = "Operações de cadastro, consulta, atualização e inativação de clientes.")
@@ -45,7 +47,10 @@ public class ClienteController {
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             novo, "Cliente criado com sucesso", true);
     URI location =
-        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(novo.getId()).toUri();
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(novo.getId())
+            .toUri();
     return ResponseEntity.created(location).body(body);
   }
 
@@ -72,43 +77,54 @@ public class ClienteController {
     @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
   })
   @GetMapping
-    public ResponseEntity<
-                    com.deliverytech.delivery_api.dto.response.ApiResult<
-                            com.deliverytech.delivery_api.dto.response.PagedResponse<
-                                    com.deliverytech.delivery_api.dto.response.ClienteResponse>>>
-            listar(
-                    @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                    @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-        // Usar PageableUtil para padronizar comportamento de paginação
-        var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.CLIENTE);
-        var pageResult = clienteService.listarAtivos(pageable);
+  public ResponseEntity<
+          com.deliverytech.delivery_api.dto.response.ApiResult<
+              com.deliverytech.delivery_api.dto.response.PagedResponse<
+                  com.deliverytech.delivery_api.dto.response.ClienteResponse>>>
+      listar(
+          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+          @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+    // Usar PageableUtil para padronizar comportamento de paginação
+    var pageable =
+        com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+            page,
+            size,
+            (String) null,
+            com.deliverytech.delivery_api.util.SortableProperties.CLIENTE);
+    var pageResult = clienteService.listarAtivos(pageable);
 
-        // Construir links de navegação
-        var uriBuilder = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest();
-        java.util.Map<String, String> links = new java.util.HashMap<>();
-        links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-        int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
-        links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-        if (pageResult.hasNext()) {
-            links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
-        }
-        if (pageResult.hasPrevious()) {
-            links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
-        }
-
-        var paged =
-                new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                        pageResult.getContent(),
-                        pageResult.getTotalElements(),
-                        pageResult.getNumber(),
-                        pageResult.getSize(),
-                        pageResult.getTotalPages(),
-                        links,
-                        "Clientes obtidos com sucesso",
-                        true);
-        return ResponseEntity.ok(
-                new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Clientes obtidos com sucesso", true));
+    // Construir links de navegação
+    var uriBuilder =
+        org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest();
+    java.util.Map<String, String> links = new java.util.HashMap<>();
+    links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+    int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+    links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+    if (pageResult.hasNext()) {
+      links.put(
+          "next",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
     }
+    if (pageResult.hasPrevious()) {
+      links.put(
+          "prev",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+    }
+
+    var paged =
+        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+            pageResult.getContent(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.getTotalPages(),
+            links,
+            "Clientes obtidos com sucesso",
+            true);
+    return ResponseEntity.ok(
+        new com.deliverytech.delivery_api.dto.response.ApiResult<>(
+            paged, "Clientes obtidos com sucesso", true));
+  }
 
   @Operation(
       summary = "Buscar cliente por e-mail",
@@ -255,34 +271,43 @@ public class ClienteController {
                     null, "clienteId inválido", false));
       }
 
-                var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
-                var pageResult = pedidoService.buscarPedidosPorCliente(clienteId, pageable);
+      var pageable =
+          com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+              page,
+              size,
+              (String) null,
+              com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
+      var pageResult = pedidoService.buscarPedidosPorCliente(clienteId, pageable);
 
-                var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
-                java.util.Map<String, String> links = new java.util.HashMap<>();
-                links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-                int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
-                links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-                if (pageResult.hasNext()) {
-                    links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
-                }
-                if (pageResult.hasPrevious()) {
-                    links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
-                }
+      var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+      java.util.Map<String, String> links = new java.util.HashMap<>();
+      links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+      int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+      links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+      if (pageResult.hasNext()) {
+        links.put(
+            "next",
+            uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+      }
+      if (pageResult.hasPrevious()) {
+        links.put(
+            "prev",
+            uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+      }
 
-                var paged =
-                        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                                pageResult.getContent(),
-                                pageResult.getTotalElements(),
-                                pageResult.getNumber(),
-                                pageResult.getSize(),
-                                pageResult.getTotalPages(),
-                                links,
-                                "Pedidos do cliente obtidos",
-                                true);
-                return ResponseEntity.ok(
-                        new com.deliverytech.delivery_api.dto.response.ApiResult<>(
-                                paged, "Pedidos do cliente obtidos", true));
+      var paged =
+          new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+              pageResult.getContent(),
+              pageResult.getTotalElements(),
+              pageResult.getNumber(),
+              pageResult.getSize(),
+              pageResult.getTotalPages(),
+              links,
+              "Pedidos do cliente obtidos",
+              true);
+      return ResponseEntity.ok(
+          new com.deliverytech.delivery_api.dto.response.ApiResult<>(
+              paged, "Pedidos do cliente obtidos", true));
     } catch (RuntimeException ex) {
       // Em caso de erro (ex.: cliente não existe)
       return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND)

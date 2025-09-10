@@ -32,7 +32,9 @@ public class PedidoRequest {
   @NotNull
   @Schema(
       description = "Endereço de entrega do pedido.",
-      example = "{\"rua\": \"Rua das Flores\", \"numero\": \"123\", \"bairro\": \"Centro\", \"cidade\": \"São Paulo\", \"estado\": \"SP\", \"cep\": \"01234-567\"}",
+      example =
+          "{\"rua\": \"Rua das Flores\", \"numero\": \"123\", \"bairro\": \"Centro\", \"cidade\":"
+              + " \"São Paulo\", \"estado\": \"SP\", \"cep\": \"01234-567\"}",
       requiredMode = Schema.RequiredMode.REQUIRED)
   private EnderecoRequest enderecoEntrega;
 

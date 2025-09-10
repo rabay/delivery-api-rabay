@@ -3,8 +3,8 @@ package com.deliverytech.delivery_api.controller;
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.dto.request.StatusRequest;
 import com.deliverytech.delivery_api.model.Restaurante;
-import com.deliverytech.delivery_api.service.ProdutoService;
 import com.deliverytech.delivery_api.service.PedidoService;
+import com.deliverytech.delivery_api.service.ProdutoService;
 import com.deliverytech.delivery_api.service.RestauranteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -14,30 +14,34 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import java.net.URI;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping(value = "/api/restaurantes", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+    value = "/api/restaurantes",
+    produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 @Tag(
     name = "Restaurantes",
     description =
         "Gerenciamento de restaurantes, incluindo cadastro, consulta, atualização,"
             + " inativação e busca por categoria.")
 public class RestauranteController {
-    private final RestauranteService restauranteService;
-    private final ProdutoService produtoService;
-    private final PedidoService pedidoService;
+  private final RestauranteService restauranteService;
+  private final ProdutoService produtoService;
+  private final PedidoService pedidoService;
 
-    public RestauranteController(
-            RestauranteService restauranteService, ProdutoService produtoService, PedidoService pedidoService) {
-        this.restauranteService = restauranteService;
-        this.produtoService = produtoService;
-        this.pedidoService = pedidoService;
-    }
+  public RestauranteController(
+      RestauranteService restauranteService,
+      ProdutoService produtoService,
+      PedidoService pedidoService) {
+    this.restauranteService = restauranteService;
+    this.produtoService = produtoService;
+    this.pedidoService = pedidoService;
+  }
 
   @Operation(
       summary = "Cadastrar novo restaurante",
@@ -46,7 +50,13 @@ public class RestauranteController {
     @ApiResponse(
         responseCode = "201",
         description = "Restaurante criado com sucesso",
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResult.class))),
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema =
+                    @Schema(
+                        implementation =
+                            com.deliverytech.delivery_api.dto.response.ApiResult.class))),
     @ApiResponse(
         responseCode = "400",
         description = "Request inválido",
@@ -62,7 +72,10 @@ public class RestauranteController {
     Restaurante novo = restauranteService.cadastrar(restauranteRequest);
 
     URI location =
-        ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(novo.getId()).toUri();
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(novo.getId())
+            .toUri();
 
     return ResponseEntity.created(location)
         .body(
@@ -110,31 +123,40 @@ public class RestauranteController {
       listar(
           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
           @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-            var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.RESTAURANTE);
-            var pageResult = restauranteService.buscarRestaurantesDisponiveis(pageable);
+    var pageable =
+        com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+            page,
+            size,
+            (String) null,
+            com.deliverytech.delivery_api.util.SortableProperties.RESTAURANTE);
+    var pageResult = restauranteService.buscarRestaurantesDisponiveis(pageable);
 
-            var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
-            java.util.Map<String, String> links = new java.util.HashMap<>();
-            links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-            int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
-            links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-            if (pageResult.hasNext()) {
-                links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
-            }
-            if (pageResult.hasPrevious()) {
-                links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
-            }
+    var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+    java.util.Map<String, String> links = new java.util.HashMap<>();
+    links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+    int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+    links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+    if (pageResult.hasNext()) {
+      links.put(
+          "next",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+    }
+    if (pageResult.hasPrevious()) {
+      links.put(
+          "prev",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+    }
 
-            var paged =
-                    new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                            pageResult.getContent(),
-                            pageResult.getTotalElements(),
-                            pageResult.getNumber(),
-                            pageResult.getSize(),
-                            pageResult.getTotalPages(),
-                            links,
-                            "Restaurantes obtidos com sucesso",
-                            true);
+    var paged =
+        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+            pageResult.getContent(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.getTotalPages(),
+            links,
+            "Restaurantes obtidos com sucesso",
+            true);
     return ResponseEntity.ok(
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Restaurantes obtidos com sucesso", true));
@@ -239,31 +261,40 @@ public class RestauranteController {
           @PathVariable String categoria,
           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
           @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-            var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.RESTAURANTE);
-            var pageResult = restauranteService.buscarRestaurantesPorCategoria(categoria, pageable);
+    var pageable =
+        com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+            page,
+            size,
+            (String) null,
+            com.deliverytech.delivery_api.util.SortableProperties.RESTAURANTE);
+    var pageResult = restauranteService.buscarRestaurantesPorCategoria(categoria, pageable);
 
-            var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
-            java.util.Map<String, String> links = new java.util.HashMap<>();
-            links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-            int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
-            links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-            if (pageResult.hasNext()) {
-                links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
-            }
-            if (pageResult.hasPrevious()) {
-                links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
-            }
+    var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+    java.util.Map<String, String> links = new java.util.HashMap<>();
+    links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+    int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+    links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+    if (pageResult.hasNext()) {
+      links.put(
+          "next",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+    }
+    if (pageResult.hasPrevious()) {
+      links.put(
+          "prev",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+    }
 
-            var paged =
-                    new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                            pageResult.getContent(),
-                            pageResult.getTotalElements(),
-                            pageResult.getNumber(),
-                            pageResult.getSize(),
-                            pageResult.getTotalPages(),
-                            links,
-                            "Restaurantes obtidos por categoria",
-                            true);
+    var paged =
+        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+            pageResult.getContent(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.getTotalPages(),
+            links,
+            "Restaurantes obtidos por categoria",
+            true);
     return ResponseEntity.ok(
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Restaurantes obtidos por categoria", true));
@@ -364,89 +395,128 @@ public class RestauranteController {
           @PathVariable String cep,
           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
           @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-            var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.RESTAURANTE);
-            var pageResult = restauranteService.buscarProximos(cep, pageable);
+    var pageable =
+        com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+            page,
+            size,
+            (String) null,
+            com.deliverytech.delivery_api.util.SortableProperties.RESTAURANTE);
+    var pageResult = restauranteService.buscarProximos(cep, pageable);
 
-            var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
-            java.util.Map<String, String> links = new java.util.HashMap<>();
-            links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-            int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
-            links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-            if (pageResult.hasNext()) {
-                links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
-            }
-            if (pageResult.hasPrevious()) {
-                links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
-            }
+    var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+    java.util.Map<String, String> links = new java.util.HashMap<>();
+    links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+    int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+    links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+    if (pageResult.hasNext()) {
+      links.put(
+          "next",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+    }
+    if (pageResult.hasPrevious()) {
+      links.put(
+          "prev",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+    }
 
-            var paged =
-                    new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                            pageResult.getContent(),
-                            pageResult.getTotalElements(),
-                            pageResult.getNumber(),
-                            pageResult.getSize(),
-                            pageResult.getTotalPages(),
-                            links,
-                            "Restaurantes próximos obtidos",
-                            true);
+    var paged =
+        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+            pageResult.getContent(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.getTotalPages(),
+            links,
+            "Restaurantes próximos obtidos",
+            true);
     return ResponseEntity.ok(
         new com.deliverytech.delivery_api.dto.response.ApiResult<>(
             paged, "Restaurantes próximos obtidos", true));
   }
 
-    @Operation(
-            summary = "Listar pedidos do restaurante",
-            description = "Retorna os pedidos realizados para um restaurante específico.")
-    @Parameters({
-        @io.swagger.v3.oas.annotations.Parameter(name = "page", description = "Índice da página (0-based)", example = "0"),
-        @io.swagger.v3.oas.annotations.Parameter(name = "size", description = "Tamanho da página", example = "20")
-    })
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                responseCode = "200",
-                description = "Pedidos do restaurante paginados (ApiResult<PagedResponse<PedidoResponse>>)",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.deliverytech.delivery_api.dto.response.ApiResultPedidoPaged.class))),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "restauranteId inválido"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Restaurante não encontrado"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
-    @GetMapping("/{restauranteId:[0-9]+}/pedidos")
-    public ResponseEntity<
-                    com.deliverytech.delivery_api.dto.response.ApiResult<
-                            com.deliverytech.delivery_api.dto.response.PagedResponse<
-                                    com.deliverytech.delivery_api.dto.response.PedidoResponse>>>
-            buscarPedidosDoRestaurante(
-                    @PathVariable Long restauranteId,
-                    @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                    @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-            var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
-            var pageResult = pedidoService.buscarPedidosPorRestaurante(restauranteId, pageable);
+  @Operation(
+      summary = "Listar pedidos do restaurante",
+      description = "Retorna os pedidos realizados para um restaurante específico.")
+  @Parameters({
+    @io.swagger.v3.oas.annotations.Parameter(
+        name = "page",
+        description = "Índice da página (0-based)",
+        example = "0"),
+    @io.swagger.v3.oas.annotations.Parameter(
+        name = "size",
+        description = "Tamanho da página",
+        example = "20")
+  })
+  @ApiResponses({
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = "Pedidos do restaurante paginados (ApiResult<PagedResponse<PedidoResponse>>)",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema =
+                    @Schema(
+                        implementation =
+                            com.deliverytech.delivery_api.dto.response.ApiResultPedidoPaged
+                                .class))),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "400",
+        description = "restauranteId inválido"),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "404",
+        description = "Restaurante não encontrado"),
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "500",
+        description = "Erro interno do servidor")
+  })
+  @GetMapping("/{restauranteId:[0-9]+}/pedidos")
+  public ResponseEntity<
+          com.deliverytech.delivery_api.dto.response.ApiResult<
+              com.deliverytech.delivery_api.dto.response.PagedResponse<
+                  com.deliverytech.delivery_api.dto.response.PedidoResponse>>>
+      buscarPedidosDoRestaurante(
+          @PathVariable Long restauranteId,
+          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+          @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
+    var pageable =
+        com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+            page,
+            size,
+            (String) null,
+            com.deliverytech.delivery_api.util.SortableProperties.PEDIDO);
+    var pageResult = pedidoService.buscarPedidosPorRestaurante(restauranteId, pageable);
 
-            var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
-            java.util.Map<String, String> links = new java.util.HashMap<>();
-            links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-            int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
-            links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-            if (pageResult.hasNext()) {
-                links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
-            }
-            if (pageResult.hasPrevious()) {
-                links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
-            }
-
-            var paged =
-                    new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                            pageResult.getContent(),
-                            pageResult.getTotalElements(),
-                            pageResult.getNumber(),
-                            pageResult.getSize(),
-                            pageResult.getTotalPages(),
-                            links,
-                            "Pedidos do restaurante obtidos",
-                            true);
-
-            return ResponseEntity.ok(new com.deliverytech.delivery_api.dto.response.ApiResult<>(paged, "Pedidos do restaurante obtidos", true));
+    var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+    java.util.Map<String, String> links = new java.util.HashMap<>();
+    links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+    int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+    links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+    if (pageResult.hasNext()) {
+      links.put(
+          "next",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
     }
+    if (pageResult.hasPrevious()) {
+      links.put(
+          "prev",
+          uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+    }
+
+    var paged =
+        new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+            pageResult.getContent(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.getTotalPages(),
+            links,
+            "Pedidos do restaurante obtidos",
+            true);
+
+    return ResponseEntity.ok(
+        new com.deliverytech.delivery_api.dto.response.ApiResult<>(
+            paged, "Pedidos do restaurante obtidos", true));
+  }
 
   @Operation(
       summary = "Listar produtos de um restaurante",
@@ -497,31 +567,40 @@ public class RestauranteController {
       restauranteService
           .buscarPorId(restauranteId)
           .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
-            var pageable = com.deliverytech.delivery_api.util.PageableUtil.buildPageable(page, size, (String) null, com.deliverytech.delivery_api.util.SortableProperties.PRODUTO);
-            var pageResult = produtoService.buscarProdutosPorRestaurante(restauranteId, pageable);
+      var pageable =
+          com.deliverytech.delivery_api.util.PageableUtil.buildPageable(
+              page,
+              size,
+              (String) null,
+              com.deliverytech.delivery_api.util.SortableProperties.PRODUTO);
+      var pageResult = produtoService.buscarProdutosPorRestaurante(restauranteId, pageable);
 
-            var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
-            java.util.Map<String, String> links = new java.util.HashMap<>();
-            links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
-            int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
-            links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
-            if (pageResult.hasNext()) {
-                links.put("next", uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
-            }
-            if (pageResult.hasPrevious()) {
-                links.put("prev", uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
-            }
+      var uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
+      java.util.Map<String, String> links = new java.util.HashMap<>();
+      links.put("first", uriBuilder.replaceQueryParam("page", 0).build().toUriString());
+      int lastPage = Math.max(0, pageResult.getTotalPages() - 1);
+      links.put("last", uriBuilder.replaceQueryParam("page", lastPage).build().toUriString());
+      if (pageResult.hasNext()) {
+        links.put(
+            "next",
+            uriBuilder.replaceQueryParam("page", pageResult.getNumber() + 1).build().toUriString());
+      }
+      if (pageResult.hasPrevious()) {
+        links.put(
+            "prev",
+            uriBuilder.replaceQueryParam("page", pageResult.getNumber() - 1).build().toUriString());
+      }
 
-            var paged =
-                    new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
-                            pageResult.getContent(),
-                            pageResult.getTotalElements(),
-                            pageResult.getNumber(),
-                            pageResult.getSize(),
-                            pageResult.getTotalPages(),
-                            links,
-                            "Produtos do restaurante obtidos",
-                            true);
+      var paged =
+          new com.deliverytech.delivery_api.dto.response.PagedResponse<>(
+              pageResult.getContent(),
+              pageResult.getTotalElements(),
+              pageResult.getNumber(),
+              pageResult.getSize(),
+              pageResult.getTotalPages(),
+              links,
+              "Produtos do restaurante obtidos",
+              true);
       return ResponseEntity.ok(
           new com.deliverytech.delivery_api.dto.response.ApiResult<>(
               paged, "Produtos do restaurante obtidos", true));

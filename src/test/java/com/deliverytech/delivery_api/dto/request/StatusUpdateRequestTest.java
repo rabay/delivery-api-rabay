@@ -46,8 +46,7 @@ class StatusUpdateRequestTest {
     void shouldAcceptAllValidStatusValues() {
       // Given
       String[] validStatuses = {
-        "CRIADO", "CONFIRMADO", "EM_PREPARACAO", "PRONTO",
-        "EM_ENTREGA", "ENTREGUE", "CANCELADO"
+        "CRIADO", "CONFIRMADO", "EM_PREPARACAO", "PRONTO", "EM_ENTREGA", "ENTREGUE", "CANCELADO"
       };
 
       for (String status : validStatuses) {
@@ -58,9 +57,7 @@ class StatusUpdateRequestTest {
         Set<ConstraintViolation<StatusUpdateRequest>> violations = validator.validate(request);
 
         // Then
-        assertThat(violations)
-            .withFailMessage("Status '%s' deveria ser válido", status)
-            .isEmpty();
+        assertThat(violations).withFailMessage("Status '%s' deveria ser válido", status).isEmpty();
       }
     }
 
@@ -188,8 +185,10 @@ class StatusUpdateRequestTest {
       StatusUpdateRequest invalidRequest = new StatusUpdateRequest("");
 
       // When
-      Set<ConstraintViolation<StatusUpdateRequest>> validViolations = validator.validate(validRequest);
-      Set<ConstraintViolation<StatusUpdateRequest>> invalidViolations = validator.validate(invalidRequest);
+      Set<ConstraintViolation<StatusUpdateRequest>> validViolations =
+          validator.validate(validRequest);
+      Set<ConstraintViolation<StatusUpdateRequest>> invalidViolations =
+          validator.validate(invalidRequest);
 
       // Then
       assertThat(validViolations).isEmpty();

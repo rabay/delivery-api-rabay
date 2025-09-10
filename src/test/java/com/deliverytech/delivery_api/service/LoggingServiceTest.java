@@ -1,14 +1,14 @@
 package com.deliverytech.delivery_api.service;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
 
 class LoggingServiceTest {
 
-    @Test
-    void testServiceCreation() {
-        LoggingService loggingService = new LoggingService("target/logs_test");
-        assertNotNull(loggingService);
-    }
+  @Test
+  void testServiceCreation() {
+    LoggingService loggingService = new LoggingService("target/logs_test");
+    assertNotNull(loggingService);
+  }
 }

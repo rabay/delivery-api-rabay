@@ -53,7 +53,7 @@ public class RestauranteRequest {
 
   @NotNull(message = "Tempo de entrega é obrigatório")
   @Min(value = 10, message = "Tempo de entrega deve ser pelo menos 10 minutos")
-    @Max(value = 120, message = "Tempo de entrega não pode exceder 120 minutos")
+  @Max(value = 120, message = "Tempo de entrega não pode exceder 120 minutos")
   @ValidTempoEntrega
   @Schema(
       description = "Tempo estimado de entrega em minutos. Deve ser pelo menos 10 minutos.",

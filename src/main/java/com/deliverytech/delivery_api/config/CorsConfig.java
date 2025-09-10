@@ -27,7 +27,8 @@ public class CorsConfig {
             .filter(s -> !s.isEmpty())
             .toList();
 
-    if (allowedOrigins.isEmpty() || (allowedOrigins.size() == 1 && "*".equals(allowedOrigins.get(0)))) {
+    if (allowedOrigins.isEmpty()
+        || (allowedOrigins.size() == 1 && "*".equals(allowedOrigins.get(0)))) {
       config.addAllowedOriginPattern("*");
     } else {
       allowedOrigins.forEach(config::addAllowedOrigin);

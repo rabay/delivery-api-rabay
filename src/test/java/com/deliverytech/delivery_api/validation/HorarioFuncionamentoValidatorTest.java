@@ -1,13 +1,13 @@
 package com.deliverytech.delivery_api.validation;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class HorarioFuncionamentoValidatorTest {
 
@@ -28,8 +28,7 @@ class HorarioFuncionamentoValidatorTest {
   }
 
   static class TestBean {
-    @ValidHorarioFuncionamento
-    String horario;
+    @ValidHorarioFuncionamento String horario;
 
     TestBean(String horario) {
       this.horario = horario;

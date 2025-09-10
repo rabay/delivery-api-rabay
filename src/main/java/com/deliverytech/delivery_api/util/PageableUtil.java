@@ -6,7 +6,6 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,11 +13,10 @@ import org.springframework.data.domain.Sort;
 /**
  * Utilitário para construção segura e padronizada de {@link Pageable}.
  *
- * Recursos:
- * - Normaliza page/size (page >= 0, 1 <= size <= maxSize)
- * - Parsing flexível de parâmetros de sort (aceita múltiplos valores ou uma string única com vírgulas)
- * - Validação estrita contra uma allow-list de propriedades (opcional via parâmetro strict)
- * - Overloads convenientes para diferentes formatos de entrada
+ * <p>Recursos: - Normaliza page/size (page >= 0, 1 <= size <= maxSize) - Parsing flexível de
+ * parâmetros de sort (aceita múltiplos valores ou uma string única com vírgulas) - Validação
+ * estrita contra uma allow-list de propriedades (opcional via parâmetro strict) - Overloads
+ * convenientes para diferentes formatos de entrada
  */
 public final class PageableUtil {
 
@@ -29,19 +27,23 @@ public final class PageableUtil {
   private PageableUtil() {}
 
   /**
-   * Constrói um {@link Pageable} com validação estrita de sort (lança IllegalArgumentException
-   * se uma propriedade não estiver na allow-list).
+   * Constrói um {@link Pageable} com validação estrita de sort (lança IllegalArgumentException se
+   * uma propriedade não estiver na allow-list).
    *
    * @param page 0-based; se null ou negativo, usa 0
    * @param size se null usa DEFAULT_SIZE; forçado entre 1 e maxSize
    * @param sortParam exemplo: "nome,asc" ou "nome,asc;preco,desc" (suporta ';' para múltiplos)
    * @param allowedSortProps conjunto de propriedades permitidas (não nulo)
    */
-  public static Pageable buildPageable(Integer page,
-      Integer size,
-      String sortParam,
-      Set<String> allowedSortProps) {
-    return buildPageable(page, size, parseSortParam(sortParam), allowedSortProps, true, DEFAULT_SIZE,
+  public static Pageable buildPageable(
+      Integer page, Integer size, String sortParam, Set<String> allowedSortProps) {
+    return buildPageable(
+        page,
+        size,
+        parseSortParam(sortParam),
+        allowedSortProps,
+        true,
+        DEFAULT_SIZE,
         DEFAULT_MAX_SIZE);
   }
 
@@ -52,12 +54,13 @@ public final class PageableUtil {
    * @param size
    * @param sortParams array onde cada entrada pode ser "propriedade" ou "propriedade,dir"
    * @param allowedSortProps conjunto de propriedades permitidas (não nulo)
-   * @param strict se true lança IllegalArgumentException ao encontrar propriedade não permitida;
-   *        se false ignora entradas inválidas
+   * @param strict se true lança IllegalArgumentException ao encontrar propriedade não permitida; se
+   *     false ignora entradas inválidas
    * @param defaultSize valor default quando size == null
    * @param maxSize limite superior para size
    */
-  public static Pageable buildPageable(Integer page,
+  public static Pageable buildPageable(
+      Integer page,
       Integer size,
       String[] sortParams,
       Set<String> allowedSortProps,
@@ -110,20 +113,21 @@ public final class PageableUtil {
     return sort.isUnsorted() ? PageRequest.of(p, s) : PageRequest.of(p, s, sort);
   }
 
-  /**
-   * Conveniência: aceita varargs para allowedSortProps.
-   */
-  public static Pageable buildPageable(Integer page,
+  /** Conveniência: aceita varargs para allowedSortProps. */
+  public static Pageable buildPageable(
+      Integer page,
       Integer size,
       String sortParam,
       boolean strict,
       int defaultSize,
       int maxSize,
       String... allowedSortProps) {
-    Set<String> allowed = (allowedSortProps == null)
-        ? Collections.emptySet()
-        : Arrays.stream(allowedSortProps).collect(Collectors.toSet());
-    return buildPageable(page, size, parseSortParam(sortParam), allowed, strict, defaultSize, maxSize);
+    Set<String> allowed =
+        (allowedSortProps == null)
+            ? Collections.emptySet()
+            : Arrays.stream(allowedSortProps).collect(Collectors.toSet());
+    return buildPageable(
+        page, size, parseSortParam(sortParam), allowed, strict, defaultSize, maxSize);
   }
 
   private static String[] parseSortParam(String sortParam) {
