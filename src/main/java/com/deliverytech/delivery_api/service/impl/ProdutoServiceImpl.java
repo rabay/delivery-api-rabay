@@ -295,7 +295,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   public void atualizarEstoque(Long produtoId, Integer novaQuantidade) {
     Produto produto =
         produtoRepository
-            .findById(produtoId)
+            .findByIdWithLock(produtoId)
             .orElseThrow(() -> new EntityNotFoundException("Produto", produtoId));
 
     produto.setQuantidadeEstoque(novaQuantidade);

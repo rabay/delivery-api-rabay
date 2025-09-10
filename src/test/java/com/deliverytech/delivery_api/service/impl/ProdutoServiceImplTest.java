@@ -99,7 +99,7 @@ public class ProdutoServiceImplTest {
         produto.setId(1L);
         produto.setQuantidadeEstoque(10);
 
-        when(produtoRepository.findById(1L)).thenReturn(java.util.Optional.of(produto));
+        when(produtoRepository.findByIdWithLock(1L)).thenReturn(java.util.Optional.of(produto));
         when(produtoRepository.save(produto)).thenReturn(produto);
 
         produtoService.atualizarEstoque(1L, 20);
@@ -114,7 +114,7 @@ public class ProdutoServiceImplTest {
         produto.setId(1L);
         produto.setQuantidadeEstoque(10);
 
-        when(produtoRepository.findById(1L)).thenReturn(java.util.Optional.of(produto));
+        when(produtoRepository.findByIdWithLock(1L)).thenReturn(java.util.Optional.of(produto));
         when(produtoRepository.save(produto)).thenReturn(produto);
 
         produtoService.ajustarEstoque(1L, 5);
@@ -129,7 +129,7 @@ public class ProdutoServiceImplTest {
         produto.setId(1L);
         produto.setQuantidadeEstoque(-1);
 
-        when(produtoRepository.findById(1L)).thenReturn(java.util.Optional.of(produto));
+        when(produtoRepository.findByIdWithLock(1L)).thenReturn(java.util.Optional.of(produto));
 
         produtoService.ajustarEstoque(1L, 5);
 
@@ -161,7 +161,7 @@ public class ProdutoServiceImplTest {
         pedido.setId(1L);
         pedido.setItens(java.util.Arrays.asList(item));
         
-        when(produtoRepository.findById(1L)).thenReturn(java.util.Optional.of(produto));
+        when(produtoRepository.findByIdWithLock(1L)).thenReturn(java.util.Optional.of(produto));
         when(produtoRepository.save(produto)).thenReturn(produto);
 
         // Test the method
@@ -196,7 +196,7 @@ public class ProdutoServiceImplTest {
         pedido.setId(1L);
         pedido.setItens(java.util.Arrays.asList(item));
         
-        when(produtoRepository.findById(1L)).thenReturn(java.util.Optional.of(produto));
+        when(produtoRepository.findByIdWithLock(1L)).thenReturn(java.util.Optional.of(produto));
 
         // Test the method
         produtoService.reservarEstoque(pedido);
@@ -230,7 +230,7 @@ public class ProdutoServiceImplTest {
         pedido.setId(1L);
         pedido.setItens(java.util.Arrays.asList(item));
         
-        when(produtoRepository.findById(1L)).thenReturn(java.util.Optional.of(produto));
+        when(produtoRepository.findByIdWithLock(1L)).thenReturn(java.util.Optional.of(produto));
         when(produtoRepository.save(produto)).thenReturn(produto);
 
         // Test the method
