@@ -28,6 +28,14 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
+    // Skip logging for health and info endpoints in test environment
+    String requestURI = request.getRequestURI();
+    if ((requestURI.equals("/health") || requestURI.equals("/info")) &&
+        "test-unit".equals(System.getProperty("spring.profiles.active"))) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     // Wrap request and response to enable content caching
     ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
     ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper(response);
@@ -45,7 +53,12 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
       long duration = endTime - startTime;
 
       // Log the request and response
-      loggingService.logRequestResponse(wrappedRequest, wrappedResponse, requestId, duration);
+      try {
+        loggingService.logRequestResponse(wrappedRequest, wrappedResponse, requestId, duration);
+      } catch (Exception e) {
+        // Log error but don't fail the request
+        System.err.println("Error logging request/response: " + e.getMessage());
+      }
 
       // Copy response body back to original response
       wrappedResponse.copyBodyToResponse();

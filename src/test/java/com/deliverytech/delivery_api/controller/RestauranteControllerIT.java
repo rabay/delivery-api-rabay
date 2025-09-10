@@ -18,6 +18,8 @@ import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,7 +40,7 @@ class RestauranteControllerIT extends BaseIntegrationTest {
     void shouldCreateRestauranteWithValidData_andReturnLocationHeader() throws Exception {
         RestauranteRequest request = new RestauranteRequest();
         request.setNome("Restaurante Teste");
-        request.setCategoria("Geral");
+        request.setCategoria("Brasileira");
         request.setEndereco("Rua A, 123");
         request.setTaxaEntrega(new BigDecimal("5.0"));
         request.setTempoEntregaMinutos(30);
@@ -57,11 +59,27 @@ class RestauranteControllerIT extends BaseIntegrationTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    void shouldCreateRestaurante_WithInvalidData_ReturnBadRequest() throws Exception {
+        RestauranteRequest request = new RestauranteRequest();
+        request.setNome(""); // Nome vazio
+        request.setCategoria("CategoriaInvalida"); // Categoria inválida
+        request.setEndereco("Rua B, 456");
+        request.setTaxaEntrega(new BigDecimal("-1.0")); // Taxa negativa
+        request.setTempoEntregaMinutos(-5); // Tempo negativo
+
+        mockMvc.perform(post("/api/restaurantes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void shouldGetRestauranteById_whenExists() throws Exception {
         // criar via service para simplificar
         RestauranteRequest req = new RestauranteRequest();
         req.setNome("Restaurante Get");
-        req.setCategoria("Teste");
+        req.setCategoria("Italiana");
         req.setEndereco("Rua B, 1");
         req.setTaxaEntrega(BigDecimal.valueOf(3));
         req.setTempoEntregaMinutos(20);
@@ -76,10 +94,20 @@ class RestauranteControllerIT extends BaseIntegrationTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    void shouldGetRestauranteById_WithInvalidId_ReturnNotFound() throws Exception {
+        mockMvc.perform(get("/api/restaurantes/{id}", 99999L)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", containsString("Restaurante não encontrado")));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void shouldUpdateRestaurante_andReturnUpdated() throws Exception {
         RestauranteRequest req = new RestauranteRequest();
         req.setNome("Restaurante Up");
-        req.setCategoria("Teste");
+        req.setCategoria("Mexicana");
         req.setEndereco("Rua C, 2");
         req.setTaxaEntrega(BigDecimal.valueOf(4));
         req.setTempoEntregaMinutos(25);
@@ -87,7 +115,7 @@ class RestauranteControllerIT extends BaseIntegrationTest {
 
         RestauranteRequest update = new RestauranteRequest();
         update.setNome("Restaurante Updated");
-        update.setCategoria("Atualizado");
+        update.setCategoria("Japonesa");
         update.setEndereco("Rua C, 2");
         update.setTaxaEntrega(BigDecimal.valueOf(6));
         update.setTempoEntregaMinutos(40);
@@ -97,7 +125,7 @@ class RestauranteControllerIT extends BaseIntegrationTest {
                 .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nome").value("Restaurante Updated"))
-                .andExpect(jsonPath("$.data.categoria").value("Atualizado"));
+                .andExpect(jsonPath("$.data.categoria").value("Japonesa"));
     }
 
     @Test
@@ -105,7 +133,7 @@ class RestauranteControllerIT extends BaseIntegrationTest {
     void shouldInactivateRestaurante_andReturnOk() throws Exception {
         RestauranteRequest req = new RestauranteRequest();
         req.setNome("Restaurante To Inactivate");
-        req.setCategoria("Teste");
+        req.setCategoria("Chinesa");
         req.setEndereco("Rua D, 3");
         req.setTaxaEntrega(BigDecimal.valueOf(2));
         req.setTempoEntregaMinutos(15);
@@ -124,7 +152,7 @@ class RestauranteControllerIT extends BaseIntegrationTest {
         for (int i = 0; i < 7; i++) {
             RestauranteRequest req = new RestauranteRequest();
             req.setNome("R Pag " + i);
-            req.setCategoria("Cat");
+            req.setCategoria("Americana");
             req.setEndereco("Rua X, " + i);
             req.setTaxaEntrega(BigDecimal.valueOf(1));
             req.setTempoEntregaMinutos(10 + i);
@@ -137,5 +165,89 @@ class RestauranteControllerIT extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.data.items.length()").value(5))
                 .andExpect(jsonPath("$.data.links.first").exists())
                 .andExpect(jsonPath("$.data.links.last").exists());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void shouldListRestaurantes_FilterByCategoria() throws Exception {
+        // criar restaurantes de diferentes categorias (usando categoria única para teste)
+        RestauranteRequest req1 = new RestauranteRequest();
+        req1.setNome("Restaurante Mexicano Unico");
+        req1.setCategoria("Mexicana");
+        req1.setEndereco("Rua A, 1");
+        req1.setTaxaEntrega(BigDecimal.valueOf(5));
+        req1.setTempoEntregaMinutos(25);
+        restauranteService.cadastrar(req1);
+
+        // criar outro restaurante de categoria diferente
+        RestauranteRequest req2 = new RestauranteRequest();
+        req2.setNome("Restaurante Americana Unico");
+        req2.setCategoria("Americana");
+        req2.setEndereco("Rua B, 2");
+        req2.setTaxaEntrega(BigDecimal.valueOf(4));
+        req2.setTempoEntregaMinutos(20);
+        restauranteService.cadastrar(req2);
+
+        mockMvc.perform(get("/api/restaurantes")
+                .param("categoria", "Mexicana")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.items").isArray())
+                .andExpect(jsonPath("$.data.totalItems").isNumber())
+                .andExpect(jsonPath("$.success", is(true)));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void shouldUpdateRestaurante_WithValidData() throws Exception {
+        // criar restaurante
+        RestauranteRequest createReq = new RestauranteRequest();
+        createReq.setNome("Restaurante Original");
+        createReq.setCategoria("Brasileira");
+        createReq.setEndereco("Rua Original, 1");
+        createReq.setTaxaEntrega(BigDecimal.valueOf(3));
+        createReq.setTempoEntregaMinutos(20);
+        Restaurante saved = restauranteService.cadastrar(createReq);
+
+        // atualizar
+        RestauranteRequest updateReq = new RestauranteRequest();
+        updateReq.setNome("Restaurante Atualizado");
+        updateReq.setCategoria("Italiana");
+        updateReq.setEndereco("Rua Atualizada, 2");
+        updateReq.setTaxaEntrega(BigDecimal.valueOf(5));
+        updateReq.setTempoEntregaMinutos(25);
+
+        mockMvc.perform(put("/api/restaurantes/{id}", saved.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateReq)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.nome", is("Restaurante Atualizado")))
+                .andExpect(jsonPath("$.data.categoria", is("Italiana")));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void shouldDeactivateRestaurante() throws Exception {
+        // criar restaurante
+        RestauranteRequest req = new RestauranteRequest();
+        req.setNome("Restaurante Para Desativar");
+        req.setCategoria("Chinesa");
+        req.setEndereco("Rua Desativar, 1");
+        req.setTaxaEntrega(BigDecimal.valueOf(4));
+        req.setTempoEntregaMinutos(30);
+        Restaurante saved = restauranteService.cadastrar(req);
+
+        mockMvc.perform(delete("/api/restaurantes/{id}", saved.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.message", containsString("inativado")));
+
+        // verificar se foi desativado (deve retornar o restaurante mas com ativo=false)
+        mockMvc.perform(get("/api/restaurantes/{id}", saved.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ativo", is(false)))
+                .andExpect(jsonPath("$.data.excluido", is(true)));
     }
 }

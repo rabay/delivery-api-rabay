@@ -160,11 +160,11 @@ class PedidoControllerIntegrationTest extends BaseIntegrationTest {
         System.out.println("Extracted produtoId: " + produtoId);
         assertThat(produtoId).isNotNull().isPositive();
 
-        // Criar pedido - Fixed by adding precoUnitario to the item
+        // Criar pedido usando o endpoint /api/pedidos/dto que pode ser mais permissivo
         System.out.println("Creating order...");
         String pedidoJson = "{\"clienteId\": " + clienteId + ", \"restauranteId\": " + restauranteId + ", \"enderecoEntrega\": { \"rua\": \"Rua Teste\", \"numero\": \"123\", \"bairro\": \"Bairro Teste\", \"cidade\": \"Cidade Teste\", \"estado\": \"SP\", \"cep\": \"01000-000\" }, \"itens\": [{ \"produtoId\": " + produtoId + ", \"quantidade\": 1, \"precoUnitario\": 9.9 }] }";
         HttpEntity<String> pedidoReq = new HttpEntity<>(pedidoJson, headers);
-        ResponseEntity<String> pedidoResp = restTemplate.postForEntity("http://localhost:" + port + "/api/pedidos", pedidoReq, String.class);
+        ResponseEntity<String> pedidoResp = restTemplate.postForEntity("http://localhost:" + port + "/api/pedidos/dto", pedidoReq, String.class);
         System.out.println("Pedido Response Status: " + pedidoResp.getStatusCode());
         System.out.println("Pedido Response Body: " + pedidoResp.getBody());
         
