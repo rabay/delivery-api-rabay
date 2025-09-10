@@ -1,12 +1,10 @@
 package com.deliverytech.delivery_api.repository;
 
-import com.deliverytech.delivery_api.BaseIntegrationTest;
 import com.deliverytech.delivery_api.model.Pedido;
 import com.deliverytech.delivery_api.model.Cliente;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +21,7 @@ import jakarta.persistence.PersistenceContext;
 // Remove @DataJpaTest since we're using @SpringBootTest in BaseIntegrationTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-class PedidoRepositoryTest extends BaseIntegrationTest {
+class PedidoRepositoryTest extends BaseRepositoryTest {
     @Autowired
     private PedidoRepository pedidoRepository;
     @Autowired
@@ -70,7 +68,7 @@ class PedidoRepositoryTest extends BaseIntegrationTest {
     void testFindByClienteId() {
         Cliente c = new Cliente();
         c.setNome("Carlos");
-        c.setEmail("carlos@email.com");
+        c.setEmail("carlos@teste-unico.com");
         c.setAtivo(true);
         clienteRepository.save(c);
         

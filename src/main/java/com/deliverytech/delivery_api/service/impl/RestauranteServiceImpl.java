@@ -140,7 +140,7 @@ public class RestauranteServiceImpl implements RestauranteService {
     if (taxaBase == null) {
       taxaBase = BigDecimal.ZERO;
     }
-    String primeirosDigitos = cep.substring(0, Math.min(2, cep.length()));
+    String primeirosDigitos = cep.substring(0, Math.min(1, cep.length()));
     try {
       int codigoRegiao = Integer.parseInt(primeirosDigitos);
       BigDecimal multiplicador;
@@ -174,7 +174,7 @@ public class RestauranteServiceImpl implements RestauranteService {
   @Transactional(readOnly = true)
   public List<Restaurante> buscarProximos(String cep) {
     List<Restaurante> restaurantesAtivos = restauranteRepository.findByAtivoTrueAndExcluidoFalse();
-    String primeirosDigitos = cep.substring(0, Math.min(2, cep.length()));
+    String primeirosDigitos = cep.substring(0, Math.min(1, cep.length()));
     try {
       int codigoRegiao = Integer.parseInt(primeirosDigitos);
       if (codigoRegiao <= 5) {
@@ -297,7 +297,7 @@ public class RestauranteServiceImpl implements RestauranteService {
     var page = restauranteRepository.findByAtivoTrueAndExcluidoFalse(pageable);
     // For simplicity, if region filter reduces results it will be applied in-memory on the page
     // content
-    String primeirosDigitos = cep.substring(0, Math.min(2, cep.length()));
+    String primeirosDigitos = cep.substring(0, Math.min(1, cep.length()));
     try {
       int codigoRegiao = Integer.parseInt(primeirosDigitos);
       if (codigoRegiao <= 5) {

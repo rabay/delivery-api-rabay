@@ -4,11 +4,14 @@ import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.projection.FaturamentoPorCategoriaProjection;
 import com.deliverytech.delivery_api.projection.RelatorioVendasProdutos;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import jakarta.persistence.LockModeType;
 
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
@@ -65,4 +68,8 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
       nativeQuery = true)
   List<FaturamentoPorCategoriaProjection> faturamentoPorCategoria(
       @Param("inicio") java.time.LocalDateTime inicio, @Param("fim") java.time.LocalDateTime fim);
+
+  @Query("SELECT p FROM Produto p WHERE p.id = :id")
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  Optional<Produto> findByIdWithLock(@Param("id") Long id);
 }
