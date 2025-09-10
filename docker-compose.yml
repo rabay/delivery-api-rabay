@@ -8,8 +8,8 @@ services:
       - db
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-    # A aplicação poderá acessar o banco pelo hostname 'db'
-    # Profile dev ativado para usar configurações MySQL
+    networks:
+      - delivery-network
 
   db:
     image: mysql:8.0
@@ -30,8 +30,8 @@ services:
       --collation-server=utf8mb4_unicode_ci
       --innodb-buffer-pool-size=128M
       --max-connections=100
-    # O banco estará acessível na rede interna como 'db:3306'
-    # Scripts de inicialização executados automaticamente
+    networks:
+      - delivery-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -48,9 +48,58 @@ services:
       MYSQL_ROOT_PASSWORD: rootpass
     depends_on:
       - db
-    # Painel de controle MySQL acessível em http://localhost:8081
-    # Login automático configurado com credenciais do MySQL
+    networks:
+      - delivery-network
+
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - delivery-network
+    depends_on:
+      - app
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.53
+    container_name: jaeger
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+      - "9411:9411"
+    networks:
+      - delivery-network
+
+  grafana:
+    image: grafana/grafana:9.4.7
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - delivery-network
+    depends_on:
+      - prometheus
+
+  alertmanager:
+    image: prom/alertmanager:v0.25.0
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    networks:
+      - delivery-network
 
 volumes:
   mysql_data:
     driver: local
+
+networks:
+  delivery-network:
+    driver: bridge

@@ -13,6 +13,10 @@ import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
 import com.deliverytech.delivery_api.service.PedidoService;
 import com.deliverytech.delivery_api.service.ProdutoService;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,12 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PedidoServiceImpl implements PedidoService {
   private static final Logger log = LoggerFactory.getLogger(PedidoServiceImpl.class);
+  private static final Logger auditLogger = LoggerFactory.getLogger("audit");
   private final PedidoRepository pedidoRepository;
   private final ProdutoRepository produtoRepository;
   private final ClienteRepository clienteRepository;
   private final RestauranteRepository restauranteRepository;
   private final PedidoMapper pedidoMapper;
   private final ProdutoService produtoService;
+  private final MeterRegistry meterRegistry;
 
   public PedidoServiceImpl(
       PedidoRepository pedidoRepository,
@@ -41,19 +47,26 @@ public class PedidoServiceImpl implements PedidoService {
       ClienteRepository clienteRepository,
       RestauranteRepository restauranteRepository,
       PedidoMapper pedidoMapper,
-      ProdutoService produtoService) {
+      ProdutoService produtoService,
+      MeterRegistry meterRegistry) {
     this.pedidoRepository = pedidoRepository;
     this.produtoRepository = produtoRepository;
     this.clienteRepository = clienteRepository;
     this.restauranteRepository = restauranteRepository;
     this.pedidoMapper = pedidoMapper;
     this.produtoService = produtoService;
+    this.meterRegistry = meterRegistry;
   }
 
   @Override
   public Pedido criar(Pedido pedido) {
     try {
       pedido.setStatus(StatusPedido.CRIADO);
+      Counter.builder("pedidos.status")
+          .tag("status", StatusPedido.CRIADO.name())
+          .description("Total de pedidos por status")
+          .register(meterRegistry)
+          .increment();
       pedido.setDataPedido(LocalDateTime.now());
       if (pedido.getItens() == null || pedido.getItens().isEmpty()) {
         log.warn(
@@ -123,7 +136,9 @@ public class PedidoServiceImpl implements PedidoService {
       // Reserve stock for all items
       produtoService.reservarEstoque(pedido);
 
-      return pedidoRepository.save(pedido);
+      Pedido pedidoSalvo = pedidoRepository.save(pedido);
+      auditLogger.info("Novo pedido criado. Pedido ID: {}, Cliente ID: {}", pedidoSalvo.getId(), pedidoSalvo.getCliente().getId());
+      return pedidoSalvo;
     } catch (Exception e) {
       log.error("Erro ao criar pedido: {}", e.getMessage(), e);
       throw e;
@@ -200,8 +215,24 @@ public class PedidoServiceImpl implements PedidoService {
       produtoService.cancelarReservaEstoque(pedido);
     }
 
+    Counter.builder("pedidos.status")
+        .tag("status", status.name())
+        .description("Total de pedidos por status")
+        .register(meterRegistry)
+        .increment();
+
+    if (status == StatusPedido.ENTREGUE) {
+      DistributionSummary.builder("pedidos.valor")
+          .description("Valor total dos pedidos entregues")
+          .baseUnit("reais")
+          .register(meterRegistry)
+          .record(pedido.getValorTotal().doubleValue());
+    }
+
     pedido.setStatus(status);
-    return pedidoRepository.save(pedido);
+    Pedido pedidoAtualizado = pedidoRepository.save(pedido);
+    auditLogger.info("Status do pedido atualizado. Pedido ID: {}, Novo Status: {}", id, status);
+    return pedidoAtualizado;
   }
 
   @Override
@@ -397,6 +428,7 @@ public class PedidoServiceImpl implements PedidoService {
   // ===== NOVO MÉTODO COM DTO =====
 
   @Override
+  @Timed(value = "pedidos.criacao", description = "Tempo para criar um novo pedido")
   public PedidoResponse criarPedido(PedidoRequest pedidoRequest) {
     try {
       // Validate cliente exists and not excluded

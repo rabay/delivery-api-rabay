@@ -28,9 +28,9 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
-    // Skip logging for health and info endpoints in test environment
+    // Skip logging for actuator endpoints in test environment
     String requestURI = request.getRequestURI();
-    if ((requestURI.equals("/health") || requestURI.equals("/info")) &&
+    if (requestURI.startsWith("/actuator") &&
         "test-unit".equals(System.getProperty("spring.profiles.active"))) {
       filterChain.doFilter(request, response);
       return;

@@ -35,7 +35,7 @@ public class SecurityConfig {
       authorize ->
         authorize
           // Public endpoints - Authentication not required
-          .requestMatchers("/api/auth/**", "/health", "/info", "/actuator/**", "/db/**")
+          .requestMatchers("/api/auth/**", "/actuator/health", "/actuator/info", "/actuator/prometheus", "/db/**")
           .permitAll()
           // Public restaurant endpoints
           .requestMatchers(

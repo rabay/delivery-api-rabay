@@ -88,3 +88,24 @@ logging:
     org.springframework.security: DEBUG
     com.deliverytech.delivery_api.security: DEBUG
   directory: entregaveis/logs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info,env,prometheus
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://jaeger:9411/api/v2/spans
+
+info:
+  application:
+    name: '@project.name@'
+    description: '@project.description@'
+    version: '@project.version@'
