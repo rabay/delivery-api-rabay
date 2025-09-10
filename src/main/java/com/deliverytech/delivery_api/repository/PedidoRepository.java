@@ -19,8 +19,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
   List<Pedido> findByStatus(StatusPedido status);
 
-  long countByStatus(StatusPedido status);
-
   List<Pedido> findByDataPedidoBetween(LocalDateTime inicio, LocalDateTime fim);
 
   List<Pedido> findTop10ByOrderByDataPedidoDesc();

@@ -20,8 +20,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,16 +38,9 @@ public class PedidoController {
   private static final Logger logger = LoggerFactory.getLogger(PedidoController.class);
 
   private final PedidoService pedidoService;
-  private final MeterRegistry meterRegistry;
-  private final Timer pedidoCreationTimer;
 
-  public PedidoController(PedidoService pedidoService, MeterRegistry meterRegistry) {
+  public PedidoController(PedidoService pedidoService) {
     this.pedidoService = pedidoService;
-    this.meterRegistry = meterRegistry;
-    this.pedidoCreationTimer = Timer.builder("pedidos.creation.timer")
-            .description("Tempo de criação de pedidos")
-            .publishPercentiles(0.5, 0.95) // median and 95th percentile
-            .register(meterRegistry);
   }
 
   @Operation(
@@ -223,29 +214,25 @@ public class PedidoController {
   @PostMapping
   public ResponseEntity<ApiResult<PedidoResponse>> criar(
       @Valid @RequestBody PedidoRequest pedidoRequest) {
-    Timer.Sample sample = Timer.start(meterRegistry);
     try {
       logger.debug("Recebido PedidoRequest: {}", pedidoRequest);
       Pedido pedido = mapToEntity(pedidoRequest);
       logger.debug("Pedido mapeado: {}", pedido);
-      Pedido novo = pedidoService.criar(pedido);
-      PedidoResponse response = mapToResponse(novo);
-      logger.info(
-              "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
-      URI location =
-              ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
-      sample.stop(pedidoCreationTimer);
-      return ResponseEntity.created(location).body(new ApiResult<>(response, "Pedido criado com sucesso", true));
+    Pedido novo = pedidoService.criar(pedido);
+    PedidoResponse response = mapToResponse(novo);
+    logger.info(
+      "Pedido criado com sucesso: id={} status= {}", response.getId(), response.getStatus());
+    URI location =
+      ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+    return ResponseEntity.created(location).body(new ApiResult<>(response, "Pedido criado com sucesso", true));
     } catch (RuntimeException ex) {
       logger.error("Erro de negócio ao criar pedido: {}", ex.getMessage(), ex);
-      sample.stop(pedidoCreationTimer);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(new ApiResult<>(null, "Erro de negócio: " + ex.getMessage(), false));
+          .body(new ApiResult<>(null, "Erro de negócio: " + ex.getMessage(), false));
     } catch (Exception ex) {
       logger.error("Erro inesperado ao criar pedido: {}", ex.getMessage(), ex);
-      sample.stop(pedidoCreationTimer);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
+          .body(new ApiResult<>(null, "Erro interno: " + ex.getMessage(), false));
     }
   }
 
