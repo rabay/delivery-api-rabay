@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -132,6 +135,7 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "pedidos", key = "#id")
   public Pedido buscarPorId(Long id) {
     return pedidoRepository
         .findById(id)
@@ -140,6 +144,7 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("pedidos_lista")
   public List<Pedido> buscarPorCliente(Long clienteId) {
     List<Pedido> pedidos = pedidoRepository.findByClienteId(clienteId);
     if (pedidos == null) {
@@ -158,6 +163,7 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("pedidos_lista")
   public List<Pedido> buscarPorRestaurante(Long restauranteId) {
     return pedidoRepository.findByRestauranteId(restauranteId);
   }
@@ -171,11 +177,16 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("pedidos_lista")
   public List<Pedido> buscarPorStatus(StatusPedido status) {
     return pedidoRepository.findByStatus(status);
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "pedidos", key = "#id"),
+      @CacheEvict(value = "pedidos_lista", allEntries = true)
+  })
   public Pedido atualizarStatus(Long id, StatusPedido status) {
     Pedido pedido =
         pedidoRepository
@@ -205,6 +216,10 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "pedidos", key = "#id"),
+      @CacheEvict(value = "pedidos_lista", allEntries = true)
+  })
   public Pedido confirmar(Long id) {
     Pedido pedido =
         pedidoRepository
@@ -219,6 +234,10 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "pedidos", key = "#pedidoId"),
+      @CacheEvict(value = "pedidos_lista", allEntries = true)
+  })
   public Pedido cancelar(Long pedidoId) {
     Pedido pedido =
         pedidoRepository
@@ -241,6 +260,10 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "pedidos", key = "#pedidoId"),
+      @CacheEvict(value = "pedidos_lista", allEntries = true)
+  })
   public Pedido adicionarItem(Long pedidoId, Long produtoId, Integer quantidade) {
     Pedido pedido =
         pedidoRepository
@@ -314,6 +337,7 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("pedidos_lista")
   public List<Pedido> listarComFiltros(
       StatusPedido status, LocalDate dataInicio, LocalDate dataFim) {
     if (status == null && dataInicio == null && dataFim == null) {
@@ -341,6 +365,7 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("pedidos_lista")
   public List<Pedido> buscarPorPeriodo(LocalDateTime inicio, LocalDateTime fim) {
     return pedidoRepository.findByDataPedidoBetween(inicio, fim);
   }
@@ -353,12 +378,14 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("pedidos_lista")
   public List<Pedido> buscarPorClienteComItens(Long clienteId) {
     return pedidoRepository.findByClienteIdWithItens(clienteId);
   }
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("pedidos_lista")
   public List<Pedido> listarTodos() {
     return pedidoRepository.findAll();
   }
@@ -388,6 +415,10 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "pedidos", key = "#id"),
+      @CacheEvict(value = "pedidos_lista", allEntries = true)
+  })
   public void deletar(Long id) {
     Pedido pedido =
         pedidoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pedido", id));
@@ -397,6 +428,7 @@ public class PedidoServiceImpl implements PedidoService {
   // ===== NOVO MÉTODO COM DTO =====
 
   @Override
+  @CacheEvict(value = "pedidos_lista", allEntries = true)
   public PedidoResponse criarPedido(PedidoRequest pedidoRequest) {
     try {
       // Validate cliente exists and not excluded

@@ -15,18 +15,24 @@ import com.deliverytech.delivery_api.service.ProdutoService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.CacheManager;
 
 @Service
 @Transactional
 public class ProdutoServiceImpl implements ProdutoService {
   private final ProdutoRepository produtoRepository;
   private final ProdutoMapper produtoMapper;
+  private final CacheManager cacheManager;
 
-  public ProdutoServiceImpl(ProdutoRepository produtoRepository, ProdutoMapper produtoMapper) {
+  public ProdutoServiceImpl(ProdutoRepository produtoRepository, ProdutoMapper produtoMapper, CacheManager cacheManager) {
     this.produtoRepository = produtoRepository;
     this.produtoMapper = produtoMapper;
+    this.cacheManager = cacheManager;
   }
 
   @Override
@@ -90,6 +96,10 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "produtos", key = "#id"),
+      @CacheEvict(value = "produtos_lista", allEntries = true)
+  })
   public void inativar(Long id) {
     Produto produto =
         produtoRepository
@@ -100,6 +110,10 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "produtos", key = "#id"),
+      @CacheEvict(value = "produtos_lista", allEntries = true)
+  })
   public void deletar(Long id) {
     Produto produto =
         produtoRepository
@@ -128,6 +142,10 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "produtos", key = "#id"),
+      @CacheEvict(value = "produtos_lista", allEntries = true)
+  })
   public void alterarDisponibilidade(Long id, boolean disponivel) {
     Produto produto =
         produtoRepository
@@ -147,6 +165,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   // ===== NOVOS MÉTODOS COM DTOs =====
 
   @Override
+  @CacheEvict(value = "produtos_lista", allEntries = true)
   public ProdutoResponse cadastrar(ProdutoRequest produtoRequest) {
     Produto produto = produtoMapper.toEntity(produtoRequest);
   // Verifica duplicidade de nome no mesmo restaurante
@@ -164,6 +183,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "#id")
   public ProdutoResponse buscarProdutoPorId(Long id) {
     Produto produto =
         produtoRepository
@@ -180,6 +200,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("produtos_lista")
   public List<ProdutoResponse> buscarProdutosPorRestaurante(Long restauranteId) {
     List<Produto> produtos = produtoRepository.findByRestauranteIdAndExcluidoFalse(restauranteId);
     return produtos.stream().map(produtoMapper::toResponse).collect(Collectors.toList());
@@ -194,6 +215,10 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "produtos", key = "#id"),
+      @CacheEvict(value = "produtos_lista", allEntries = true)
+  })
   public ProdutoResponse atualizar(Long id, ProdutoRequest produtoRequest) {
     Produto existente =
         produtoRepository
@@ -226,6 +251,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("produtos_lista")
   public List<ProdutoResponse> buscarProdutosPorCategoria(String categoria) {
     List<Produto> produtos = produtoRepository.findByCategoriaAndExcluidoFalse(categoria);
     return produtos.stream().map(produtoMapper::toResponse).collect(Collectors.toList());
@@ -233,6 +259,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("produtos_lista")
   public List<ProdutoResponse> buscarDisponiveis() {
     List<Produto> produtos = produtoRepository.findByDisponivelTrueAndExcluidoFalse();
     return produtos.stream().map(produtoMapper::toResponse).collect(Collectors.toList());
@@ -292,6 +319,10 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "produtos", key = "#produtoId"),
+      @CacheEvict(value = "produtos_lista", allEntries = true)
+  })
   public void atualizarEstoque(Long produtoId, Integer novaQuantidade) {
     Produto produto =
         produtoRepository
@@ -304,6 +335,10 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "produtos", key = "#produtoId"),
+      @CacheEvict(value = "produtos_lista", allEntries = true)
+  })
   public void ajustarEstoque(Long produtoId, Integer quantidade) {
     // Buscar produto com lock pessimista para evitar race conditions
     Produto produto = produtoRepository.findByIdWithLock(produtoId)
@@ -334,7 +369,9 @@ public class ProdutoServiceImpl implements ProdutoService {
         produto.reduzirEstoque(item.getQuantidade());
         produtoRepository.save(produto);
       }
+      cacheManager.getCache("produtos").evict(item.getProduto().getId());
     }
+    cacheManager.getCache("produtos_lista").clear();
   }
 
   @Override
@@ -359,11 +396,14 @@ public class ProdutoServiceImpl implements ProdutoService {
         produto.aumentarEstoque(item.getQuantidade());
         produtoRepository.save(produto);
       }
+      cacheManager.getCache("produtos").evict(item.getProduto().getId());
     }
+    cacheManager.getCache("produtos_lista").clear();
   }
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable("produtos_lista")
   public List<ProdutoResponse> buscarProdutosPorNome(String nome) {
     List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCaseAndExcluidoFalse(nome);
     return produtos.stream()

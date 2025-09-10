@@ -1,6 +1,6 @@
 package com.deliverytech.delivery_api.controller;
 
-import com.deliverytech.delivery_api.BaseIntegrationTest;
+import com.deliverytech.delivery_api.AbstractIntegrationTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ClienteControllerDebugTest extends BaseIntegrationTest {
+class ClienteControllerDebugTest extends AbstractIntegrationTest {
 
     @LocalServerPort
     private int port;

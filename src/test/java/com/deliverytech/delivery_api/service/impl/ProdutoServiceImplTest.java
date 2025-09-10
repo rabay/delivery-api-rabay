@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 import java.math.BigDecimal;
 // Remove the Optional import to avoid conflicts
@@ -30,12 +32,19 @@ public class ProdutoServiceImplTest {
     @Mock
     private ProdutoMapper produtoMapper;
 
+    @Mock
+    private CacheManager cacheManager;
+
+    @Mock
+    private Cache cache;
+
     @InjectMocks
     private ProdutoServiceImpl produtoService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+        when(cacheManager.getCache(anyString())).thenReturn(cache);
     }
 
     @Test

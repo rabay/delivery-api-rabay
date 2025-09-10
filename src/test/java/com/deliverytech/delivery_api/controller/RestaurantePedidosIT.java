@@ -1,30 +1,28 @@
 package com.deliverytech.delivery_api.controller;
 
-import com.deliverytech.delivery_api.BaseIntegrationTest;
+import com.deliverytech.delivery_api.AbstractIntegrationTest;
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.model.Restaurante;
-import com.deliverytech.delivery_api.service.RestauranteService;
 import com.deliverytech.delivery_api.service.ProdutoService;
+import com.deliverytech.delivery_api.service.RestauranteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-class RestaurantePedidosIT extends BaseIntegrationTest {
+class RestaurantePedidosIT extends AbstractIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

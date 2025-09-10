@@ -1,6 +1,6 @@
 package com.deliverytech.delivery_api.repository;
 
-import com.deliverytech.delivery_api.BaseIntegrationTest;
+import com.deliverytech.delivery_api.AbstractIntegrationTest;
 import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.projection.RelatorioVendasClientes;
 import jakarta.persistence.EntityManager;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
-class ClienteRepositoryTest extends BaseIntegrationTest {
+class ClienteRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private ClienteRepository clienteRepository;

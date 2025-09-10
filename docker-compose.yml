@@ -6,8 +6,11 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - redis
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
     # A aplicação poderá acessar o banco pelo hostname 'db'
     # Profile dev ativado para usar configurações MySQL
 
@@ -51,6 +54,18 @@ services:
     # Painel de controle MySQL acessível em http://localhost:8081
     # Login automático configurado com credenciais do MySQL
 
+  redis:
+    image: redis:7-alpine
+    container_name: delivery-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning --requirepass redispass
+
 volumes:
   mysql_data:
+    driver: local
+  redis_data:
     driver: local

@@ -1,21 +1,15 @@
 package com.deliverytech.delivery_api.service;
 
-import com.deliverytech.delivery_api.BaseIntegrationTest;
+import com.deliverytech.delivery_api.AbstractIntegrationTest;
 import com.deliverytech.delivery_api.dto.request.ClienteRequest;
 import com.deliverytech.delivery_api.dto.response.ClienteResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.context.annotation.Import;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-@Import({com.deliverytech.delivery_api.service.impl.ClienteServiceImpl.class, com.deliverytech.delivery_api.mapper.ClienteMapper.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-class ClienteServiceIT extends BaseIntegrationTest {
+class ClienteServiceIT extends AbstractIntegrationTest {
     @Autowired
     private ClienteService clienteService;
 

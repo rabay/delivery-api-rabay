@@ -1,6 +1,6 @@
 package com.deliverytech.delivery_api.controller;
 
-import com.deliverytech.delivery_api.BaseIntegrationTest;
+import com.deliverytech.delivery_api.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class PedidoControllerIntegrationTest extends BaseIntegrationTest {
+class PedidoControllerIntegrationTest extends AbstractIntegrationTest {
 
     @LocalServerPort
     private int port;

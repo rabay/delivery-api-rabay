@@ -1,48 +1,68 @@
 package com.deliverytech.delivery_api.repository;
 
-import com.deliverytech.delivery_api.BaseIntegrationTest;
-import com.deliverytech.delivery_api.model.Produto;
-import com.deliverytech.delivery_api.model.Restaurante;
+import com.deliverytech.delivery_api.AbstractIntegrationTest;
+import com.deliverytech.delivery_api.entities.Produto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ProdutoRepositoryIT extends BaseIntegrationTest {
+public class ProdutoRepositoryIT extends AbstractIntegrationTest {
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Autowired
     private ProdutoRepository produtoRepository;
-    
-    @Autowired
-    private RestauranteRepository restauranteRepository;
 
     @Test
-    void testFindByRestaurante() {
-        Restaurante r = new Restaurante();
-        r.setNome("Burguer House");
-        r.setCategoria("Lanches");
-        r.setAtivo(true);
-        r.setAvaliacao(new java.math.BigDecimal("4.2"));
-        restauranteRepository.save(r);
-        Produto p = new Produto();
-        p.setNome("X-Burguer");
-        p.setCategoria("Lanche");
-        p.setDisponivel(true);
-        p.setRestaurante(r);
-        p.setPreco(new BigDecimal("15.00"));
-        p.setQuantidadeEstoque(10); // Add required field
-        produtoRepository.save(p);
-        List<Produto> results = produtoRepository.findByRestauranteAndExcluidoFalse(r);
-        assertThat(results).extracting(Produto::getNome).contains("X-Burguer");
-        // adicional: verificar busca por id do restaurante (findByRestauranteIdAndExcluidoFalse)
-        List<Produto> resultsById = produtoRepository.findByRestauranteIdAndExcluidoFalse(r.getId());
-        assertThat(resultsById).extracting(Produto::getNome).contains("X-Burguer");
+    public void whenFindByRestauranteId_thenReturnProdutos() {
+        // given
+        Produto produto = new Produto("Produto Teste", "Descrição Teste", BigDecimal.valueOf(10.00), true, 1L);
+        entityManager.persist(produto);
+        entityManager.flush();
+
+        // when
+        List<Produto> found = produtoRepository.findByRestauranteId(1L);
+
+        // then
+        assertThat(found).hasSize(1).extracting(Produto::getNome).contains(produto.getNome());
+    }
+
+    @Test
+    public void whenFindByNomeContainingIgnoreCaseAndRestauranteId_thenReturnProdutos() {
+        // given
+        Produto produto = new Produto("Produto Teste", "Descrição Teste", BigDecimal.valueOf(10.00), true, 1L);
+        entityManager.persist(produto);
+        entityManager.flush();
+
+        // when
+        List<Produto> found = produtoRepository.findByNomeContainingIgnoreCaseAndRestauranteId("produto", 1L);
+
+        // then
+        assertThat(found).hasSize(1).extracting(Produto::getNome).contains(produto.getNome());
+    }
+
+    @Test
+    public void whenFindAvailableProductsByRestaurante_thenReturnAvailableProdutos() {
+        // given
+        Produto produto1 = new Produto("Produto 1", "Descrição 1", BigDecimal.valueOf(10.00), true, 1L);
+        Produto produto2 = new Produto("Produto 2", "Descrição 2", BigDecimal.valueOf(20.00), false, 1L);
+        entityManager.persist(produto1);
+        entityManager.persist(produto2);
+        entityManager.flush();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        List<Produto> found = produtoRepository.findAvailableProductsByRestaurante(1L, pageable);
+
+        // then
+        assertThat(found).hasSize(1).extracting(Produto::getNome).contains(produto1.getNome());
     }
 }
