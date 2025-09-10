@@ -305,10 +305,9 @@ public class ProdutoServiceImpl implements ProdutoService {
   @Override
   @Transactional
   public void ajustarEstoque(Long produtoId, Integer quantidade) {
-    Produto produto =
-        produtoRepository
-            .findById(produtoId)
-            .orElseThrow(() -> new EntityNotFoundException("Produto", produtoId));
+    // Buscar produto com lock pessimista para evitar race conditions
+    Produto produto = produtoRepository.findByIdWithLock(produtoId)
+        .orElseThrow(() -> new EntityNotFoundException("Produto", produtoId));
 
     // Only adjust stock for non-infinite stock products
     if (!produto.isInfiniteStock()) {
@@ -322,7 +321,9 @@ public class ProdutoServiceImpl implements ProdutoService {
   public void reservarEstoque(com.deliverytech.delivery_api.model.Pedido pedido) {
     // Reserve stock for all items in the order
     for (ItemPedido item : pedido.getItens()) {
-      Produto produto = item.getProduto();
+      // Buscar produto com lock pessimista para evitar race conditions
+      Produto produto = produtoRepository.findByIdWithLock(item.getProduto().getId())
+          .orElseThrow(() -> new EntityNotFoundException("Produto", item.getProduto().getId()));
 
       // Validate stock availability
       validarEstoque(produto, item.getQuantidade());
@@ -349,7 +350,9 @@ public class ProdutoServiceImpl implements ProdutoService {
   public void cancelarReservaEstoque(com.deliverytech.delivery_api.model.Pedido pedido) {
     // Release reserved stock back to available stock
     for (ItemPedido item : pedido.getItens()) {
-      Produto produto = item.getProduto();
+      // Buscar produto com lock pessimista para evitar race conditions
+      Produto produto = produtoRepository.findByIdWithLock(item.getProduto().getId())
+          .orElseThrow(() -> new EntityNotFoundException("Produto", item.getProduto().getId()));
 
       // Only restore stock for non-infinite stock products
       if (!produto.isInfiniteStock()) {
