@@ -1,114 +1,535 @@
 package com.deliverytech.delivery_api.model;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.BeforeEach;
-import static org.junit.jupiter.api.Assertions.*;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
-public class ProdutoTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    private Produto produto;
+@DisplayName("Produto Entity Tests")
+class ProdutoTest {
+
+    private Validator validator;
 
     @BeforeEach
-    public void setUp() {
-        produto = Produto.builder()
-                .id(1L)
-                .nome("Produto Teste")
-                .categoria("Categoria Teste")
-                .descricao("Descrição Teste")
-                .preco(new BigDecimal("10.00"))
-                .disponivel(true)
-                .excluido(false)
-                .quantidadeEstoque(10)
-                .build();
+    void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
-    @Test
-    public void testIsInfiniteStock_WithNegativeValue_ShouldReturnTrue() {
-        produto.setQuantidadeEstoque(-1);
-        assertTrue(produto.isInfiniteStock());
-        
-        produto.setQuantidadeEstoque(-5);
-        assertTrue(produto.isInfiniteStock());
+    @Nested
+    @DisplayName("Constructor and Builder Tests")
+    class ConstructorAndBuilderTests {
+
+        @Test
+        @DisplayName("Should create Produto with no-args constructor")
+        void shouldCreateProdutoWithNoArgsConstructor() {
+            // When
+            Produto produto = new Produto();
+
+            // Then
+            assertNotNull(produto);
+            assertNull(produto.getId());
+            assertNull(produto.getNome());
+            assertNull(produto.getCategoria());
+            assertNull(produto.getDescricao());
+            assertNull(produto.getPreco());
+            assertTrue(produto.getDisponivel()); // Default value from @Builder.Default
+            assertFalse(produto.getExcluido()); // Default value from @Builder.Default
+            assertNull(produto.getRestaurante());
+            assertNull(produto.getQuantidadeEstoque());
+        }
+
+        @Test
+        @DisplayName("Should create Produto with all-args constructor")
+        void shouldCreateProdutoWithAllArgsConstructor() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+
+            // When
+            Produto produto = new Produto(1L, "Pizza Margherita", "Pizza", "Pizza tradicional",
+                    new BigDecimal("25.90"), true, false, restaurante, 10);
+
+            // Then
+            assertEquals(1L, produto.getId());
+            assertEquals("Pizza Margherita", produto.getNome());
+            assertEquals("Pizza", produto.getCategoria());
+            assertEquals("Pizza tradicional", produto.getDescricao());
+            assertEquals(new BigDecimal("25.90"), produto.getPreco());
+            assertTrue(produto.getDisponivel());
+            assertFalse(produto.getExcluido());
+            assertEquals(restaurante, produto.getRestaurante());
+            assertEquals(10, produto.getQuantidadeEstoque());
+        }
+
+        @Test
+        @DisplayName("Should create Produto using builder pattern")
+        void shouldCreateProdutoUsingBuilderPattern() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(2L).build();
+
+            // When
+            Produto produto = Produto.builder()
+                    .id(1L)
+                    .nome("Hambúrguer")
+                    .categoria("Lanches")
+                    .descricao("Hambúrguer artesanal")
+                    .preco(new BigDecimal("15.50"))
+                    .disponivel(true)
+                    .excluido(false)
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(5)
+                    .build();
+
+            // Then
+            assertEquals(1L, produto.getId());
+            assertEquals("Hambúrguer", produto.getNome());
+            assertEquals("Lanches", produto.getCategoria());
+            assertEquals("Hambúrguer artesanal", produto.getDescricao());
+            assertEquals(new BigDecimal("15.50"), produto.getPreco());
+            assertTrue(produto.getDisponivel());
+            assertFalse(produto.getExcluido());
+            assertEquals(restaurante, produto.getRestaurante());
+            assertEquals(5, produto.getQuantidadeEstoque());
+        }
+
+        @Test
+        @DisplayName("Should set default values for disponivel and excluido")
+        void shouldSetDefaultValuesForDisponivelAndExcluido() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+
+            // When
+            Produto produto = Produto.builder()
+                    .nome("Produto Teste")
+                    .preco(new BigDecimal("10.00"))
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // Then
+            assertTrue(produto.getDisponivel()); // Default true
+            assertFalse(produto.getExcluido()); // Default false
+        }
     }
 
-    @Test
-    public void testIsInfiniteStock_WithNonNegativeValue_ShouldReturnFalse() {
-        produto.setQuantidadeEstoque(0);
-        assertFalse(produto.isInfiniteStock());
-        
-        produto.setQuantidadeEstoque(10);
-        assertFalse(produto.isInfiniteStock());
+    @Nested
+    @DisplayName("Validation Tests")
+    class ValidationTests {
+
+        @Test
+        @DisplayName("Should validate Produto with all required fields")
+        void shouldValidateProdutoWithAllRequiredFields() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+            Produto produto = Produto.builder()
+                    .nome("Produto Válido")
+                    .preco(new BigDecimal("10.00"))
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertTrue(violations.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Should fail validation when nome is blank")
+        void shouldFailValidationWhenNomeIsBlank() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+            Produto produto = Produto.builder()
+                    .nome("")
+                    .preco(new BigDecimal("10.00"))
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertFalse(violations.isEmpty());
+            assertEquals(1, violations.size());
+            assertEquals("Nome do produto é obrigatório", violations.iterator().next().getMessage());
+        }
+
+        @Test
+        @DisplayName("Should fail validation when nome is null")
+        void shouldFailValidationWhenNomeIsNull() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+            Produto produto = Produto.builder()
+                    .nome(null)
+                    .preco(new BigDecimal("10.00"))
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertFalse(violations.isEmpty());
+            assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Nome do produto é obrigatório")));
+        }
+
+        @Test
+        @DisplayName("Should fail validation when nome is too long")
+        void shouldFailValidationWhenNomeIsTooLong() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+            String nomeLongo = "a".repeat(101); // 101 caracteres
+            Produto produto = Produto.builder()
+                    .nome(nomeLongo)
+                    .preco(new BigDecimal("10.00"))
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertFalse(violations.isEmpty());
+            assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Nome não pode ter mais de 100 caracteres")));
+        }
+
+        @Test
+        @DisplayName("Should fail validation when preco is null")
+        void shouldFailValidationWhenPrecoIsNull() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+            Produto produto = Produto.builder()
+                    .nome("Produto Teste")
+                    .preco(null)
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertFalse(violations.isEmpty());
+            assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Preço é obrigatório")));
+        }
+
+        @Test
+        @DisplayName("Should fail validation when preco is zero")
+        void shouldFailValidationWhenPrecoIsZero() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+            Produto produto = Produto.builder()
+                    .nome("Produto Teste")
+                    .preco(BigDecimal.ZERO)
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertFalse(violations.isEmpty());
+            assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Preço deve ser maior que zero")));
+        }
+
+        @Test
+        @DisplayName("Should fail validation when restaurante is null")
+        void shouldFailValidationWhenRestauranteIsNull() {
+            // Given
+            Produto produto = Produto.builder()
+                    .nome("Produto Teste")
+                    .preco(new BigDecimal("10.00"))
+                    .restaurante(null)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertFalse(violations.isEmpty());
+            assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Restaurante é obrigatório")));
+        }
+
+        @Test
+        @DisplayName("Should validate categoria length")
+        void shouldValidateCategoriaLength() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+            String categoriaLonga = "a".repeat(51); // 51 caracteres
+            Produto produto = Produto.builder()
+                    .nome("Produto Teste")
+                    .categoria(categoriaLonga)
+                    .preco(new BigDecimal("10.00"))
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertFalse(violations.isEmpty());
+            assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Categoria não pode ter mais de 50 caracteres")));
+        }
+
+        @Test
+        @DisplayName("Should validate descricao length")
+        void shouldValidateDescricaoLength() {
+            // Given
+            Restaurante restaurante = Restaurante.builder().id(1L).build();
+            String descricaoLonga = "a".repeat(501); // 501 caracteres
+            Produto produto = Produto.builder()
+                    .nome("Produto Teste")
+                    .descricao(descricaoLonga)
+                    .preco(new BigDecimal("10.00"))
+                    .restaurante(restaurante)
+                    .quantidadeEstoque(1)
+                    .build();
+
+            // When
+            Set<ConstraintViolation<Produto>> violations = validator.validate(produto);
+
+            // Then
+            assertFalse(violations.isEmpty());
+            assertTrue(violations.stream().anyMatch(v -> v.getMessage().contains("Descrição não pode ter mais de 500 caracteres")));
+        }
     }
 
-    @Test
-    public void testIsDisponivel_WithInfiniteStock_ShouldReturnTrue() {
-        produto.setQuantidadeEstoque(-1);
-        produto.setDisponivel(true);
-        assertTrue(produto.isDisponivel());
+    @Nested
+    @DisplayName("Business Logic Tests")
+    class BusinessLogicTests {
+
+        @Test
+        @DisplayName("Should identify infinite stock when quantidadeEstoque is negative")
+        void shouldIdentifyInfiniteStockWhenQuantidadeEstoqueIsNegative() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(-1)
+                    .build();
+
+            // When & Then
+            assertTrue(produto.isInfiniteStock());
+        }
+
+        @Test
+        @DisplayName("Should not identify infinite stock when quantidadeEstoque is positive")
+        void shouldNotIdentifyInfiniteStockWhenQuantidadeEstoqueIsPositive() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(10)
+                    .build();
+
+            // When & Then
+            assertFalse(produto.isInfiniteStock());
+        }
+
+        @Test
+        @DisplayName("Should not identify infinite stock when quantidadeEstoque is zero")
+        void shouldNotIdentifyInfiniteStockWhenQuantidadeEstoqueIsZero() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(0)
+                    .build();
+
+            // When & Then
+            assertFalse(produto.isInfiniteStock());
+        }
+
+        @Test
+        @DisplayName("Should be disponivel when disponivel is true and has stock")
+        void shouldBeDisponivelWhenDisponivelIsTrueAndHasStock() {
+            // Given
+            Produto produto = Produto.builder()
+                    .disponivel(true)
+                    .quantidadeEstoque(5)
+                    .build();
+
+            // When & Then
+            assertTrue(produto.isDisponivel());
+        }
+
+        @Test
+        @DisplayName("Should be disponivel when disponivel is true and has infinite stock")
+        void shouldBeDisponivelWhenDisponivelIsTrueAndHasInfiniteStock() {
+            // Given
+            Produto produto = Produto.builder()
+                    .disponivel(true)
+                    .quantidadeEstoque(-1)
+                    .build();
+
+            // When & Then
+            assertTrue(produto.isDisponivel());
+        }
+
+        @Test
+        @DisplayName("Should not be disponivel when disponivel is false")
+        void shouldNotBeDisponivelWhenDisponivelIsFalse() {
+            // Given
+            Produto produto = Produto.builder()
+                    .disponivel(false)
+                    .quantidadeEstoque(10)
+                    .build();
+
+            // When & Then
+            assertFalse(produto.isDisponivel());
+        }
+
+        @Test
+        @DisplayName("Should not be disponivel when has no stock")
+        void shouldNotBeDisponivelWhenHasNoStock() {
+            // Given
+            Produto produto = Produto.builder()
+                    .disponivel(true)
+                    .quantidadeEstoque(0)
+                    .build();
+
+            // When & Then
+            assertFalse(produto.isDisponivel());
+        }
+
+        @Test
+        @DisplayName("Should reduce stock correctly")
+        void shouldReduceStockCorrectly() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(10)
+                    .build();
+
+            // When
+            produto.reduzirEstoque(3);
+
+            // Then
+            assertEquals(7, produto.getQuantidadeEstoque());
+        }
+
+        @Test
+        @DisplayName("Should not reduce stock when infinite stock")
+        void shouldNotReduceStockWhenInfiniteStock() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(-1)
+                    .build();
+
+            // When
+            produto.reduzirEstoque(5);
+
+            // Then
+            assertEquals(-1, produto.getQuantidadeEstoque());
+        }
+
+        @Test
+        @DisplayName("Should not reduce stock when quantidade is null")
+        void shouldNotReduceStockWhenQuantidadeIsNull() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(10)
+                    .build();
+
+            // When
+            produto.reduzirEstoque(null);
+
+            // Then
+            assertEquals(10, produto.getQuantidadeEstoque());
+        }
+
+        @Test
+        @DisplayName("Should increase stock correctly")
+        void shouldIncreaseStockCorrectly() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(5)
+                    .build();
+
+            // When
+            produto.aumentarEstoque(3);
+
+            // Then
+            assertEquals(8, produto.getQuantidadeEstoque());
+        }
+
+        @Test
+        @DisplayName("Should not increase stock when infinite stock")
+        void shouldNotIncreaseStockWhenInfiniteStock() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(-1)
+                    .build();
+
+            // When
+            produto.aumentarEstoque(5);
+
+            // Then
+            assertEquals(-1, produto.getQuantidadeEstoque());
+        }
+
+        @Test
+        @DisplayName("Should not increase stock when quantidade is null")
+        void shouldNotIncreaseStockWhenQuantidadeIsNull() {
+            // Given
+            Produto produto = Produto.builder()
+                    .quantidadeEstoque(5)
+                    .build();
+
+            // When
+            produto.aumentarEstoque(null);
+
+            // Then
+            assertEquals(5, produto.getQuantidadeEstoque());
+        }
     }
 
-    @Test
-    public void testIsDisponivel_WithPositiveStockAndAvailable_ShouldReturnTrue() {
-        produto.setQuantidadeEstoque(5);
-        produto.setDisponivel(true);
-        assertTrue(produto.isDisponivel());
-    }
+    @Nested
+    @DisplayName("Equals and HashCode Tests")
+    class EqualsAndHashCodeTests {
 
-    @Test
-    public void testIsDisponivel_WithZeroStockAndAvailable_ShouldReturnFalse() {
-        produto.setQuantidadeEstoque(0);
-        produto.setDisponivel(true);
-        assertFalse(produto.isDisponivel());
-    }
+        @Test
+        @DisplayName("Should be equal when same id")
+        void shouldBeEqualWhenSameId() {
+            // Given
+            Produto produto1 = Produto.builder().id(1L).build();
+            Produto produto2 = Produto.builder().id(1L).build();
 
-    @Test
-    public void testIsDisponivel_WithPositiveStockAndNotAvailable_ShouldReturnFalse() {
-        produto.setQuantidadeEstoque(5);
-        produto.setDisponivel(false);
-        assertFalse(produto.isDisponivel());
-    }
+            // When & Then
+            assertEquals(produto1, produto2);
+            assertEquals(produto1.hashCode(), produto2.hashCode());
+        }
 
-    @Test
-    public void testReduzirEstoque_WithRegularStock_ShouldReduceQuantity() {
-        produto.setQuantidadeEstoque(10);
-        produto.reduzirEstoque(3);
-        assertEquals(7, produto.getQuantidadeEstoque());
-    }
+        @Test
+        @DisplayName("Should not be equal when different id")
+        void shouldNotBeEqualWhenDifferentId() {
+            // Given
+            Produto produto1 = Produto.builder().id(1L).build();
+            Produto produto2 = Produto.builder().id(2L).build();
 
-    @Test
-    public void testReduzirEstoque_WithInfiniteStock_ShouldNotChangeQuantity() {
-        produto.setQuantidadeEstoque(-1);
-        produto.reduzirEstoque(5);
-        assertEquals(-1, produto.getQuantidadeEstoque());
-    }
+            // When & Then
+            assertNotEquals(produto1, produto2);
+        }
 
-    @Test
-    public void testReduzirEstoque_WithNullQuantity_ShouldNotChangeQuantity() {
-        produto.setQuantidadeEstoque(10);
-        produto.reduzirEstoque(null);
-        assertEquals(10, produto.getQuantidadeEstoque());
-    }
+        @Test
+        @DisplayName("Should not be equal when one has null id")
+        void shouldNotBeEqualWhenOneHasNullId() {
+            // Given
+            Produto produto1 = Produto.builder().id(1L).build();
+            Produto produto2 = Produto.builder().id(null).build();
 
-    @Test
-    public void testAumentarEstoque_WithRegularStock_ShouldIncreaseQuantity() {
-        produto.setQuantidadeEstoque(10);
-        produto.aumentarEstoque(5);
-        assertEquals(15, produto.getQuantidadeEstoque());
-    }
-
-    @Test
-    public void testAumentarEstoque_WithInfiniteStock_ShouldNotChangeQuantity() {
-        produto.setQuantidadeEstoque(-1);
-        produto.aumentarEstoque(5);
-        assertEquals(-1, produto.getQuantidadeEstoque());
-    }
-
-    @Test
-    public void testAumentarEstoque_WithNullQuantity_ShouldNotChangeQuantity() {
-        produto.setQuantidadeEstoque(10);
-        produto.aumentarEstoque(null);
-        assertEquals(10, produto.getQuantidadeEstoque());
+            // When & Then
+            assertNotEquals(produto1, produto2);
+        }
     }
 }

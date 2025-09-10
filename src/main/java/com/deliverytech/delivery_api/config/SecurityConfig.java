@@ -63,7 +63,7 @@ public class SecurityConfig {
           .permitAll()
           // Admin-only endpoints
           .requestMatchers("/api/pedidos")
-          .hasAuthority("ADMIN")
+          .hasRole("ADMIN")
           // Swagger/OpenAPI endpoints - Documentation access
           .requestMatchers(
             "/v3/api-docs",
