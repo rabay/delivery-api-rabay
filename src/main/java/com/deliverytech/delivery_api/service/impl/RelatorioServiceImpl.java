@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class RelatorioServiceImpl implements RelatorioService {
   @Autowired private ClienteRepository clienteRepository;
 
   @Override
+  @Cacheable(value = "relatorios", key = "'vendasPorRestaurante:' + #dataInicio + ':' + #dataFim")
   public List<RelatorioVendas> relatorioVendasPorRestaurante(
       LocalDate dataInicio, LocalDate dataFim) {
     return pedidoRepository.calcularTotalVendasPorRestaurante(
@@ -30,6 +32,9 @@ public class RelatorioServiceImpl implements RelatorioService {
   }
 
   @Override
+  @Cacheable(
+      value = "relatorios",
+      key = "'produtosMaisVendidos:' + #limite + ':' + #dataInicio + ':' + #dataFim")
   public List<RelatorioVendasProdutos> relatorioProdutosMaisVendidos(
       int limite, LocalDate dataInicio, LocalDate dataFim) {
     var pageable = org.springframework.data.domain.PageRequest.of(0, Math.max(1, limite));
@@ -38,6 +43,9 @@ public class RelatorioServiceImpl implements RelatorioService {
   }
 
   @Override
+  @Cacheable(
+      value = "relatorios",
+      key = "'clientesAtivos:' + #limite + ':' + #dataInicio + ':' + #dataFim")
   public List<RelatorioVendasClientes> relatorioClientesAtivos(
       int limite, LocalDate dataInicio, LocalDate dataFim) {
     var pageable = org.springframework.data.domain.PageRequest.of(0, Math.max(1, limite));
@@ -46,6 +54,9 @@ public class RelatorioServiceImpl implements RelatorioService {
   }
 
   @Override
+  @Cacheable(
+      value = "relatorios",
+      key = "'pedidosPorPeriodo:' + #dataInicio + ':' + #dataFim + ':' + #status")
   public List<Map<String, Object>> relatorioPedidosPorPeriodo(
       LocalDate dataInicio, LocalDate dataFim, String status) {
     // Exemplo simplificado: pode ser adaptado para usar consulta customizada
@@ -66,6 +77,9 @@ public class RelatorioServiceImpl implements RelatorioService {
   }
 
   @Override
+  @Cacheable(
+      value = "relatorios",
+      key = "'faturamentoPorCategoria:' + #dataInicio + ':' + #dataFim")
   public List<Map<String, Object>> faturamentoPorCategoria(
       LocalDate dataInicio, LocalDate dataFim) {
     List<com.deliverytech.delivery_api.projection.FaturamentoPorCategoriaProjection> dados =
@@ -82,6 +96,7 @@ public class RelatorioServiceImpl implements RelatorioService {
   }
 
   @Override
+  @Cacheable(value = "relatorios", key = "'resumoVendas:' + #dataInicio + ':' + #dataFim")
   public Map<String, Object> resumoVendas(LocalDate dataInicio, LocalDate dataFim) {
     Map<String, Object> resumo = new HashMap<>();
     resumo.put(

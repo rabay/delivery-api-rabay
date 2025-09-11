@@ -15,6 +15,8 @@ import com.deliverytech.delivery_api.service.ProdutoService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   public Produto cadastrar(Produto produto) {
     if (produto.getCategoria() == null || produto.getCategoria().isEmpty()) {
       throw new BusinessException("Categoria obrigatória");
@@ -49,12 +52,14 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "#restaurante.id")
   public List<Produto> buscarPorRestaurante(Restaurante restaurante) {
     return produtoRepository.findByRestauranteAndExcluidoFalse(restaurante);
   }
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "'disponiveis'")
   public List<Produto> buscarDisponiveisEntities() {
     return produtoRepository.findByDisponivelTrueAndExcluidoFalse();
   }
@@ -72,6 +77,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   public Produto atualizar(Long id, Produto produtoAtualizado) {
     Produto existente =
         produtoRepository
@@ -90,6 +96,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   public void inativar(Long id) {
     Produto produto =
         produtoRepository
@@ -100,6 +107,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   public void deletar(Long id) {
     Produto produto =
         produtoRepository
@@ -112,12 +120,14 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "#categoria")
   public List<Produto> buscarPorCategoria(String categoria) {
     return produtoRepository.findByCategoriaAndExcluidoFalse(categoria);
   }
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "#nome")
   public List<Produto> buscarPorNome(String nome) {
     // Se existir método customizado, usar:
     // return produtoRepository.findByNomeContainingIgnoreCaseAndExcluidoFalse(nome);
@@ -128,6 +138,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   public void alterarDisponibilidade(Long id, boolean disponivel) {
     Produto produto =
         produtoRepository
@@ -147,6 +158,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   // ===== NOVOS MÉTODOS COM DTOs =====
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   public ProdutoResponse cadastrar(ProdutoRequest produtoRequest) {
     Produto produto = produtoMapper.toEntity(produtoRequest);
     // Verifica duplicidade de nome no mesmo restaurante
@@ -180,6 +192,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "#restauranteId")
   public List<ProdutoResponse> buscarProdutosPorRestaurante(Long restauranteId) {
     List<Produto> produtos = produtoRepository.findByRestauranteIdAndExcluidoFalse(restauranteId);
     return produtos.stream().map(produtoMapper::toResponse).collect(Collectors.toList());
@@ -194,6 +207,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   public ProdutoResponse atualizar(Long id, ProdutoRequest produtoRequest) {
     Produto existente =
         produtoRepository
@@ -226,6 +240,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "#categoria")
   public List<ProdutoResponse> buscarProdutosPorCategoria(String categoria) {
     List<Produto> produtos = produtoRepository.findByCategoriaAndExcluidoFalse(categoria);
     return produtos.stream().map(produtoMapper::toResponse).collect(Collectors.toList());
@@ -233,6 +248,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "'disponiveis'")
   public List<ProdutoResponse> buscarDisponiveis() {
     List<Produto> produtos = produtoRepository.findByDisponivelTrueAndExcluidoFalse();
     return produtos.stream().map(produtoMapper::toResponse).collect(Collectors.toList());
@@ -291,6 +307,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   @Transactional
   public void atualizarEstoque(Long produtoId, Integer novaQuantidade) {
     Produto produto =
@@ -303,6 +320,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   @Transactional
   public void ajustarEstoque(Long produtoId, Integer quantidade) {
     // Buscar produto com lock pessimista para evitar race conditions
@@ -319,6 +337,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   @Transactional
   public void reservarEstoque(com.deliverytech.delivery_api.model.Pedido pedido) {
     // Reserve stock for all items in the order
@@ -342,6 +361,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   @Transactional
   public void confirmarEstoque(com.deliverytech.delivery_api.model.Pedido pedido) {
     // Confirm stock reduction for all items in the order
@@ -350,6 +370,7 @@ public class ProdutoServiceImpl implements ProdutoService {
   }
 
   @Override
+  @CacheEvict(value = "produtos", allEntries = true)
   @Transactional
   public void cancelarReservaEstoque(com.deliverytech.delivery_api.model.Pedido pedido) {
     // Release reserved stock back to available stock
@@ -370,6 +391,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "produtos", key = "#nome")
   public List<ProdutoResponse> buscarProdutosPorNome(String nome) {
     List<Produto> produtos = produtoRepository.findByNomeContainingIgnoreCaseAndExcluidoFalse(nome);
     return produtos.stream()

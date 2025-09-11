@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,7 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @CacheEvict(value = "pedidos", allEntries = true)
   public Pedido criar(Pedido pedido) {
     try {
       pedido.setStatus(StatusPedido.CRIADO);
@@ -140,6 +143,7 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "pedidos", key = "#clienteId")
   public List<Pedido> buscarPorCliente(Long clienteId) {
     List<Pedido> pedidos = pedidoRepository.findByClienteId(clienteId);
     if (pedidos == null) {
@@ -158,6 +162,7 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "pedidos", key = "#restauranteId")
   public List<Pedido> buscarPorRestaurante(Long restauranteId) {
     return pedidoRepository.findByRestauranteId(restauranteId);
   }
@@ -171,11 +176,13 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "pedidos", key = "#status")
   public List<Pedido> buscarPorStatus(StatusPedido status) {
     return pedidoRepository.findByStatus(status);
   }
 
   @Override
+  @CacheEvict(value = "pedidos", allEntries = true)
   public Pedido atualizarStatus(Long id, StatusPedido status) {
     Pedido pedido =
         pedidoRepository
@@ -205,6 +212,7 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @CacheEvict(value = "pedidos", allEntries = true)
   public Pedido confirmar(Long id) {
     Pedido pedido =
         pedidoRepository
@@ -219,6 +227,7 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @CacheEvict(value = "pedidos", allEntries = true)
   public Pedido cancelar(Long pedidoId) {
     Pedido pedido =
         pedidoRepository
@@ -241,6 +250,7 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @CacheEvict(value = "pedidos", allEntries = true)
   public Pedido adicionarItem(Long pedidoId, Long produtoId, Integer quantidade) {
     Pedido pedido =
         pedidoRepository
@@ -373,6 +383,9 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(
+      value = "pedidos",
+      key = "#clienteId + ':' + #pageable.offset + ':' + #pageable.pageSize")
   public org.springframework.data.domain.Page<PedidoResponse> buscarPedidosPorCliente(
       Long clienteId, org.springframework.data.domain.Pageable pageable) {
     var page = pedidoRepository.findByClienteId(clienteId, pageable);
@@ -381,6 +394,9 @@ public class PedidoServiceImpl implements PedidoService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(
+      value = "pedidos",
+      key = "#restauranteId + ':' + #pageable.offset + ':' + #pageable.pageSize")
   public org.springframework.data.domain.Page<PedidoResponse> buscarPedidosPorRestaurante(
       Long restauranteId, org.springframework.data.domain.Pageable pageable) {
     var page = pedidoRepository.findByRestauranteId(restauranteId, pageable);
@@ -388,6 +404,7 @@ public class PedidoServiceImpl implements PedidoService {
   }
 
   @Override
+  @CacheEvict(value = "pedidos", allEntries = true)
   public void deletar(Long id) {
     Pedido pedido =
         pedidoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pedido", id));
@@ -397,6 +414,7 @@ public class PedidoServiceImpl implements PedidoService {
   // ===== NOVO MÉTODO COM DTO =====
 
   @Override
+  @CacheEvict(value = "pedidos", allEntries = true)
   public PedidoResponse criarPedido(PedidoRequest pedidoRequest) {
     try {
       // Validate cliente exists and not excluded
