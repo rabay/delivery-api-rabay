@@ -1,0 +1,70 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "type": "row",
+      "title": "Pedidos",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Pedidos Criados (última 1h)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(increase(orders_created_total[1h]))", "format": "time_series"}
+      ],
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 1}
+    },
+    {
+      "type": "stat",
+      "title": "Pedidos Confirmados (última 1h)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(increase(orders_confirmed_total[1h]))", "format": "time_series"}
+      ],
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 1}
+    },
+    {
+      "type": "stat",
+      "title": "Pedidos Entregues (última 1h)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(increase(orders_delivered_total[1h]))", "format": "time_series"}
+      ],
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 1}
+    },
+    {
+      "type": "timeseries",
+      "title": "Taxa de Criação de Pedidos (1h)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(rate(orders_created_total[5m]))", "format": "time_series"}
+      ],
+      "gridPos": {"h": 6, "w": 12, "x": 0, "y": 5}
+    },
+    {
+      "type": "timeseries",
+      "title": "Tempo de Processamento de Pedidos (p95)",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "histogram_quantile(0.95, sum(rate(order_processing_time_seconds_bucket[5m])) by (le))", "format": "time_series"}
+      ],
+      "gridPos": {"h": 6, "w": 12, "x": 12, "y": 5}
+    }
+  ],
+  "schemaVersion": 31,
+  "style": "dark",
+  "tags": ["orders","delivery"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Delivery API - Pedidos",
+  "uid": "delivery-orders",
+  "version": 1
+}

@@ -30,7 +30,10 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
     // Skip logging for health and info endpoints in test environment
     String requestURI = request.getRequestURI();
-    if ((requestURI.equals("/health") || requestURI.equals("/info"))
+    if ((requestURI.equals("/health")
+            || requestURI.equals("/info")
+            || requestURI.startsWith("/actuator/health")
+            || requestURI.startsWith("/actuator/info"))
         && "test-unit".equals(System.getProperty("spring.profiles.active"))) {
       filterChain.doFilter(request, response);
       return;

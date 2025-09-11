@@ -1,0 +1,13 @@
+# Configuration for test-unit profile
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,loggers
+  endpoint:
+    health:
+      show-details: always
+      # Disable external service health indicators in test environments
+      enabled:
+        defaults: true
+        externalService: false

@@ -1,0 +1,41 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {"type": "row", "title": "Produtos", "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0}},
+    {
+      "type": "stat",
+      "title": "Produtos Criados (24h)",
+      "datasource": "Prometheus",
+  "targets": [{"expr": "sum(increase(products_created_total[24h]))", "format": "time_series"}],
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 1}
+    },
+    {
+      "type": "stat",
+      "title": "Produtos Disponíveis",
+      "datasource": "Prometheus",
+  "targets": [{"expr": "sum(products_available)", "format": "time_series"}],
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 1}
+    },
+    {
+      "type": "timeseries",
+      "title": "Atualizações de Produto (1h)",
+      "datasource": "Prometheus",
+  "targets": [{"expr": "sum(rate(products_updated_total[5m]))", "format": "time_series"}],
+      "gridPos": {"h": 6, "w": 12, "x": 0, "y": 5}
+    }
+  ],
+  "schemaVersion": 31,
+  "style": "dark",
+  "tags": ["products","catalog"],
+  "templating": {"list": []},
+  "time": {"from": "now-24h", "to": "now"},
+  "timezone": "browser",
+  "title": "Delivery API - Produtos",
+  "uid": "delivery-products",
+  "version": 1
+}

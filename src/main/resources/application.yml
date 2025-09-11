@@ -24,6 +24,27 @@ jwt:
   secret: my-secret-keyQWERTYUIOPASDFGHJKLZXCVBNMQWERTY1
   expiration: 86400000
 
+# SpringDoc OpenAPI configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+  show-actuator: true
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,loggers
+  endpoint:
+    health:
+      show-details: always
+
 ---
 spring:
   config:

@@ -6,6 +6,8 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - prometheus
+      - grafana
     environment:
       - SPRING_PROFILES_ACTIVE=dev
     # A aplicação poderá acessar o banco pelo hostname 'db'
@@ -50,6 +52,40 @@ services:
       - db
     # Painel de controle MySQL acessível em http://localhost:8081
     # Login automático configurado com credenciais do MySQL
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_LOG_MODE=console
+    volumes:
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - app-network
+    depends_on:
+      - prometheus
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   mysql_data:

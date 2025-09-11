@@ -227,3 +227,307 @@ WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 2);
 INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal) 
 SELECT 3, 3, 5, 3, 15.00, 45.00 
 WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 3);
+
+-- ========= Dados adicionais para enriquecer a massa (clientes, restaurantes, usuários, produtos, pedidos históricos) =========
+
+-- -- Clientes adicionais
+-- INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
+-- SELECT 6, 'Bruna Lima', 'bruna.lima@email.com', '11999990006', 'Rua F, 45', TRUE, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 6);
+
+-- INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
+-- SELECT 7, 'Rafael Gomes', 'rafael.gomes@email.com', '11999990007', 'Av. B, 200', TRUE, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 7);
+
+-- INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
+-- SELECT 8, 'Mariana Ribeiro', 'mariana.ribeiro@email.com', '11999990008', 'Rua C, 123', TRUE, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 8);
+
+-- INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
+-- SELECT 9, 'Lucas Almeida', 'lucas.almeida@email.com', '11999990009', 'Praça D, 10', TRUE, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 9);
+
+-- INSERT INTO cliente (id, nome, email, telefone, endereco, ativo, excluido)
+-- SELECT 10, 'Fernanda Castro', 'fernanda.castro@email.com', '11999990010', 'Rua E, 77', TRUE, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM cliente WHERE id = 10);
+
+-- -- Restaurantes adicionais
+-- INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
+-- SELECT 6, 'Taco Town', 'Mexicana', 'Av. Mex, 50', 4.50, '1122223336', 'tacotown@rest.com', 28, TRUE, 4.1, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 6);
+
+-- INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
+-- SELECT 7, 'Padaria Central', 'Padaria', 'Rua Pao, 12', 2.50, '1122223337', 'padariacentral@rest.com', 20, TRUE, 4.4, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 7);
+
+-- INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
+-- SELECT 8, 'Veggie Corner', 'Vegetariana', 'Av. Verde, 300', 3.00, '1122223338', 'veggiec@rest.com', 30, TRUE, 4.6, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 8);
+
+-- INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
+-- SELECT 9, 'Café do Museu', 'Café', 'Rua Historia, 5', 3.50, '1122223339', 'cafedomuseu@rest.com', 18, TRUE, 4.3, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 9);
+
+-- INSERT INTO restaurante (id, nome, categoria, endereco, taxa_entrega, telefone, email, tempo_entrega_minutos, ativo, avaliacao, excluido)
+-- SELECT 10, 'Açougue do Bairro', 'Carnes', 'Av. Churrasco, 9', 5.50, '1122223340', 'acougue@rest.com', 35, TRUE, 4.0, FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM restaurante WHERE id = 10);
+
+-- -- Usuários adicionais (ADMIN já existe)
+-- INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao)
+-- SELECT 5, 'Cliente Extra', 'cliente.extra@delivery.com', '$2a$10$ExampleHashForClient5xxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'CLIENTE', TRUE, NOW()
+-- WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE id = 5);
+
+-- INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao, restaurante_id)
+-- SELECT 6, 'Dono Taco', 'dono@tacotown.com', '$2a$10$ExampleHashForOwner6xxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'RESTAURANTE', TRUE, NOW(), 6
+-- WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE id = 6);
+
+-- INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao)
+-- SELECT 7, 'Entregador Extra', 'entregador.extra@delivery.com', '$2a$10$ExampleHashForDelivery7xxxxxxxxxxxxxxxxxxxxxxxx', 'ENTREGADOR', TRUE, NOW()
+-- WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE id = 7);
+
+-- INSERT INTO usuario (id, nome, email, senha, role, ativo, data_criacao, restaurante_id)
+-- SELECT 8, 'Padaria Owner', 'owner@padaria.com', '$2a$10$ExampleHashForOwner8xxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'RESTAURANTE', TRUE, NOW(), 7
+-- WHERE NOT EXISTS (SELECT 1 FROM usuario WHERE id = 8);
+
+-- -- Produtos adicionais (IDs 11..30)
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 11, 'Taco de Carnitas', 'Taco', 'Taco tradicional com carne suculenta', 12.00, TRUE, FALSE, 6, 40
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 11);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 12, 'Taco Veggie', 'Taco', 'Taco vegetariano com feijão e abacate', 11.00, TRUE, FALSE, 6, 30
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 12);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 13, 'Pão Francês (6 uni)', 'Padaria', 'Pacote com 6 pães franceses frescos', 8.00, TRUE, FALSE, 7, 100
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 13);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 14, 'Pão de Queijo (8 uni)', 'Padaria', 'Porção com 8 pães de queijo', 15.00, TRUE, FALSE, 7, 80
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 14);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 15, 'Salada Caesar', 'Salada', 'Salada Caesar com croutons', 18.00, TRUE, FALSE, 8, 25
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 15);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 16, 'Burger Veggie', 'Hambúrguer', 'Hambúrguer vegetal com molho especial', 22.00, TRUE, FALSE, 8, 30
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 16);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 17, 'Cappuccino', 'Bebida', 'Cappuccino cremoso 300ml', 9.00, TRUE, FALSE, 9, 60
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 17);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 18, 'Sanduíche Natural', 'Salgado', 'Sanduíche natural com peito de peru', 14.00, TRUE, FALSE, 9, 50
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 18);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 19, 'Bife Ancho (500g)', 'Carnes', 'Corte especial para grelhar', 45.00, TRUE, FALSE, 10, 20
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 19);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 20, 'Linguiça artesanal (kg)', 'Carnes', 'Linguiça suína temperada', 25.00, TRUE, FALSE, 10, 15
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 20);
+
+-- -- Produtos adicionais para restaurantes já existentes (aumentar variedade)
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 21, 'Pizza Quatro Queijos', 'Pizza', NULL, 32.00, TRUE, FALSE, 1, 12
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 21);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 22, 'Sushi Combo 10', 'Sushi', NULL, 60.00, TRUE, FALSE, 3, 10
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 22);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 23, 'Porção de Camarão Grelhado', 'Frutos do Mar', NULL, 35.00, TRUE, FALSE, 5, 8
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 23);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 24, 'Gyros Vegetariano', 'Espeto', NULL, 18.00, TRUE, FALSE, 4, 10
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 24);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 25, 'Big Burger XL', 'Hambúrguer', NULL, 38.00, TRUE, FALSE, 2, 6
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 25);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 26, 'Fish & Chips Premium', 'Peixe', NULL, 42.00, TRUE, FALSE, 5, 4
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 26);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 27, 'Sobremesa Brownie', 'Sobremesa', NULL, 12.00, TRUE, FALSE, 7, 30
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 27);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 28, 'Suco Natural Laranja', 'Bebida', NULL, 7.00, TRUE, FALSE, 9, 40
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 28);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 29, 'Combo Café + Pão', 'Combo', NULL, 12.00, TRUE, FALSE, 9, 50
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 29);
+
+-- INSERT INTO produto (id, nome, categoria, descricao, preco, disponivel, excluido, restaurante_id, quantidade_estoque)
+-- SELECT 30, 'Porção Mista (2 pessoas)', 'Compartilhamento', NULL, 55.00, TRUE, FALSE, 6, 10
+-- WHERE NOT EXISTS (SELECT 1 FROM produto WHERE id = 30);
+
+-- -- Pedidos históricos adicionais (4..15)
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 4, 6, 6, 36.00, NULL, 'PED-0004', 36.00, 'Sem cebola', 'Rua F', '45', 'Centro', 'Sao Paulo', 'SP', '01100-000', '', 'ENTREGUE', '2025-08-10 12:15:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 4);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 5, 7, 7, 23.00, NULL, 'PED-0005', 23.00, NULL, 'Rua Pao', '12', 'Bela Vista', 'Sao Paulo', 'SP', '01200-000', '', 'ENTREGUE', '2025-08-12 09:30:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 5);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 6, 8, 8, 40.00, 5.00, 'PED-0006', 45.00, 'Sem croutons', NULL, NULL, NULL, NULL, NULL, NULL, 'CANCELADO', '2025-07-20 19:45:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 6);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 7, 9, 9, 16.00, NULL, 'PED-0007', 16.00, NULL, 'Rua Historia', '5', 'Centro', 'Sao Paulo', 'SP', '01300-000', '', 'CRIADO', '2025-09-01 08:10:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 7);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 8, 10, 10, 95.00, NULL, 'PED-0008', 95.00, 'Pedido grande', 'Av. Churrasco', '9', 'Bairro Alto', 'Sao Paulo', 'SP', '01400-000', '', 'ENTREGUE', '2025-06-30 20:00:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 8);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 9, 1, 2, 45.00, NULL, 'PED-0009', 45.00, NULL, 'Rua A', '100', 'Centro', 'Sao Paulo', 'SP', '01000-000', '', 'ENTREGUE', '2025-08-01 13:20:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 9);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 10, 2, 1, 60.00, NULL, 'PED-0010', 60.00, 'Com borda recheada', NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', '2025-07-05 18:00:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 10);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 11, 3, 3, 80.00, NULL, 'PED-0011', 80.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', '2025-05-12 21:30:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 11);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 12, 4, 4, 28.00, NULL, 'PED-0012', 28.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', '2025-08-15 14:00:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 12);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 13, 5, 5, 70.00, NULL, 'PED-0013', 70.00, 'Com bebida', NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', '2025-07-01 19:00:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 13);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 14, 6, 1, 30.00, NULL, 'PED-0014', 30.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', '2025-08-20 12:00:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 14);
+
+-- INSERT INTO pedido (id, cliente_id, restaurante_id, valor_total, desconto, numero_pedido, subtotal, observacoes, logradouro, numero, bairro, cidade, estado, cep, complemento, status, data_pedido, excluido)
+-- SELECT 15, 7, 6, 22.00, NULL, 'PED-0015', 22.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ENTREGUE', '2025-08-22 11:30:00', FALSE
+-- WHERE NOT EXISTS (SELECT 1 FROM pedido WHERE id = 15);
+
+-- -- Itens para os pedidos adicionais (id 4..30)
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 4, 4, 11, 3, 12.00, 36.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 4);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 5, 5, 13, 1, 8.00, 8.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 5);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 6, 6, 16, 2, 22.00, 44.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 6);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 7, 7, 18, 1, 14.00, 14.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 7);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 8, 8, 19, 2, 45.00, 90.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 8);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 9, 9, 3, 1, 30.00, 30.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 9);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 10, 10, 21, 1, 32.00, 32.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 10);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 11, 11, 22, 1, 60.00, 60.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 11);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 12, 12, 24, 1, 18.00, 18.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 12);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 13, 13, 23, 2, 35.00, 70.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 13);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 14, 14, 2, 1, 28.00, 28.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 14);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 15, 15, 11, 1, 12.00, 12.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 15);
+
+-- -- Itens adicionais mix para maior realismo
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 16, 4, 30, 1, 55.00, 55.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 16);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 17, 8, 20, 2, 25.00, 50.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 17);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 18, 10, 1, 2, 25.00, 50.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 18);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 19, 11, 6, 1, 12.00, 12.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 19);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 20, 13, 26, 1, 42.00, 42.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 20);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 21, 5, 14, 2, 15.00, 30.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 21);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 22, 9, 4, 1, 10.00, 10.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 22);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 23, 12, 24, 1, 18.00, 18.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 23);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 24, 14, 3, 1, 30.00, 30.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 24);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 25, 15, 12, 2, 11.00, 22.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 25);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 26, 8, 23, 1, 35.00, 35.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 26);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 27, 11, 22, 1, 60.00, 60.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 27);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 28, 13, 5, 2, 15.00, 30.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 28);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 29, 2, 4, 1, 10.00, 10.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 29);
+
+-- INSERT INTO item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, subtotal)
+-- SELECT 30, 15, 30, 1, 55.00, 55.00
+-- WHERE NOT EXISTS (SELECT 1 FROM item_pedido WHERE id = 30);
+
+-- -- Fim dos dados adicionais

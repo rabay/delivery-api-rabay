@@ -44,9 +44,15 @@ public class TestConfig {
     registry.add("spring.jpa.defer-datasource-initialization", () -> "true");
     // Disable open-in-view to prevent warnings
     registry.add("spring.jpa.open-in-view", () -> "false");
-    // Override the default datasource configuration
-    registry.add("spring.config.location", () -> "");
-    registry.add("spring.profiles.active", () -> "");
+    // Set the active profile for tests
+    registry.add("spring.profiles.active", () -> "test-unit");
+    // Configure Actuator for tests
+    registry.add(
+        "management.endpoints.web.exposure.include",
+        () -> "health,info,metrics,prometheus,env,loggers");
+    registry.add("management.endpoint.health.show-details", () -> "always");
+    registry.add("management.endpoint.health.enabled.defaults", () -> "true");
+    registry.add("management.endpoint.health.enabled.externalService", () -> "false");
   }
 
   public static MySQLContainer<?> getMysqlContainer() {

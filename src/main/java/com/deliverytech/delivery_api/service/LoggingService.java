@@ -66,7 +66,10 @@ public class LoggingService {
       return "auth.log";
     } else if (requestURI.startsWith("/api/relatorios")) {
       return "relatorios.log";
-    } else if (requestURI.startsWith("/health") || requestURI.startsWith("/info")) {
+    } else if (requestURI.startsWith("/health")
+        || requestURI.startsWith("/info")
+        || requestURI.startsWith("/actuator/health")
+        || requestURI.startsWith("/actuator/info")) {
       return "health.log";
     } else if (requestURI.startsWith("/db")) {
       return "db.log";
