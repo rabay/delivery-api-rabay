@@ -12,6 +12,22 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
     # A aplicação poderá acessar o banco pelo hostname 'db'
     # Profile dev ativado para usar configurações MySQL
+    # Limites de recursos para melhor gerenciamento de containers
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    # Configuração de verificação de saúde
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
     image: mysql:8.0
@@ -34,6 +50,15 @@ services:
       --max-connections=100
     # O banco estará acessível na rede interna como 'db:3306'
     # Scripts de inicialização executados automaticamente
+    # Limites de recursos para banco de dados
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest

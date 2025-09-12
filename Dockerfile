@@ -40,9 +40,9 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 # Expondo porta padrão Spring Boot
 EXPOSE 8080
 
-# Healthcheck para endpoint /health
+# Healthcheck para endpoint /actuator/health
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-	CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+	CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 # Entrypoint seguro
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
