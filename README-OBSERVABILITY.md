@@ -5,6 +5,7 @@ Este documento fornece uma documentação abrangente dos recursos de observabili
 ## Visão Geral
 
 A solução de observabilidade está integrada à aplicação Spring Boot 3.5.5 existente utilizando:
+
 - Spring Boot Actuator para verificação de saúde e exposição de métricas
 - Micrometer para coleta de métricas e exportação para Prometheus
 - Logback para geração de logs estruturados em arquivos locais
@@ -15,7 +16,7 @@ A solução de observabilidade está integrada à aplicação Spring Boot 3.5.5 
 Os endpoints do Actuator estão documentados no Swagger UI. Para acessar:
 
 1. Inicie a aplicação
-2. Acesse o Swagger UI em http://localhost:8080/swagger-ui/index.html
+2. Acesse o Swagger UI em [Swagger UI](http://localhost:8080/swagger-ui/index.html)
 3. Os endpoints de observabilidade estarão disponíveis na mesma interface que os endpoints principais da aplicação
 4. Os endpoints do Actuator estarão identificados com o prefixo `/actuator/`
 
@@ -61,6 +62,7 @@ Métricas de negócio customizadas foram implementadas utilizando Micrometer:
 ### Métricas de Sistema
 
 A aplicação também expõe métricas padrão da JVM e do sistema via Micrometer:
+
 - Uso de memória da JVM
 - Estatísticas de garbage collection
 - Utilização de threads
@@ -87,6 +89,7 @@ A aplicação utiliza Logback com Logstash encoder para gerar logs estruturados 
 ### Formato dos Logs
 
 Cada entrada de log é estruturada em JSON com os seguintes campos:
+
 - `timestamp` - Timestamp no formato ISO 8601
 - `log.level` - Nível do log (INFO, WARN, ERROR, etc.)
 - `logger.name` - Nome do logger
@@ -113,8 +116,8 @@ A aplicação inclui indicadores de saúde customizados para:
    - Reporta status do banco como UP ou DOWN
 
 2. **Saúde de Serviços Externos**
-   - Verifica conectividade com Google (https://www.google.com)
-   - Verifica conectividade com Amazon (https://www.amazon.com)
+   - Verifica conectividade com Google ([https://www.google.com](https://www.google.com))
+   - Verifica conectividade com Amazon ([https://www.amazon.com](https://www.amazon.com))
    - Reporta status do serviço como UP ou DOWN
 
 ## Monitoramento e Alertas
@@ -124,11 +127,13 @@ A aplicação inclui indicadores de saúde customizados para:
 O ambiente de desenvolvimento inclui serviços de monitoramento:
 
 1. **Prometheus** - Servidor de coleta de métricas
-   - Acessível em http://localhost:9090
+
+   - Acessível em [http://localhost:9090](http://localhost:9090)
    - Coleta métricas da aplicação a cada 15 segundos
 
 2. **Grafana** - Dashboard de visualização
-   - Acessível em http://localhost:3000
+
+   - Acessível em [http://localhost:3000](http://localhost:3000)
    - Pré-configurado com Prometheus como fonte de dados
 
 ### Métricas-Chave para Monitorar

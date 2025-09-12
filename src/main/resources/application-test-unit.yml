@@ -8,6 +8,5 @@ management:
     health:
       show-details: always
       # Disable external service health indicators in test environments
-      enabled:
-        defaults: true
-        externalService: false
+      access: UNRESTRICTED
+      # External service health indicators are disabled in test environments
