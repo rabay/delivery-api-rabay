@@ -209,10 +209,8 @@ class PedidoControllerIntegrationTest extends BaseIntegrationTest {
     System.out.println("clienteId value: " + clienteId);
 
     // Buscar pedidos pelo cliente
-    // Note: This endpoint does not require authentication according to SecurityConfig
-    HttpHeaders noAuthHeaders = new HttpHeaders();
-    noAuthHeaders.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<String> buscarReq = new HttpEntity<>(noAuthHeaders);
+    // Note: This endpoint requires authentication according to SecurityConfig
+    // Using the same authenticated headers
     String url = "http://localhost:" + port + "/api/clientes/" + clienteId + "/pedidos";
     System.out.println("Making request to: " + url);
     System.out.println(
@@ -222,7 +220,7 @@ class PedidoControllerIntegrationTest extends BaseIntegrationTest {
             + (clienteId != null ? clienteId.getClass().getName() : "null")
             + ")");
     ResponseEntity<String> buscarResp =
-        restTemplate.exchange(url, HttpMethod.GET, buscarReq, String.class);
+        restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
     System.out.println("Search Response Status: " + buscarResp.getStatusCode());
     System.out.println("Search Response Body: " + buscarResp.getBody());
     System.out.println("Search Response Headers: " + buscarResp.getHeaders());

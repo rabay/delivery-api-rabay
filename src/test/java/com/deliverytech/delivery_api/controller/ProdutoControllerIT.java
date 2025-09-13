@@ -72,6 +72,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldListProdutosPaged_andReturnPagedItems() throws Exception {
     // Criar produtos específicos para este teste
     Restaurante r = createRestaurante("Rest Prod List Specific");
@@ -183,6 +184,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldListProdutosPaged_andReturnCorrectPage() throws Exception {
     Restaurante r = createRestaurante("Rest Prod Page");
     for (int i = 0; i < 6; i++) {
@@ -205,6 +207,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldGetProdutoById_andReturnProduto() throws Exception {
     Restaurante r = createRestaurante("Rest Prod Get");
 
@@ -226,6 +229,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldGetProdutoById_whenNotFound_andReturn404() throws Exception {
     mockMvc
         .perform(get("/api/produtos/{id}", 99999).contentType(MediaType.APPLICATION_JSON))
@@ -234,6 +238,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldSearchProdutosByNome_andReturnFilteredResults() throws Exception {
     Restaurante r = createRestaurante("Rest Prod Search Specific");
 
@@ -279,6 +284,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldSearchProdutosByCategoria_andReturnFilteredResults() throws Exception {
     Restaurante r = createRestaurante("Rest Prod Cat");
 
@@ -322,6 +328,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldSearchProdutosByCategoria_whenNoResults_andReturnEmpty() throws Exception {
     mockMvc
         .perform(
@@ -335,6 +342,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldCreateProduto_withInvalidCategoria_andReturn400() throws Exception {
     Restaurante r = createRestaurante("Rest Prod Invalid");
 
@@ -355,6 +363,7 @@ class ProdutoControllerIT extends BaseIntegrationTest {
   }
 
   @Test
+  @WithMockUser(roles = "ADMIN")
   void shouldCreateProduto_withShortDescricao_andReturn400() throws Exception {
     Restaurante r = createRestaurante("Rest Prod Short Desc");
 
