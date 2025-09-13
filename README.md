@@ -252,10 +252,6 @@ O projeto implementa filtros (filters) para registrar todas as requisições e r
 - [Sobre a coleção de testes do Postman](entregaveis/README.md)
 - [Sobre os diagramas do sistema](diagramas/README.md)
 - [Sobre transações ACID](README-ACID.md)
-- [Sobre o OpenAPI / Swagger](README-SWAGGER.md)
-- [Sobre implementações para observabilidade](README-OBSERVABILITY.md)
-- [Sobre as implementações para cache](README-CACHE.md)
-- [Sobre o CI/CD](README-CICD.md)
 
 ---
 

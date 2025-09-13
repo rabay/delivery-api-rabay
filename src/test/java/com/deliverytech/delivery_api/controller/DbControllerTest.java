@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve retornar esquema do banco sem parâmetro de tabela")
-  @WithMockUser(roles = "ADMIN")
   void deveRetornarEsquemaBancoSemParametro() throws Exception {
     mockMvc
         .perform(get("/db/schema"))
@@ -42,7 +40,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve retornar esquema do banco com parâmetro de tabela")
-  @WithMockUser(roles = "ADMIN")
   void deveRetornarEsquemaBancoComParametroTabela() throws Exception {
     mockMvc
         .perform(get("/db/schema").param("table", "CLIENTE"))
@@ -56,7 +53,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve retornar esquema mesmo com tabela inexistente")
-  @WithMockUser(roles = "ADMIN")
   void deveRetornarEsquemaComTabelaInexistente() throws Exception {
     mockMvc
         .perform(get("/db/schema").param("table", "NON_EXISTENT_TABLE"))
@@ -69,7 +65,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve executar teste de integridade do banco")
-  @WithMockUser(roles = "ADMIN")
   void deveExecutarTesteIntegridade() throws Exception {
     mockMvc
         .perform(get("/db/integrity"))
@@ -82,7 +77,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve executar consulta SELECT válida")
-  @WithMockUser(roles = "ADMIN")
   void deveExecutarConsultaSelectValida() throws Exception {
     String requestBody = "{\"sql\": \"SELECT 1 as test\"}";
 
@@ -98,7 +92,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve rejeitar consulta sem campo sql")
-  @WithMockUser(roles = "ADMIN")
   void deveRejeitarConsultaSemCampoSql() throws Exception {
     String requestBody = "{}";
 
@@ -112,7 +105,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve rejeitar consulta com campo sql vazio")
-  @WithMockUser(roles = "ADMIN")
   void deveRejeitarConsultaComCampoSqlVazio() throws Exception {
     String requestBody = "{\"sql\": \"\"}";
 
@@ -126,7 +118,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve rejeitar consulta INSERT")
-  @WithMockUser(roles = "ADMIN")
   void deveRejeitarConsultaInsert() throws Exception {
     String requestBody = "{\"sql\": \"INSERT INTO TESTE VALUES (1)\"}";
 
@@ -140,7 +131,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve rejeitar consulta UPDATE")
-  @WithMockUser(roles = "ADMIN")
   void deveRejeitarConsultaUpdate() throws Exception {
     String requestBody = "{\"sql\": \"UPDATE TESTE SET NOME = 'TESTE'\"}";
 
@@ -154,7 +144,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve rejeitar consulta DELETE")
-  @WithMockUser(roles = "ADMIN")
   void deveRejeitarConsultaDelete() throws Exception {
     String requestBody = "{\"sql\": \"DELETE FROM TESTE WHERE ID = 1\"}";
 
@@ -168,7 +157,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve rejeitar consulta com múltiplas instruções")
-  @WithMockUser(roles = "ADMIN")
   void deveRejeitarConsultaComMultiplasInstrucoes() throws Exception {
     String requestBody = "{\"sql\": \"SELECT 1; SELECT 2\"}";
 
@@ -182,7 +170,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve rejeitar consulta muito longa")
-  @WithMockUser(roles = "ADMIN")
   void deveRejeitarConsultaMuitoLonga() throws Exception {
     // Criar uma string maior que 2000 caracteres
     StringBuilder longQuery = new StringBuilder("SELECT ");
@@ -202,7 +189,6 @@ class DbControllerTest {
 
   @Test
   @DisplayName("Deve rejeitar consulta que não começa com SELECT")
-  @WithMockUser(roles = "ADMIN")
   void deveRejeitarConsultaQueNaoComecaComSelect() throws Exception {
     String requestBody = "{\"sql\": \"SHOW TABLES\"}";
 
@@ -212,5 +198,32 @@ class DbControllerTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.success").value(false))
         .andExpect(jsonPath("$.message").value("Apenas consultas SELECT são permitidas"));
+  }
+
+  @Test
+  @DisplayName("Deve aceitar consulta WITH (CTE)")
+  void deveAceitarConsultaWith() throws Exception {
+    String requestBody = "{\"sql\": \"WITH CTE AS (SELECT 1 as num) SELECT * FROM CTE\"}";
+
+    mockMvc
+        .perform(post("/db/query").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("Consulta executada com sucesso"));
+  }
+
+  @Test
+  @DisplayName("Deve retornar erro para consulta SQL inválida")
+  void deveRetornarErroParaConsultaSqlInvalida() throws Exception {
+    String requestBody = "{\"sql\": \"SELECT * FROM TABELA_INEXISTENTE\"}";
+
+    mockMvc
+        .perform(post("/db/query").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.success").value(false))
+        .andExpect(jsonPath("$.message").exists())
+        .andExpect(jsonPath("$.data.error").exists());
   }
 }

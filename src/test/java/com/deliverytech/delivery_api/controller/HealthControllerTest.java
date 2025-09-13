@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,7 +21,6 @@ class HealthControllerTest extends BaseIntegrationTest {
 
   @Test
   @DisplayName("Deve retornar status saudável na chamada /actuator/health")
-  @WithMockUser(roles = "ADMIN")
   void deveRetornarStatusSaudavel() throws Exception {
     mockMvc
         .perform(get("/actuator/health"))
@@ -35,7 +33,6 @@ class HealthControllerTest extends BaseIntegrationTest {
 
   @Test
   @DisplayName("Deve retornar informações da aplicação na chamada /actuator/info")
-  @WithMockUser(roles = "ADMIN")
   void deveRetornarInformacoesAplicacao() throws Exception {
     mockMvc
         .perform(get("/actuator/info"))
@@ -47,7 +44,6 @@ class HealthControllerTest extends BaseIntegrationTest {
 
   @Test
   @DisplayName("Deve retornar timestamp válido no health check")
-  @WithMockUser(roles = "ADMIN")
   void deveRetornarTimestampValido() throws Exception {
     mockMvc
         .perform(get("/actuator/health"))
@@ -60,7 +56,6 @@ class HealthControllerTest extends BaseIntegrationTest {
 
   @Test
   @DisplayName("Deve retornar versão Java válida no health check")
-  @WithMockUser(roles = "ADMIN")
   void deveRetornarVersaoJavaValida() throws Exception {
     mockMvc
         .perform(get("/actuator/health"))
