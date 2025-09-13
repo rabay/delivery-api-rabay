@@ -35,14 +35,21 @@ public class SecurityConfig {
             authorize ->
                 authorize
                     // Public endpoints - Authentication not required
-                    .requestMatchers("/api/auth/**", "/health", "/info", "/db/**")
+                    .requestMatchers("/api/auth/login", "/api/auth/register")
                     .permitAll()
-                    // Actuator endpoints - Health and info are public, others require
-                    // authentication
-                    .requestMatchers("/actuator/health", "/actuator/info")
+                    // Actuator endpoints
+                    .requestMatchers("/actuator/prometheus", "/actuator/info", "/actuator/health")
                     .permitAll()
                     .requestMatchers("/actuator/**")
-                    .authenticated()
+                    .hasRole("ADMIN")
+                    // Database management endpoints - Public for testing/development
+                    .requestMatchers("/db/**")
+                    .permitAll()
+                    // Client and Restaurant creation - Admin role required
+                    .requestMatchers(HttpMethod.POST, "/api/clientes")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/api/restaurantes")
+                    .hasRole("ADMIN")
                     // Public restaurant endpoints
                     .requestMatchers(
                         "/api/restaurantes/*/taxa-entrega/*", "/api/restaurantes/*/produtos")
@@ -54,9 +61,7 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/produtos/*/disponibilidade")
                     .permitAll()
-                    // Public cliente endpoints - Allow creation and retrieval
-                    .requestMatchers(HttpMethod.POST, "/api/clientes")
-                    .permitAll()
+                    // Public cliente endpoints - ONLY GET requests
                     .requestMatchers(HttpMethod.GET, "/api/clientes")
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/clientes/{id}")
